@@ -1,3 +1,5 @@
+package src.Exceptions;
+
 public class InvalidLogicOperatorException extends Exception {
     
     public InvalidLogicOperatorException() {
