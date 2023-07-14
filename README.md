@@ -1,2 +1,2 @@
-Propositional Logic Expression Evaluator
+Discrete Logical Expression Evaluator
 
