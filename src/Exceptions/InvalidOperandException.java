@@ -7,6 +7,6 @@ public class InvalidOperandException extends Exception {
     }
 
     public InvalidOperandException(String expression) {
-        this();
+        super("Invalid operand(s): " + expression);
     }
 }

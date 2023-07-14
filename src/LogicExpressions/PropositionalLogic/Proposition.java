@@ -1,96 +1,207 @@
 package src.LogicExpressions.PropositionalLogic;
-import java.util.Stack;
-import java.util.Queue;
-import java.nio.charset.Charset;
-import java.util.List;
-import src.Exceptions.*;
+
+import src.LogicExpressions.PropositionalLogic.Laws.PropositionLaws;
 import src.LogicExpressions.PropositionalLogic.Operators.LogicalOperators;
+import java.util.Queue;
+import java.util.LinkedList;
+import src.Exceptions.*;
 
-public class Proposition<T> extends LogicalOperators {
-    private Queue<Character> expressionBuffer;
+/**
+ * 
+ */
+public class Proposition extends LogicalOperators {
 
-    private String expression;
-    private char[] propositionalElements;
-    private String[] propositionalStatements;
+    private Expression expression;
+    private PropositionLaws laws;
 
     private final boolean TRUE = true;
     private final boolean FALSE = false;
 
     public Proposition() {
-        this.expression = "(P&Q)|(R->S)";
-        this.propositionalElements = this.expression.toCharArray();
-        this.propositionalStatements = parseStatements(this.propositionalElements);
+        this.expression = new Expression();
+        this.laws = null;
+    }
+
+    public Proposition(String e)
+            throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+        this.expression = new Expression(e);
+    }
+
+    public String equivalences() {
 
     }
 
-    public Proposition(String expression) throws InvalidLogicOperatorException, InvalidOperandException {
-        throwILOEIfNecessary(expression);
-        throwIOpEIfNecessary(expression);
-
-        this.expression = expression;
-        this.propositionalElements = this.expression.toCharArray();
-        this.propositionalStatements = parseStatements(this.propositionalElements);
-    }
-
-    private void throwILOEIfNecessary(String e) throws InvalidLogicOperatorException {
-        if (e.contains("+") || e.contains("*") || e.contains("/") || e.contains("%"))
-            throw new InvalidLogicOperatorException(expression);
-    }
-
-    private void throwIOpEIfNecessary(String e) {
-        if ()
-    }
-
-    private String[] parseStatements(char[] e) {
-        int count = 0;
-        for (int i = e.length; i >= 0; i--) {
-            if (e[i] != '(') {
-                expressionBuffer.add(e[i]);
-                count++;
-            } else if (e[i] == '(') {
-                expressionBuffer.add(e[i]);
-                for (int j = 1; j < count; j++) {
-
-                }
-                count = 0;
-            }
-
-        }       
-    }
-
-    private void sortStatements(String[] s) {
-        
-    }
-
-
-
-
-
-
-    public void setExpression(String expression) {
-        this.expression = expression;
+    public String identifyLaw() {
+        String e = expression.getExpression();
 
     }
 
-    public String getExpression() {
-        return this.expression;
-    }
-    
-    
-    public boolean evaluate() {
+    public String evaluate() {
+        boolean result = TRUE;
 
+        return this.expression + " : " + result;
     }
 
     public String truthTable() {
         boolean[][] table;
 
     }
-    
 
-    
+    /**
+     * 
+     */
+    private static class Expression {
+        // TODO: Implement the logic for parsing expressions and statements
 
-    @Override
-    public String toString() {
-        return expression + "," + ;
+        /** queue for storing/processing partitions of logical expression */
+        private Queue<Character> expressionBuffer;
+        /** logical expression String representing math equation */
+        private String expression;
+        /** collection of partitioned propositional statements */
+        private LinkedList<String> propositions;
+
+        /**
+         * 
+         */
+        public Expression() {
+            loadExpression("(~P&Q)");
+        }
+
+        /**
+         * 
+         * @param e logical expression argument
+         * @throws InvalidExpressionException    thrown by
+         *                                       checkExpressionForExceptions()
+         * @throws InvalidLogicOperatorException thrown by
+         *                                       checkExpressionForExceptions()
+         * @throws InvalidOperandException       thrown by
+         *                                       checkExpressionForExceptions()
+         */
+        public Expression(String e)
+                throws InvalidExpressionException, InvalidLogicOperatorException, InvalidOperandException {
+            checkExpressionForExceptions(e);
+
+            loadExpression(e);
+        }
+
+        /**
+         * Checks if contents of expression argument is valid.
+         * <ul>
+         * <li>First, checks if any valid variables and have been passed</li>
+         * <li>Second, checks if
+         * 
+         * @param e String representative of propositional logic expression
+         * @throws InvalidOperandException       if does not have alphabetic
+         *                                       elements/variables
+         * @throws InvalidLogicOperatorException if any operators in expression has
+         *                                       syntax errors
+         * @throws InvalidExpressionException    if has non-alphabetic OR non-operator
+         *                                       elements
+         */
+        private void checkExpressionForExceptions(String e)
+                throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
+
+            if (!hasVariable(e)) {
+                throw new InvalidOperandException("Expression does not have at least one variable");
+            }
+
+            /** temp implementation, bound to be changed and/or encapsulated */
+            boolean invalidSyntaxOperator = e.contains("~~") || e.contains("<)") || e.contains("(<") ||
+                    e.contains(">)") || e.contains("(>") || e.contains("()") ||
+                    e.contains("~)") || e.contains("~&") || e.contains("&&") ||
+                    e.contains("||") || e.contains("~|") || e.contains("(&") ||
+                    e.contains("&)") || e.contains("(|") || e.contains("|)");
+
+            if (hasOperator(e)) {
+                if (invalidSyntaxOperator)
+                    throw new InvalidLogicOperatorException("Invalid operator syntax in expression.");
+            }
+
+            char[] c = e.toCharArray();
+            for (int i = 0; i < c.length;) {
+                if ((isOperator(c[i]) || isVariable(c[i]))) {
+                    i++;
+                } else
+                    throw new InvalidExpressionException("Invalid character(s) passed in expression.");
+            }
+        }
+
+        /**
+         * @param e
+         */
+        private void loadExpression(String e) {
+            this.expressionBuffer = null;
+            this.expression = e;
+            parseStatements(e); // sets this.proposition
+        }
+
+        /**
+         * 
+         * @param e
+         * @return
+         */
+        private void parseStatements(String e) {
+            String newStatement;
+            int count = 0;
+            for (int i = e.length(); i >= 0; i--) {
+
+            }
+            sortStatements();
+        }
+
+        private void sortStatements() {
+            // TODO: sort single variable partitions at front of list
+            // TODO: sort larger partitions after single variables in list
+            // TODO: append whole expression at the end of list
+
+        }
+
+        private boolean hasOperator(String e) {
+            return (e.contains(">>") || e.contains("<<") || e.contains("<>") ||
+                    e.contains("><") || e.contains("&") || e.contains("|") ||
+                    e.contains("&") || e.contains("|") || e.contains("(") ||
+                    e.contains(")"));
+        }
+
+        private boolean hasVariable(String e) {
+            return ((e.contains("[a-zA-Z]+")));
+        }
+
+        private boolean isOperator(char c) {
+            return ((c == '&') || (c == '|') || (c == '~') || (c == '<') || (c == '>') ||
+                    (c == ')') || (c == '('));
+        }
+
+        private boolean isVariable(char c) {
+            return ((c >= 'A' && c <= 'Z') || (c >= 'a' && c >= 'z'));
+        }
+
+        public void setExpression(String e) {
+            loadExpression(e);
+        }
+
+        public String getExpression() {
+            return this.expression;
+        }
+
+        public String getStatements() {
+            String statements = null;
+            for (int i = 0; i < propositions.size(); i++)
+                statements = i + ". " + propositions.get(i);
+            
+            return statements;
+        }
+
+        public String getStatementAtIndex(int index) {
+
+        }
+
+        public String getValidOperators() {
+            return "&, |, ~, >>, <<, ><";
+        }
+
+        public String getInvalidOperators() {
+            return "+, -, *, /, %, &&, ||";
+        }
     }
 }

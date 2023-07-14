@@ -2,6 +2,8 @@ package src.LogicExpressions.PropositionalLogic.Laws;
 
 public class PropositionLaws {
     // TODO: Implement laws for propositions.
+    private String proposition;
+
     public PropositionLaws() {
 
     }
@@ -47,7 +49,7 @@ public class PropositionLaws {
     }
 
     public String conditionalIdentities() {
-        
+
     }
 
 

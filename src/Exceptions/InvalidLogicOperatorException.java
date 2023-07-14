@@ -3,10 +3,10 @@ package src.Exceptions;
 public class InvalidLogicOperatorException extends Exception {
     
     public InvalidLogicOperatorException() {
-        super("Invalid logical operators have been passed.");
+        super("Invalid logical operator(s)");
     }
 
     public InvalidLogicOperatorException(String expression) {
-        super("Invalid logical operators have been passed into " + expression + ", please use correct logical operators.");
+        super("Invalid logical operator(s): " + expression);
     }
 }

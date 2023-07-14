@@ -5,7 +5,7 @@ THINGS MUST BE IMPLEMENTED SOMEWHERE FOR PROPOSITIONS:
 ==========================================================================
 * Conditional statement conversions: Converse, Contrapositive, Inverse
 * Equivalences: Tautology, Contradiction, Neutral
-* Logic Operators: implication (->), if and only if (<->), not (~), exclusive-or OR xor (<->), reduction (<-)
+* Logic Operators: implication (>>), if and only if (<>), not (~), exclusive-or OR xor (><), reduction (<<)
 * Laws of Propositional Logic: Idempotent, Associtative, Communitative, Distributive, Identity, Domination, Double negation, Complement, De Morgan's, Absorption, Conditional Identities
 
 ==========================================================================

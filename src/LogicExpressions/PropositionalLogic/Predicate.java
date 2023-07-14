@@ -1,6 +1,6 @@
 package src.LogicExpressions.PropositionalLogic;
 
-public class Predicate {
+public class Predicate extends Quantifiers {
     
     public Predicate() {
 
