@@ -201,7 +201,7 @@ public class Proposition extends LogicalOperators {
         }
 
         public String getStatementAtIndex(int index) {
-            if (propositions)
+
         }
 
         public String getValidOperators() {
