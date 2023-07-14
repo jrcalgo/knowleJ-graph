@@ -14,8 +14,8 @@ public class Proposition extends LogicalOperators {
     private Expression expression;
     private PropositionLaws laws;
 
-    private final boolean TRUE = true;
-    private final boolean FALSE = false;
+    private static final boolean TRUE = true;
+    private static final boolean FALSE = false;
 
     public Proposition() {
         this.expression = new Expression();
@@ -80,7 +80,6 @@ public class Proposition extends LogicalOperators {
         public Expression(String e)
                 throws InvalidExpressionException, InvalidLogicOperatorException, InvalidOperandException {
             checkExpressionForExceptions(e);
-
             loadExpression(e);
         }
 
@@ -136,6 +135,14 @@ public class Proposition extends LogicalOperators {
         }
 
         /**
+         * @param e
+         */
+        private boolean checkSyntax(String e) {
+
+            return result;
+        }
+
+        /**
          * 
          * @param e
          * @return
@@ -153,7 +160,6 @@ public class Proposition extends LogicalOperators {
             // TODO: sort single variable partitions at front of list
             // TODO: sort larger partitions after single variables in list
             // TODO: append whole expression at the end of list
-
         }
 
         private boolean hasOperator(String e) {
@@ -176,7 +182,9 @@ public class Proposition extends LogicalOperators {
             return ((c >= 'A' && c <= 'Z') || (c >= 'a' && c >= 'z'));
         }
 
-        public void setExpression(String e) {
+        public void setExpression(String e)
+                throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
+            checkExpressionForExceptions(e);
             loadExpression(e);
         }
 
@@ -188,7 +196,7 @@ public class Proposition extends LogicalOperators {
             String statements = null;
             for (int i = 0; i < propositions.size(); i++)
                 statements = i + ". " + propositions.get(i);
-            
+
             return statements;
         }
 
