@@ -174,12 +174,20 @@ public class Proposition extends LogicalOperators {
         }
 
         private boolean isOperator(char c) {
+            /*For the following code we could make a static/final list as a variable and have all the valid symbols inside
+            * This way we could just call the list.contains(c) which would make the code more maintainable and easier to read
+            */
+
             return ((c == '&') || (c == '|') || (c == '~') || (c == '<') || (c == '>') ||
                     (c == ')') || (c == '('));
         }
 
         private boolean isVariable(char c) {
+            //In order to reduce code redundencey we could use the following return statement
+            boolean returnStatemenet = Character.isAlphabetic(c); //This will return true when the characther is in the alphabet
+
             return ((c >= 'A' && c <= 'Z') || (c >= 'a' && c >= 'z'));
+        
         }
 
         public void setExpression(String e)
@@ -212,4 +220,8 @@ public class Proposition extends LogicalOperators {
             return "+, -, *, /, %, &&, ||";
         }
     }
+
+    // public static void main(String[] args) {
+    //     Character
+    // }   
 }
