@@ -61,9 +61,12 @@ public class Proposition extends LogicalOperators {
         private LinkedList<String> propositions;
 
         /**
+         * @throws InvalidExpressionException
+         * @throws InvalidLogicOperatorException
+         * @throws InvalidOperandException
          * 
          */
-        public Expression() {
+        public Expression() throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
             loadExpression("(~P&Q)");
         }
 
@@ -79,7 +82,6 @@ public class Proposition extends LogicalOperators {
          */
         public Expression(String e)
                 throws InvalidExpressionException, InvalidLogicOperatorException, InvalidOperandException {
-            checkExpressionForExceptions(e);
             loadExpression(e);
         }
 
@@ -105,14 +107,14 @@ public class Proposition extends LogicalOperators {
             }
 
             /** temp implementation, bound to be changed and/or encapsulated */
-            boolean invalidSyntaxOperator = e.contains("~~") || e.contains("<)") || e.contains("(<") ||
+            boolean invalidOperatorOrder = e.contains("~~") || e.contains("<)") || e.contains("(<") ||
                     e.contains(">)") || e.contains("(>") || e.contains("()") ||
                     e.contains("~)") || e.contains("~&") || e.contains("&&") ||
                     e.contains("||") || e.contains("~|") || e.contains("(&") ||
                     e.contains("&)") || e.contains("(|") || e.contains("|)");
 
             if (hasOperator(e)) {
-                if (invalidSyntaxOperator)
+                if (invalidOperatorOrder)
                     throw new InvalidLogicOperatorException("Invalid operator syntax in expression.");
             }
 
@@ -126,9 +128,13 @@ public class Proposition extends LogicalOperators {
         }
 
         /**
-         * @param e
+         * @param e propositional logic String
+         * @throws InvalidExpressionException
+         * @throws InvalidLogicOperatorExcept throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionExceptionion
+         * @throws InvalidOperandException
          */
-        private void loadExpression(String e) {
+        private void loadExpression(String e) throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
+            checkExpressionForExceptions(e); // checks validity of expression argument
             this.expressionBuffer = null;
             this.expression = e;
             parseStatements(e); // sets this.proposition
@@ -148,12 +154,31 @@ public class Proposition extends LogicalOperators {
          * @return
          */
         private void parseStatements(String e) {
-            String newStatement;
-            int count = 0;
-            for (int i = e.length(); i >= 0; i--) {
+            // char[] expressionChar = e.toCharArray();
 
-            }
-            sortStatements();
+            /**
+             * must break each statement into partitions/separated and grouped statements.
+             * 1. Split String in two.
+             *  1.2. Check if '~' or '(' is at the left end of first string half.
+             *   1.2.1. If this is the case, pop top elements 
+             *   1.2.2. and append the element(s) to the right end of second half.
+             * 2. Convert each partition 
+             *  2.1. 
+             *  2.2. 
+             *  2.3. 
+             * 3. Check for which letters are in each String. 
+             * 4. 
+             * 
+             */
+
+             
+
+            // String newStatement;
+            // int count = 0;
+            // for (int i = e.length(); i >= 0; i--) {
+
+            // }
+            // sortStatements();
         }
 
         private void sortStatements() {
@@ -195,7 +220,7 @@ public class Proposition extends LogicalOperators {
         public String getStatements() {
             String statements = null;
             for (int i = 0; i < propositions.size(); i++)
-                statements = i + ". " + propositions.get(i);
+                statements = i + ". " + propositions.get(i) + ", ";
 
             return statements;
         }
@@ -205,7 +230,7 @@ public class Proposition extends LogicalOperators {
         }
 
         public String getValidOperators() {
-            return "&, |, ~, >>, <<, ><";
+            return "&, |, ~, >>, <<, ><, <>";
         }
 
         public String getInvalidOperators() {
