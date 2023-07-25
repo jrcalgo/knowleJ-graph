@@ -134,18 +134,10 @@ public class Proposition extends LogicalOperators {
          * @throws InvalidOperandException
          */
         private void loadExpression(String e) throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
-            checkExpressionForExceptions(e); // checks validity of expression argument
+            checkSyntax(e); // checks validity of expression argument
             this.expressionBuffer = null;
             this.expression = e;
             parseStatements(e); // sets this.proposition
-        }
-
-        /**
-         * @param e
-         */
-        private boolean checkSyntax(String e) {
-
-            return result;
         }
 
         /**
@@ -209,7 +201,6 @@ public class Proposition extends LogicalOperators {
 
         public void setExpression(String e)
                 throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
-            checkExpressionForExceptions(e);
             loadExpression(e);
         }
 
