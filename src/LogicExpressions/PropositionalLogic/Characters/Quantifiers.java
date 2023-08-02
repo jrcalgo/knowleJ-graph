@@ -1,4 +1,4 @@
-package src.LogicExpressions.PropositionalLogic.Operators;
+package src.LogicExpressions.PropositionalLogic.Characters;
 
 public class Quantifiers {
     
