@@ -1,2 +1,4 @@
-Discrete Logical Expression Evaluator
+Discrete Logic Calculator
+============================
+
 
