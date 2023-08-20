@@ -4,11 +4,15 @@ import src.LogicExpressions.PropositionalLogic.Characters.LogicalCharacters;
 import src.LogicExpressions.PropositionalLogic.Laws.PropositionLaws;
 
 import java.util.Stack;
+
+import javax.naming.PartialResultException;
+
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
+
+import src.DataStructures.PartitionedParsingTree;
 import src.Exceptions.*;
 
 /**
@@ -19,12 +23,13 @@ public class LogicalPropositions {
     private LogicalExpression expression;
     private PropositionLaws laws;
     /** collection of partitioned/parsed propositional statements */
-    private ArrayList<String> propositions;
+    private PartitionedParsingTree propositions;
 
     private static final boolean TRUE = true;
     private static final boolean FALSE = false;
 
-    public LogicalPropositions() throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
+    public LogicalPropositions()
+            throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
         this.expression = new LogicalExpression();
         this.laws = null;
     }
@@ -41,12 +46,8 @@ public class LogicalPropositions {
      * @param e
      * @return
      */
-    private void parsePropositions(String e, int front, int end) {
-
-        // TODO: partition expression into its constituent propositions, such as "p" or
-        // "Q" or "p&Q" or "(p&Q)" etc.
-        // create a b-tree data structure to first store the expression field as the
-        // root, and th
+    private void parsePropositions(String e) {
+        this.propositions = new ParsingTreeArrayList.ParsingTree(e);
 
     }
 
@@ -64,12 +65,16 @@ public class LogicalPropositions {
         return this.expression.getExpression();
     }
 
+    public String getConvertedExpression() {
+        return this.expression.getConvertedExpression();
+    }
+
     public void setExpression(String e)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         this.expression.setExpression(e);
     }
 
-    public String getStatements() {
+    public String getAllPropositions() {
         String statements = null;
         for (int i = 0; i < propositions.size(); i++)
             statements += (i + ". " + propositions.get(i) + " ");
@@ -77,7 +82,7 @@ public class LogicalPropositions {
         return statements;
     }
 
-    public String getStatements(int from, int to) {
+    public String getPropositions(int from, int to) {
         String result = null;
 
         if (from > to)
@@ -85,77 +90,31 @@ public class LogicalPropositions {
         else
             result += (from + ". " + propositions.get(from) + " ");
 
-        return getStatements(from + 1, to);
+        return getPropositions(from + 1, to);
     }
 
     public String equivalences() {
 
     }
 
-    public String identifyLaw() {
-        String e = expression.getExpression();
+    public static void main(String[] args) throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
+        LogicalPropositions e = new LogicalPropositions("(P&Q| ~R )->Z<>(Z&~R<>P>-<Q)");
+        System.out.println(e.getExpression());
+        System.out.println(e.getConvertedExpression());
 
-    }
-
-    public String evaluate() {
-        boolean result = TRUE;
-
-        return this.expression + " : " + result;
-    }
-
-    public String truthTable() {
-        boolean[][] table;
     }
 
     /**
      * 
      */
     private class LogicalExpression extends LogicalCharacters {
-        // TODO: Implement the logic for parsing expressions and statements
 
-        private final int MAX_CHARACTERS = 64;
-
-        private final static LinkedList<String> VALID_OPERATORS = new LinkedList<String>() {
-            {
-                add("&");
-                add("|");
-                add("->");
-                add("<->");
-                add("~");
-                add("><");
-                add("<-");
-                add("(");
-                add(")");
-                add(" ");
-                add("T");
-                add("F");
-            }
-        };
-
-        private final static LinkedList<String> INVALID_OPERATOR_ORDER = new LinkedList<String>() {
-            {
-                add("~~");
-                add("<)");
-                add("(<");
-                add(">)");
-                add("(>");
-                add("()");
-                add("~)");
-                add("~&");
-                add("&&");
-                add("||");
-                add("~|");
-                add("(&");
-                add("&)");
-                add("(|");
-                add("|)");
-            }
-        };
-
-        /** queue for storing/processing partitions of logical expression */
-        private Queue<Character> expressionBuffer;
         /** logical expression String representing math equation */
         private String expression;
+        /** converted logical expression string representing math equation */
+        private String convertedExpression;
+        /** Maximum number of characters accepted in converted expression String */
+        private final int MAX_CHARACTERS = 32;
 
         /**
          * @throws InvalidExpressionException
@@ -165,7 +124,7 @@ public class LogicalPropositions {
          */
         public LogicalExpression()
                 throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
-            loadExpression("(~P&Q)|~R"); // example expression
+            loadExpression("(~P&Q)|~R "); // example expression
         }
 
         /**
@@ -190,40 +149,48 @@ public class LogicalPropositions {
          * @throws InvalidOperandException
          * @throws InvalidLogicOperatorException
          */
-        private void checkSyntax(String e)
+        private void checkSyntax(String cE)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             int i = 0;
-            if (e.length() > MAX_CHARACTERS)
-                throw new InvalidExpressionException("Expression is too long; only 64 characters allowed.");
-            else if (!containsAnyOperands(e))
+            if (cE.length() > MAX_CHARACTERS)
+                throw new InvalidExpressionException("Expression is too long; only 32 converted characters allowed.");
+            else if (!containsAnyOperands(cE))
                 throw new InvalidOperandException("Expression does not have at least one valid operand.");
-            else if (containsAnyOperators(e)) {
-                while (i < INVALID_OPERATOR_ORDER.size()) {
-                    if (e.contains(INVALID_OPERATOR_ORDER.get(i)))
+            else if (containsAnyOperators(cE)) {
+                while (i < getInvalidOrderSize()) {
+                    if (cE.contains(getInvalidOrderSet(i)))
                         throw new InvalidLogicOperatorException("Invalid operator syntax in expression.");
                     i++;
                 }
                 i = 0;
             }
-            for ( ; i < e.length(); i++) {
-                if (!e.contains((CharSequence) OPERATOR_MAPS.get(i)))
-                    throw new InvalidLogicOperatorException("Invalid operator syntax in expression.");
-            }
+        }
 
-
+        private String convertExpression(String e) {
+            String cE = e; // converted String variable
+            cE = cE.replaceAll("<>", getConversionValueFromOperatorKey("<>"));
+            cE = cE.replaceAll("->", getConversionValueFromOperatorKey("->"));
+            cE = cE.replaceAll(">-<", getConversionValueFromOperatorKey(">-<"));
+            cE = cE.replaceAll("<-", getConversionValueFromOperatorKey("<-"));
+            cE = cE.replaceAll("\s", getConversionValueFromOperatorKey("\s"));
+            return cE;
         }
 
         /**
-         * @param e propositional logic String
+         * Checks syntax of expression argument and assigns it to expression field if
+         * valid
+         * 
+         * @param e propositional logic expression String
          * @throws InvalidExpressionException
          * @throws InvalidLogicOperatorExcept
          * @throws InvalidOperandException
          */
         private void loadExpression(String e)
                 throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
-            checkSyntax(e); // checks validity of expression argument
-            this.expressionBuffer = null;
+            String cE = convertExpression(e); // converts expression to valid, converted format
+            checkSyntax(cE); // checks validity of converted expression argument
             this.expression = e;
+            this.convertedExpression = cE;
         }
 
         public void setExpression(String e)
@@ -233,6 +200,10 @@ public class LogicalPropositions {
 
         public String getExpression() {
             return this.expression;
+        }
+
+        public String getConvertedExpression() {
+            return this.convertedExpression;
         }
     }
 }

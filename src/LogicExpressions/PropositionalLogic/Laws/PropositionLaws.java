@@ -1,8 +1,15 @@
 package src.LogicExpressions.PropositionalLogic.Laws;
 
+import src.LogicExpressions.PropositionalLogic.Logic.*;
+import java.util.HashMap;
+
 public class PropositionLaws {
     // TODO: Implement laws for propositions.
     private String proposition;
+
+    private final static HashMap<LogicalPropositions, String> equivalencies = new HashMap<LogicalPropositions, String>() {
+        put("")
+    };
 
     public PropositionLaws() {
 

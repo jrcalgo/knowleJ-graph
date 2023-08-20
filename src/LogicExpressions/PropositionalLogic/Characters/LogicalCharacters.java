@@ -1,11 +1,9 @@
 package src.LogicExpressions.PropositionalLogic.Characters;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class LogicalCharacters {
@@ -44,77 +42,67 @@ public class LogicalCharacters {
         }
     };
 
-    private final static String FILEPATH = "Discrete-Logic\\src\\LogicExpressions\\PropositionalLogic\\Characters\\OperandsQWERTY";
+    private static ArrayList<Character> CUSTOM_OPERAND_LIST = new ArrayList<Character>();
 
     /**
-     * File/default loaded operand list for propositional logic
+     * custom/default loaded operand list for propositional logic
      */
-    private final static ArrayList<Character> OPERAND_LIST = new ArrayList<Character>() {
+    private static ArrayList<Character> OPERAND_LIST = new ArrayList<Character>() {
         {
-            try {
-                addAll(fileToOperands(FILEPATH));
-            } catch (FileNotFoundException e) {
-                System.out.println("File not found: " + FILEPATH);
-                System.out.println("Loading default operands...");
-                addAll(DEFAULT_OPERAND_LIST);
-            } catch (IOException e) {
-                System.out.println("Error reading file: " + FILEPATH);
-                System.out.println("Loading default operands...");
-                addAll(DEFAULT_OPERAND_LIST);
-            }
-        }
+            addAll(DEFAULT_OPERAND_LIST);
+        }   
     };
 
     /** Operator map index reference integers */
-    private final int OPERATOR_CONVERSION_INDEX = 0;
+    private static final int OPERATOR_CONVERSION_INDEX = 0;
     private final int OPERATOR_NAME_INDEX = 1;
 
     /**
      * Operator map for all hand-typed operators and their corresponding conversion
      * values and names
      */
-    public final static Map<String, ArrayList<String>> OPERATOR_MAPS = new HashMap<String, ArrayList<String>>() {
+    private final static Map<String, ArrayList<String>> OPERATOR_MAPS = new HashMap<String, ArrayList<String>>() {
         {
             put("&", new ArrayList<String>() {
                 {
-                    add("∧");
+                    add("&");
                     add("and");
                 }
             });
             put("|", new ArrayList<String>() {
                 {
-                    add("∨");
+                    add("|");
                     add("or");
                 }
             });
             put("->", new ArrayList<String>() {
                 {
-                    add("→");
+                    add(">");
                     add("implies");
                 }
             });
-            put("<->", new ArrayList<String>() {
+            put("<>", new ArrayList<String>() {
                 {
-                    add("↔");
+                    add("i");
                     add("iff");
                 }
             });
             put("~", new ArrayList<String>() {
                 {
-                    add("¬");
+                    add("~");
                     add("not");
                 }
             });
-            put("><", new ArrayList<String>() {
+            put(">-<", new ArrayList<String>() {
                 {
-                    add("⊕");
+                    add("x");
                     add("xor");
                 }
             });
             put("<-", new ArrayList<String>() {
                 {
-                    add("←");
-                    add("reduction");
+                    add("<");
+                    add("reduces");
                 }
             });
             put("(", new ArrayList<String>() {
@@ -129,9 +117,9 @@ public class LogicalCharacters {
                     add("right-parenthesis");
                 }
             });
-            put(" ", new ArrayList<String>() {
+            put("\s", new ArrayList<String>() {
                 {
-                    add(" ");
+                    add("");
                     add("space");
                 }
             });
@@ -150,6 +138,79 @@ public class LogicalCharacters {
         }
     };
 
+    private final static ArrayList<String> INVALID_OPERATOR_ORDER = new ArrayList<String>() {
+        {
+        add("~&");
+        add("~|");
+        add("~>");
+        add("~<");
+        add("~x");
+        add("~)");
+        add("~i");
+
+        add("&&");
+        add("&&&");
+        add("&|");
+        add("&>");
+        add("&<");
+        add("&x");
+        add("&)");
+        add("&i");
+
+        add("||");
+        add("|||");
+        add("|&");
+        add("|>");
+        add("|<");
+        add("|x");
+        add("|)");
+        add("|i");
+
+        add(">>");
+        add(">>>");
+        add(">|");
+        add(">&");
+        add(">x");
+        add(">)");
+        add(">i");
+
+        add("xx");
+        add("xxx");
+        add("x&");
+        add("x|");
+        add("x>");
+        add("x<");
+        add("x)");
+        add("xi");
+
+        add("<<");
+        add("<<<");
+        add("<|");
+        add("<&");
+        add("<x");
+        add("<)");
+        add("<i");
+        add("<>");
+
+        add("ii");
+        add("iii");
+        add("i&");
+        add("i|");
+        add("i>");
+        add("i<");
+        add("i)");
+        add("ix");
+
+        add("()");
+        add("(|");
+        add("(&");
+        add("(>");
+        add("(<");
+        add("(x");
+        add("(i");
+        }
+    };
+
     /**
      * default constructor calls super()/Object constructor
      */
@@ -158,22 +219,25 @@ public class LogicalCharacters {
     }
 
     // ~~~~~~~~OPERAND METHODS~~~~~~~~
-    /**
-     * Helper method for loading operands from a language file
-     */
-    private static ArrayList<Character> fileToOperands(String path) throws FileNotFoundException, IOException {
-        ArrayList<Character> operands = new ArrayList<Character>();
-        BufferedReader reader = new BufferedReader(new FileReader(path));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            String[] tokens = line.split(" ");
-            for (String token : tokens) {
-                operands.add(token.charAt(0));
+    public void customOperands(ArrayList<Character> ops) throws IOException {
+        final int MAX_OPERANDS = 30;
+        if (ops.size() > MAX_OPERANDS) {
+            throw new IOException("Custom operands cannot exceed " + MAX_OPERANDS + " characters");
+        }
+        for (char c : ops) {
+            if (OPERATOR_MAPS.containsKey(Character.toString(c))) {
+                throw new IOException("Custom operands cannot contain operators");
             }
         }
-        reader.close();
+        CUSTOM_OPERAND_LIST.clear();
+        CUSTOM_OPERAND_LIST.addAll(ops);
+        OPERAND_LIST.addAll(CUSTOM_OPERAND_LIST);
+    }
 
-        return operands;
+    public void resetOperands() {
+        CUSTOM_OPERAND_LIST.clear();
+        OPERAND_LIST.clear();
+        OPERAND_LIST.addAll(DEFAULT_OPERAND_LIST);
     }
 
     /**
@@ -294,7 +358,7 @@ public class LogicalCharacters {
      * @param operator
      * @return
      */
-    public String getConversionValueFromOperatorKey(String operator) {
+    public static String getConversionValueFromOperatorKey(String operator) {
         return OPERATOR_MAPS.get(operator).get(OPERATOR_CONVERSION_INDEX);
     }
 
@@ -342,7 +406,7 @@ public class LogicalCharacters {
      * 
      * @return
      */
-    public String getStringValidOperatorTyped() {
+    public String getStringOperatorKeys() {
         return OPERATOR_MAPS.keySet().toString();
     }
 
@@ -350,7 +414,7 @@ public class LogicalCharacters {
      * 
      * @return
      */
-    public String getStringValidOperatorConversion() {
+    public String getStringOperatorConversion() {
         ArrayList<String> conversions = new ArrayList<String>();
         for (String key : OPERATOR_MAPS.keySet()) {
             conversions.add(OPERATOR_MAPS.get(key).get(OPERATOR_CONVERSION_INDEX));
@@ -362,12 +426,26 @@ public class LogicalCharacters {
      * 
      * @return
      */
-    public String getStringValidOperatorName() {
+    public String getStringOperatorName() {
         ArrayList<String> names = new ArrayList<String>();
         for (String key : OPERATOR_MAPS.keySet()) {
             names.add(OPERATOR_MAPS.get(key).get(OPERATOR_NAME_INDEX));
         }
         return names.toString();
+    }
+
+    public ArrayList<Character> getValidOperators() {
+        return OPERAND_LIST;
+    }
+
+    // ~~~~~~~~LOGICAL METHODS~~~~~~~~
+    
+    public int getInvalidOrderSize() {
+        return INVALID_OPERATOR_ORDER.size();
+    }
+
+    public String getInvalidOrderSet(int i) {
+        return INVALID_OPERATOR_ORDER.get(i);
     }
 
 }
