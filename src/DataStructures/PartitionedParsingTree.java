@@ -3,7 +3,7 @@ package src.DataStructures;
 import src.LogicExpressions.PropositionalLogic.Characters.LogicalCharacters;
 
 public class PartitionedParsingTree {
-    private Node root;
+    private TreeNode root;
 
     public PartitionedParsingTree(String expression) {
         this.root = buildTree(expression);
@@ -43,17 +43,19 @@ public class PartitionedParsingTree {
         }
     }
 
-    private static class Node {
-        private String value;
-        private Node left, right;
 
-        public Node(String value) {
+    
+    private static class TreeNode {
+        private String value;
+        private TreeNode left, right;
+
+        public TreeNode(String value) {
             this.value = value;
             this.left = null;
             this.right = null;
         }
 
-        public Node(String value, Node left, Node right) {
+        public TreeNode(String value, Node left, Node right) {
             this.value = value;
             this.left = left;
             this.right = right;

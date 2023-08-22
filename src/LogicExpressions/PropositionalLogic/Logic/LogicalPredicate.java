@@ -1,9 +1,17 @@
 package src.LogicExpressions.PropositionalLogic.Logic;
 
-public class LogicalPredicate extends Quantifiers {
-    
-    public Predicate() {
+import src.LogicExpressions.PropositionalLogic.Characters.Quantifiers;
 
+public class LogicalPredicate<T> extends Quantifiers {
+
+    T[] elements;
+
+    private static final boolean TRUE = true;
+    private static final boolean FALSE = false;
+
+    public LogicalPredicate() {
+        super();
     }
 
+    
 }

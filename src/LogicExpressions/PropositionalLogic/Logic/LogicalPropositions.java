@@ -1,6 +1,6 @@
 package src.LogicExpressions.PropositionalLogic.Logic;
 
-import src.LogicExpressions.PropositionalLogic.Characters.LogicalCharacters;
+import src.LogicExpressions.PropositionalLogic.Characters.LogicalSyntax;
 import src.LogicExpressions.PropositionalLogic.Laws.PropositionLaws;
 
 import java.util.Stack;
@@ -24,9 +24,6 @@ public class LogicalPropositions {
     private PropositionLaws laws;
     /** collection of partitioned/parsed propositional statements */
     private PartitionedParsingTree propositions;
-
-    private static final boolean TRUE = true;
-    private static final boolean FALSE = false;
 
     public LogicalPropositions()
             throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
@@ -93,28 +90,23 @@ public class LogicalPropositions {
         return getPropositions(from + 1, to);
     }
 
-    public String equivalences() {
-
-    }
-
     public static void main(String[] args) throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
         LogicalPropositions e = new LogicalPropositions("(P&Q| ~R )->Z<>(Z&~R<>P>-<Q)");
         System.out.println(e.getExpression());
         System.out.println(e.getConvertedExpression());
-
     }
 
     /**
      * 
      */
-    private class LogicalExpression extends LogicalCharacters {
+    private class LogicalExpression extends LogicalSyntax {
 
         /** logical expression String representing math equation */
         private String expression;
         /** converted logical expression string representing math equation */
         private String convertedExpression;
         /** Maximum number of characters accepted in converted expression String */
-        private final int MAX_CHARACTERS = 32;
+        private final int MAX_CHARACTERS = 16;
 
         /**
          * @throws InvalidExpressionException
@@ -153,10 +145,10 @@ public class LogicalPropositions {
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             int i = 0;
             if (cE.length() > MAX_CHARACTERS)
-                throw new InvalidExpressionException("Expression is too long; only 32 converted characters allowed.");
+                throw new InvalidExpressionException("Expression is too long; only 16 converted characters allowed.");
             else if (!containsAnyOperands(cE))
                 throw new InvalidOperandException("Expression does not have at least one valid operand.");
-            else if (containsAnyOperators(cE)) {
+            else if (containsAnyConversionOperators(cE)) {
                 while (i < getInvalidOrderSize()) {
                     if (cE.contains(getInvalidOrderSet(i)))
                         throw new InvalidLogicOperatorException("Invalid operator syntax in expression.");

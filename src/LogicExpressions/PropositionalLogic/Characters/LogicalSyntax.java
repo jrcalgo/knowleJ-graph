@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.io.IOException;
 
-public class LogicalCharacters {
+public class LogicalSyntax {
 
     /**
      * Default operand list for propositional logic
@@ -214,7 +214,7 @@ public class LogicalCharacters {
     /**
      * default constructor calls super()/Object constructor
      */
-    public LogicalCharacters() {
+    public LogicalSyntax() {
         super();
     }
 
@@ -331,6 +331,17 @@ public class LogicalCharacters {
     public boolean containsAnyOperators(String s) {
         for (String key : OPERATOR_MAPS.keySet()) {
             if (s.contains(key)) {
+                return true;
+            }
+        }
+
+        
+        return false;
+    }
+
+    public boolean containsAnyConversionOperators(String s) {
+        for (String key : OPERATOR_MAPS.keySet()) {
+            if (s.contains(OPERATOR_MAPS.get(key).get(OPERATOR_CONVERSION_INDEX))) {
                 return true;
             }
         }
