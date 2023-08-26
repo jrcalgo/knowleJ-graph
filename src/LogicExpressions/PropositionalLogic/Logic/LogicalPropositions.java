@@ -3,37 +3,53 @@ package src.LogicExpressions.PropositionalLogic.Logic;
 import src.LogicExpressions.PropositionalLogic.Characters.LogicalSyntax;
 import src.LogicExpressions.PropositionalLogic.Laws.PropositionLaws;
 
-import java.util.Stack;
-
-import javax.naming.PartialResultException;
-
-import java.util.Queue;
-import java.util.Scanner;
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 import src.DataStructures.PartitionedParsingTree;
 import src.Exceptions.*;
+import src.Interfaces.Equivalencies;
 
 /**
  * 
  */
-public class LogicalPropositions {
-
+public class LogicalPropositions extends LogicalSyntax implements Equivalencies {
+    /** Logical expression, its string and other functions */
     private LogicalExpression expression;
-    private PropositionLaws laws;
     /** collection of partitioned/parsed propositional statements */
-    private PartitionedParsingTree propositions;
+    private PartitionedParsingTree<String> partitions;
+    /** count of partitions from expression */
+    private int partitionCount;
+    /** operands contained in expression's String */
+    private ArrayList<String> operands;
+    /** count of operands in expression */
+    private int operandCount;
+    /** combination of operands and partition propositional statements */
+    private ArrayList<String> propositions;
+    /** applicable laws evaluator */ 
+    private PropositionLaws laws;
 
     public LogicalPropositions()
             throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
         this.expression = new LogicalExpression();
+        setPropositions();
         this.laws = null;
     }
 
     public LogicalPropositions(String e)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         this.expression = new LogicalExpression(e);
+        setPropositions();
+        this.laws = null;
+    }
+
+    private void parseOperands() {
+        operands = new ArrayList<String>();
+        for (Character c : this.expression.getConvertedExpression().toCharArray()) {
+            if (isOperand(c)) {
+                if (!operands.contains(c.toString()))
+                    operands.add(c.toString());
+            }
+        }
     }
 
     /**
@@ -43,19 +59,26 @@ public class LogicalPropositions {
      * @param e
      * @return
      */
-    private void parsePropositions(String e) {
-        this.propositions = new ParsingTreeArrayList.ParsingTree(e);
-
+    private void parsePartitions() {
+        this.partitions = new PartitionedParsingTree<String>(this.expression.getConvertedExpression());
     }
 
     /**
      * Helper method for parsePropositions() method, balances tree expression
      * partitions
      */
-    private void sortPropositions() {
-        // TODO: sort single variable partitions at front of list
-        // TODO: sort larger partitions after single variables in list
-        // TODO: append whole expression at the end of list
+    private void setPropositions() {
+        parseOperands();
+        //parsePartitions();
+        propositions = new ArrayList<String>();
+        for (int i = 0; i < this.operands.size(); i++) {
+            propositions.add(this.operands.get(i));
+            operandCount++;
+        }
+
+        // for (int i = 0; i < this.partitions.size(); i++) {
+        //     propositions.add(this.partitions.get(i));
+        // }
     }
 
     public String getExpression() {
@@ -72,41 +95,97 @@ public class LogicalPropositions {
     }
 
     public String getAllPropositions() {
-        String statements = null;
-        for (int i = 0; i < propositions.size(); i++)
-            statements += (i + ". " + propositions.get(i) + " ");
+        String statements = "";
+
+        for (int i = 0; i < propositions.size(); i++) {
+            if (!(i == propositions.size() - 1))
+                statements += (propositions.get(i) + " , ");
+            else
+                statements += (propositions.get(i));
+        }
 
         return statements;
     }
 
-    public String getPropositions(int from, int to) {
-        String result = null;
+    public String getPropositions(int from, int to) throws IndexOutOfBoundsException {
+        if ((from < 0) || (to > propositions.size()))
+            throw new IndexOutOfBoundsException(to + " is out of bounds.");
 
         if (from > to)
-            return result;
-        else
-            result += (from + ". " + propositions.get(from) + " ");
+            return "";
+        else 
+            if (!(from == to))
+                return propositions.get(from) + " , " + getPropositions(from + 1, to);
+            else
+                return propositions.get(from);
+    }
 
-        return getPropositions(from + 1, to);
+    public void truthTable() {
+        String[] columns = new String[propositions.size() + 1];
+        Boolean[][] table = new Boolean[propositions.size()][propositions.size() + 1];
+        for (int i = 0; i < propositions.size(); i++) {
+            columns[i] = propositions.get(i);
+        }
+
+
+    }
+
+    public String inverse(ArrayList<String> p) {
+        
+    }
+
+    public String converse(ArrayList<String> p) {
+    
+    }
+
+    public String contrapositive(ArrayList<String> p) {
+    
+    }
+
+    public String proveProposition() {
+        return "";
+    }
+
+    @Override
+    public boolean isTautology() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isTautology'");
+    }
+
+    @Override
+    public boolean isContradiction() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isContradiction'");
+    }
+
+    @Override
+    public boolean isContingency() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isContingency'");
     }
 
     public static void main(String[] args) throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
-        LogicalPropositions e = new LogicalPropositions("(P&Q| ~R )->Z<>(Z&~R<>P>-<Q)");
+        LogicalPropositions e = new LogicalPropositions("(P&Q| ~F )->Z<>(Y&~R<>P>-<Q)");
         System.out.println(e.getExpression());
         System.out.println(e.getConvertedExpression());
+        System.out.println(e.getAllPropositions());
+        System.out.println(e.getPropositions(0,3));
+        System.out.println(e.getPropositions(3, 5));
+        System.out.println(e.getPropositions(1,1));
+        e.truthTable();
     }
 
     /**
      * 
      */
-    private class LogicalExpression extends LogicalSyntax {
+    private class LogicalExpression {
 
         /** logical expression String representing math equation */
         private String expression;
-        /** converted logical expression string representing math equation */
+        /** converted logical expression string for easier back-end operations */
         private String convertedExpression;
         /** Maximum number of characters accepted in converted expression String */
-        private final int MAX_CHARACTERS = 16;
+        private final int MAX_CHARACTERS = 64;
 
         /**
          * @throws InvalidExpressionException
@@ -145,7 +224,7 @@ public class LogicalPropositions {
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             int i = 0;
             if (cE.length() > MAX_CHARACTERS)
-                throw new InvalidExpressionException("Expression is too long; only 16 converted characters allowed.");
+                throw new InvalidExpressionException("Expression is too long; only 64 converted characters allowed.");
             else if (!containsAnyOperands(cE))
                 throw new InvalidOperandException("Expression does not have at least one valid operand.");
             else if (containsAnyConversionOperators(cE)) {

@@ -2,7 +2,6 @@ package src.LogicExpressions.PropositionalLogic.Characters;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.io.IOException;
 
@@ -255,7 +254,7 @@ public class LogicalSyntax {
      * @return
      */
     public boolean isOperand(String s) {
-        return OPERAND_LIST.contains(s.charAt(0));
+        return OPERAND_LIST.contains(s);
     }
 
     /**
@@ -264,8 +263,8 @@ public class LogicalSyntax {
      * @param c
      * @return
      */
-    public boolean containsOperand(String s, char c) {
-        return s.contains(Character.toString(c));
+    public boolean containsOperand(String s, char operand) {
+        return s.contains(Character.toString(operand));
     }
 
     /**

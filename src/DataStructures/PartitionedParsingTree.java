@@ -1,25 +1,47 @@
 package src.DataStructures;
 
-import src.LogicExpressions.PropositionalLogic.Characters.LogicalCharacters;
+import src.Interfaces.Tree;
+import src.LogicExpressions.PropositionalLogic.Characters.LogicalSyntax;
 
-public class PartitionedParsingTree {
-    private TreeNode root;
+public class PartitionedParsingTree<T extends Comparable<T>> implements Tree<T> {
+    /** root node of tree */
+    private TreeNode<T> root;
+    /** connected left and right node pointers */
+    private TreeNode<T> left, right = null;
+    /** total existing elements in tree */
+    private int size;
 
     public PartitionedParsingTree(String expression) {
         this.root = buildTree(expression);
     }
 
-    private Node buildTree(String expression) {
-        // TODO: expression parsing logic
+    public boolean isEmpty() {
+        return this.size == 0;
+    }
+    
+    public int size() {
+        return this.size;
     }
 
+    public void insert(T element) {
 
+    }
+    
+    public boolean contains(T element) throws Exception {
+        
+    }
+
+    public T search(T element) {
+
+    }
+
+    private void buildTree(String expression) {
+        // TODO: expression parsing logic
+        for (Character c : expression.toCharArray()) {
+            if ()
+    }
 
     public void traverseInOrder() {
-        traverseInOrder(root);
-    }
-
-    public void traverseInOrder(Node node) {
         if (node != null) {
             traverseInOrder(node.left);
             System.out.print(node.value + " ");
@@ -27,7 +49,7 @@ public class PartitionedParsingTree {
         }
     }  
 
-    public void traversePreOrder(Node node) {
+    public void traversePreOrder() {
         if (node != null) {
             System.out.print(node.value + " ");
             traversePreOrder(node.right);
@@ -35,7 +57,7 @@ public class PartitionedParsingTree {
         }
     }
     
-    public void traversePostOrder(Node node) {
+    public void traversePostOrder() {
         if (node != null) {
             traversePostOrder(node.left);
             traversePostOrder(node.right);
@@ -43,47 +65,9 @@ public class PartitionedParsingTree {
         }
     }
 
-
-    
-    private static class TreeNode {
-        private String value;
-        private TreeNode left, right;
-
-        public TreeNode(String value) {
-            this.value = value;
-            this.left = null;
-            this.right = null;
-        }
-
-        public TreeNode(String value, Node left, Node right) {
-            this.value = value;
-            this.left = left;
-            this.right = right;
-        }
-
-        public String getValue() {
-            return this.value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        public Node getNodeLeft() {
-            return this.left;
-        }
-
-        public void setNodeLeft(Node left) {
-            this.left = left;
-        }
-
-        public Node getNodeRight() {
-            return this.right;
-        }
-
-        public void setNodeRight(Node right) {
-            this.right = right;
-        }
-
+    @Override
+    public void delete(T element) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 }
