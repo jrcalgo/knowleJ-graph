@@ -25,6 +25,8 @@ public class LogicalArgument implements Equivalencies {
         this.predicate = predicate;
     }
 
+    public void construct()
+
     @Override
     public boolean isTautology() {
         // TODO Auto-generated method stub

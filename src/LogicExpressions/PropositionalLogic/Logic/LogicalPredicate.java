@@ -9,20 +9,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-public class LogicalPredicate implements Equivalencies {
+public class LogicalPredicate extends Quantifiers implements Equivalencies {
 
     private Map<String, Boolean> operands;
-    private String expression;
+    private LogicalPropositions expression;
 
     private static final boolean TRUE = true;
     private static final boolean FALSE = false;
 
     public LogicalPredicate(LogicalPropositions expression, Map<String, Boolean> operands) {
         this.operands = new HashMap<>(operands);
-        this.expression = expression.getConvertedExpression();
+        this.expression = expression;
     }
 
-    public boolean universal(List<T> elements, Predicate<T> predicate) {
+    public boolean universal(List<T> elements, Predicate predicate) {
         for (T element : elements) {
             if (!predicate.test(element))
                 return FALSE;
@@ -30,7 +30,7 @@ public class LogicalPredicate implements Equivalencies {
         return TRUE;
     }
 
-    public boolean universal(PartitionedParsingTree<T> elements, Predicate<T> predicate) {
+    public boolean universal(PartitionedParsingTree<T> elements, Predicate predicate) {
         for (T element : elements) {
             if (!predicate.test(element))
                 return FALSE;

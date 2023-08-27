@@ -25,6 +25,8 @@ public class LogicalPropositions extends LogicalSyntax implements Equivalencies 
     private int operandCount;
     /** combination of operands and partition propositional statements */
     private ArrayList<String> propositions;
+
+    private String[][] truthTable;
     /** applicable laws evaluator */ 
     private PropositionLaws laws;
 
@@ -32,6 +34,7 @@ public class LogicalPropositions extends LogicalSyntax implements Equivalencies 
             throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
         this.expression = new LogicalExpression();
         setPropositions();
+        setTruthTable();
         this.laws = null;
     }
 
@@ -39,6 +42,7 @@ public class LogicalPropositions extends LogicalSyntax implements Equivalencies 
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         this.expression = new LogicalExpression(e);
         setPropositions();
+        setTruthTable();
         this.laws = null;
     }
 
@@ -46,8 +50,10 @@ public class LogicalPropositions extends LogicalSyntax implements Equivalencies 
         operands = new ArrayList<String>();
         for (Character c : this.expression.getConvertedExpression().toCharArray()) {
             if (isOperand(c)) {
-                if (!operands.contains(c.toString()))
+                if (!operands.contains(c.toString())) {
                     operands.add(c.toString());
+                    operandCount++;
+                }
             }
         }
     }
@@ -68,13 +74,17 @@ public class LogicalPropositions extends LogicalSyntax implements Equivalencies 
      * partitions
      */
     private void setPropositions() {
-        parseOperands();
-        //parsePartitions();
         propositions = new ArrayList<String>();
+
+        parseOperands();
         for (int i = 0; i < this.operands.size(); i++) {
             propositions.add(this.operands.get(i));
-            operandCount++;
         }
+
+        //parsePartitions();
+        // for (int i = 0; i < this.partitions.size(); i++) {
+        //     propositions.add(this.partitions.get(i));
+        // }
 
         // for (int i = 0; i < this.partitions.size(); i++) {
         //     propositions.add(this.partitions.get(i));
@@ -94,7 +104,7 @@ public class LogicalPropositions extends LogicalSyntax implements Equivalencies 
         this.expression.setExpression(e);
     }
 
-    public String getAllPropositions() {
+    public String getPropositions() {
         String statements = "";
 
         for (int i = 0; i < propositions.size(); i++) {
@@ -120,25 +130,71 @@ public class LogicalPropositions extends LogicalSyntax implements Equivalencies 
                 return propositions.get(from);
     }
 
-    public void truthTable() {
-        String[] columns = new String[propositions.size() + 1];
-        Boolean[][] table = new Boolean[propositions.size()][propositions.size() + 1];
+    private static void permuteOperandValues(char[] chars, int n, String prefix) {
+        if (n == 0) {
+            return;
+        }
+        for (int i = 0; i < chars.length; i++) {
+            permuteOperandValues(chars, n - 1, prefix + chars[i]);
+        }
+    }
+
+    private void setTruthTable() {
+        truthTable = new String[(int) (Math.pow(2, operandCount)) + 1][propositions.size()];
+        Boolean[][] values = new Boolean[(int) Math.pow(2, operandCount)][propositions.size()];
         for (int i = 0; i < propositions.size(); i++) {
-            columns[i] = propositions.get(i);
+            truthTable[0][i] = propositions.get(i) + "\s\s"; // titles each column with corresponding proposition/compound proposition
         }
 
+        for(int i = 0; i < values.length; i++) {
+            for(int j = 0; j < operandCount; j++) {
+
+                }
+            }
+        }
+
+        
 
     }
 
-    public String inverse(ArrayList<String> p) {
+    public String[][] getTruthTable() {
+        return this.truthTable;
+    }
+
+    public String[][] getTruthTable(int from, int to) {
+
+    }
+
+    public String[][] getTruthTable(int from, int to, int from2, int to2) {
+
+    }
+
+    public String[][] getTruthTable(int from, int to, int from2, int to2, int from3, int to3) {
+
+    }
+
+    public void printTruthTable() {
+        for (int i = 0; i < truthTable.length; i++) {
+            for (int j = 0; j < truthTable[i].length; j++) {
+                System.out.print(truthTable[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    public void printTruthTable(int from, int to) {
+
+    }
+
+    public String inverse(String p) {
         
     }
 
-    public String converse(ArrayList<String> p) {
+    public String converse(String p) {
     
     }
 
-    public String contrapositive(ArrayList<String> p) {
+    public String contrapositive(String p) {
     
     }
 
@@ -168,11 +224,12 @@ public class LogicalPropositions extends LogicalSyntax implements Equivalencies 
         LogicalPropositions e = new LogicalPropositions("(P&Q| ~F )->Z<>(Y&~R<>P>-<Q)");
         System.out.println(e.getExpression());
         System.out.println(e.getConvertedExpression());
-        System.out.println(e.getAllPropositions());
+        System.out.println(e.getPropositions());
         System.out.println(e.getPropositions(0,3));
         System.out.println(e.getPropositions(3, 5));
         System.out.println(e.getPropositions(1,1));
-        e.truthTable();
+        e.printTruthTable();
+
     }
 
     /**
