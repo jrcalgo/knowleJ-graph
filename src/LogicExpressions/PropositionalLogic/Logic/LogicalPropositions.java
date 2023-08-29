@@ -26,8 +26,18 @@ public class LogicalPropositions extends LogicalSyntax implements Equivalencies 
     /** combination of operands and partition propositional statements */
     private ArrayList<String> propositions;
 
+    private int propositionCount;
+
     private String[][] truthTable;
-    /** applicable laws evaluator */ 
+
+    private Boolean[][] truthValues;
+
+    private int valueCount;
+
+    private int valueRow;
+
+    private int valueCol;
+    /** applicable laws evaluator */
     private PropositionLaws laws;
 
     public LogicalPropositions()
@@ -53,6 +63,7 @@ public class LogicalPropositions extends LogicalSyntax implements Equivalencies 
                 if (!operands.contains(c.toString())) {
                     operands.add(c.toString());
                     operandCount++;
+                    propositionCount++;
                 }
             }
         }
@@ -81,13 +92,13 @@ public class LogicalPropositions extends LogicalSyntax implements Equivalencies 
             propositions.add(this.operands.get(i));
         }
 
-        //parsePartitions();
+        // parsePartitions();
         // for (int i = 0; i < this.partitions.size(); i++) {
-        //     propositions.add(this.partitions.get(i));
+        // propositions.add(this.partitions.get(i));
         // }
 
         // for (int i = 0; i < this.partitions.size(); i++) {
-        //     propositions.add(this.partitions.get(i));
+        // propositions.add(this.partitions.get(i));
         // }
     }
 
@@ -123,42 +134,85 @@ public class LogicalPropositions extends LogicalSyntax implements Equivalencies 
 
         if (from > to)
             return "";
-        else 
-            if (!(from == to))
-                return propositions.get(from) + " , " + getPropositions(from + 1, to);
-            else
-                return propositions.get(from);
+        else if (!(from == to))
+            return propositions.get(from) + " , " + getPropositions(from + 1, to);
+        else
+            return propositions.get(from);
     }
 
-    private static void permuteOperandValues(char[] chars, int n, String prefix) {
+    private void permuteOperandValues(int n, String prefix) {
+        final char[] chars = { 'T', 'F' };
+        //do {
         if (n == 0) {
+            for(int i = 0; i < valueRow; i++) {
+                for(int j = 0; j < valueCol; j++) {
+                   truthTable[i+1][j] = prefix.charAt(j) + "\s\s";
+                   
+                }
+                
+            }
             return;
+
         }
-        for (int i = 0; i < chars.length; i++) {
-            permuteOperandValues(chars, n - 1, prefix + chars[i]);
-        }
+
+        for (int i = 0; i < chars.length; i++)
+            permuteOperandValues(n - 1, prefix + chars[i]);
+
+
+        //} while (n > 0);
+        
+
+        return;
+
     }
 
     private void setTruthTable() {
-        truthTable = new String[(int) (Math.pow(2, operandCount)) + 1][propositions.size()];
-        Boolean[][] values = new Boolean[(int) Math.pow(2, operandCount)][propositions.size()];
-        for (int i = 0; i < propositions.size(); i++) {
-            truthTable[0][i] = propositions.get(i) + "\s\s"; // titles each column with corresponding proposition/compound proposition
-        }
+        valueRow = (int) Math.pow(2, operandCount);
+        valueCol = propositions.size();
+        truthValues = new Boolean[valueRow][valueCol];
+        truthTable = new String[valueRow + 1][valueCol]; // +1 for column titles
 
-        for(int i = 0; i < values.length; i++) {
-            for(int j = 0; j < operandCount; j++) {
-
-                }
-            }
-        }
-
+        for (int i = 0; i < propositions.size(); i++) 
+            truthTable[0][i] = propositions.get(i) + "\s\s"; // titles each column with corresponding
+                                                             // proposition/compound proposition
         
 
+        permuteOperandValues(operandCount, "");
+        int permutationCount = truthValues.length;
+
+        // for (int i = 1; i < permutationCount; i++) {
+        //     for(int j = 0; i < elements[i].length; j++) {
+        //         truthTable[i][j] = elements[i][j];
+        //         // if (elements[i][j].equals("T"))
+                //     truthValues[i][j] = true;
+                // else
+        //         //     truthValues[i][j] = false;
+        //     }
+        // }
+
+
+        // 
+        // for (int i = 0; i < truthValues.length; i++) {
+        //     for (int j = 0; j < operandCount; j++) {
+        //     }
+
+        //}
     }
 
     public String[][] getTruthTable() {
         return this.truthTable;
+    }
+
+    public String[] getStringTableRow(int row) {
+        return this.truthTable[row];
+    }
+
+    public String[][] getStringTableColumn(int col) {
+        return this.truthTable[col][0];
+    }
+
+    public Boolean[][] getTableValues() {
+        return this.truthValues;
     }
 
     public String[][] getTruthTable(int from, int to) {
@@ -176,7 +230,7 @@ public class LogicalPropositions extends LogicalSyntax implements Equivalencies 
     public void printTruthTable() {
         for (int i = 0; i < truthTable.length; i++) {
             for (int j = 0; j < truthTable[i].length; j++) {
-                System.out.print(truthTable[i][j] + " ");
+                System.out.print(truthTable[i][j] + "\s\s");
             }
             System.out.println();
         }
@@ -187,15 +241,15 @@ public class LogicalPropositions extends LogicalSyntax implements Equivalencies 
     }
 
     public String inverse(String p) {
-        
+
     }
 
     public String converse(String p) {
-    
+
     }
 
     public String contrapositive(String p) {
-    
+
     }
 
     public String proveProposition() {
@@ -206,6 +260,8 @@ public class LogicalPropositions extends LogicalSyntax implements Equivalencies 
     public boolean isTautology() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'isTautology'");
+        return this.truthValues.equals(true);
+
     }
 
     @Override
@@ -218,18 +274,6 @@ public class LogicalPropositions extends LogicalSyntax implements Equivalencies 
     public boolean isContingency() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'isContingency'");
-    }
-
-    public static void main(String[] args) throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
-        LogicalPropositions e = new LogicalPropositions("(P&Q| ~F )->Z<>(Y&~R<>P>-<Q)");
-        System.out.println(e.getExpression());
-        System.out.println(e.getConvertedExpression());
-        System.out.println(e.getPropositions());
-        System.out.println(e.getPropositions(0,3));
-        System.out.println(e.getPropositions(3, 5));
-        System.out.println(e.getPropositions(1,1));
-        e.printTruthTable();
-
     }
 
     /**
@@ -302,6 +346,16 @@ public class LogicalPropositions extends LogicalSyntax implements Equivalencies 
             cE = cE.replaceAll("<-", getConversionValueFromOperatorKey("<-"));
             cE = cE.replaceAll("\s", getConversionValueFromOperatorKey("\s"));
             return cE;
+        }
+
+        public String revertExpression(String e) {
+            String rE = e; // reverted String variable
+            rE = rE.replaceAll(getConversionValueFromOperatorKey("<>"), "<>");
+            rE = rE.replaceAll(getConversionValueFromOperatorKey("->"), "->");
+            rE = rE.replaceAll(getConversionValueFromOperatorKey(">-<"), ">-<");
+            rE = rE.replaceAll(getConversionValueFromOperatorKey("<-"), "<-");
+            rE = rE.replaceAll(getConversionValueFromOperatorKey("\s"), "\s");
+            return rE;
         }
 
         /**

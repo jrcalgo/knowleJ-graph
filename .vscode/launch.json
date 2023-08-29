@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Calculator",
+            "request": "launch",
+            "mainClass": "targets.Calculator",
+            "projectName": "Discrete-Logic_60bc7edf"
+        },
+        {
+            "type": "java",
             "name": "Permutations",
             "request": "launch",
             "mainClass": "src.LogicExpressions.PropositionalLogic.Logic.Permutations",

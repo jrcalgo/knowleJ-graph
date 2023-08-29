@@ -1,8 +1,9 @@
 package src.LogicExpressions.PropositionalLogic.Logic;
 
 import src.Interfaces.Equivalencies;
+import src.LogicExpressions.PropositionalLogic.Laws.InferenceLaws;
 
-public class LogicalArgument implements Equivalencies {
+public class LogicalArgument extends InferenceLaws implements Equivalencies {
     private LogicalPropositions expression;
     private LogicalPredicate predicate;
 
