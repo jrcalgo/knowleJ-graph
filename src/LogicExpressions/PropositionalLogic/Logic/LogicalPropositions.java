@@ -30,13 +30,13 @@ public class LogicalPropositions extends LogicalSyntax implements Equivalencies 
 
     private String[][] truthTable;
 
-    private Boolean[][] truthValues;
+    private Boolean[][] valueTable;
 
     private int valueCount;
 
-    private int valueRow;
+    private int valueRows;
 
-    private int valueCol;
+    private int valueCols;
     /** applicable laws evaluator */
     private PropositionLaws laws;
 
@@ -142,14 +142,13 @@ public class LogicalPropositions extends LogicalSyntax implements Equivalencies 
 
     private void permuteOperandValues(int n, String prefix) {
         final char[] chars = { 'T', 'F' };
-        //do {
+        // do {
         if (n == 0) {
-            for(int i = 0; i < valueRow; i++) {
-                for(int j = 0; j < valueCol; j++) {
-                   truthTable[i+1][j] = prefix.charAt(j) + "\s\s";
-                   
+            for (int i = 0; i < valueRows; i++) {
+                for (int j = 0; j < valueCols; j++) {
+                    truthTable[i + 1][j] = prefix.charAt(j) + "";
                 }
-                
+
             }
             return;
 
@@ -158,45 +157,44 @@ public class LogicalPropositions extends LogicalSyntax implements Equivalencies 
         for (int i = 0; i < chars.length; i++)
             permuteOperandValues(n - 1, prefix + chars[i]);
 
-
-        //} while (n > 0);
-        
-
         return;
 
     }
 
-    private void setTruthTable() {
-        valueRow = (int) Math.pow(2, operandCount);
-        valueCol = propositions.size();
-        truthValues = new Boolean[valueRow][valueCol];
-        truthTable = new String[valueRow + 1][valueCol]; // +1 for column titles
+    private void evaluatePartitionValues(String e) {
 
-        for (int i = 0; i < propositions.size(); i++) 
-            truthTable[0][i] = propositions.get(i) + "\s\s"; // titles each column with corresponding
-                                                             // proposition/compound proposition
-        
+    }
+
+    private void setTruthTable() {
+        valueRows = (int) Math.pow(2, operandCount);
+        valueCols = propositions.size();
+        valueCount = valueRows * valueCols;
+        valueTable = new Boolean[valueRows][valueCols];
+        truthTable = new String[valueRows + 1][valueCols]; // +1 for column titles
+
+        for (int i = 0; i < propositions.size(); i++)
+            truthTable[0][i] = propositions.get(i) + ""; // titles each column with corresponding
+                                                         // proposition/compound proposition
 
         permuteOperandValues(operandCount, "");
-        int permutationCount = truthValues.length;
+        int permutationCount = valueTable.length;
 
         // for (int i = 1; i < permutationCount; i++) {
-        //     for(int j = 0; i < elements[i].length; j++) {
-        //         truthTable[i][j] = elements[i][j];
-        //         // if (elements[i][j].equals("T"))
-                //     truthValues[i][j] = true;
-                // else
-        //         //     truthValues[i][j] = false;
-        //     }
+        // for(int j = 0; i < elements[i].length; j++) {
+        // truthTable[i][j] = elements[i][j];
+        // // if (elements[i][j].equals("T"))
+        // valueTable[i][j] = true;
+        // else
+        // // valueTable[i][j] = false;
+        // }
         // }
 
+        //
+        // for (int i = 0; i < valueTable.length; i++) {
+        // for (int j = 0; j < operandCount; j++) {
+        // }
 
-        // 
-        // for (int i = 0; i < truthValues.length; i++) {
-        //     for (int j = 0; j < operandCount; j++) {
-        //     }
-
-        //}
+        // }
     }
 
     public String[][] getTruthTable() {
@@ -208,36 +206,51 @@ public class LogicalPropositions extends LogicalSyntax implements Equivalencies 
     }
 
     public String[][] getStringTableColumn(int col) {
-        return this.truthTable[col][0];
+        String[][] column = new String[truthTable.length][1];
+        for (int i = 0; i < truthTable.length; i++)
+            column[i][col] = truthTable[i][col];
+
+        return column;
     }
 
-    public Boolean[][] getTableValues() {
-        return this.truthValues;
+    public Boolean[][] getBooleanTable() {
+        return this.valueTable;
     }
 
-    public String[][] getTruthTable(int from, int to) {
-
+    public Boolean[] getBooleanTableRow(int row) {
+        return this.valueTable[row];
     }
 
-    public String[][] getTruthTable(int from, int to, int from2, int to2) {
+    public Boolean[][] getBooleanTableColumn(int col) {
+        Boolean[][] column = new Boolean[valueCount][1];
+        int columnElements = valueCount / valueCols;
 
-    }
+        for (int i = 0; i < columnElements; i++)
+            column[i][col] = valueTable[i][col];
 
-    public String[][] getTruthTable(int from, int to, int from2, int to2, int from3, int to3) {
-
+        return column;
     }
 
     public void printTruthTable() {
-        for (int i = 0; i < truthTable.length; i++) {
+        for (int i = 0; i < truthTable[i].length; i++) {
+            System.out.print(i + ".\s");
+            System.out.print(truthTable[0][i] + "\s\s\s");
+        }
+        System.out.println();
+        for (int i = 1; i < truthTable.length; i++) {
             for (int j = 0; j < truthTable[i].length; j++) {
-                System.out.print(truthTable[i][j] + "\s\s");
+                System.out.print(i + "." + j + ".\s");
+                System.out.print(truthTable[i][j] + "\s\s\s");
             }
             System.out.println();
         }
     }
 
-    public void printTruthTable(int from, int to) {
+    public void printTruthTable(int from, int to) throws IndexOutOfBoundsException {
+        if (from > to)
+            throw new IndexOutOfBoundsException(from + " is out of bounds.");
 
+        
     }
 
     public String inverse(String p) {
@@ -260,7 +273,7 @@ public class LogicalPropositions extends LogicalSyntax implements Equivalencies 
     public boolean isTautology() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'isTautology'");
-        return this.truthValues.equals(true);
+        return this.valueTable.equals(true);
 
     }
 
@@ -286,7 +299,7 @@ public class LogicalPropositions extends LogicalSyntax implements Equivalencies 
         /** converted logical expression string for easier back-end operations */
         private String convertedExpression;
         /** Maximum number of characters accepted in converted expression String */
-        private final int MAX_CHARACTERS = 64;
+        private final int MAX_CHARACTERS = 32;
 
         /**
          * @throws InvalidExpressionException
@@ -325,7 +338,7 @@ public class LogicalPropositions extends LogicalSyntax implements Equivalencies 
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             int i = 0;
             if (cE.length() > MAX_CHARACTERS)
-                throw new InvalidExpressionException("Expression is too long; only 64 converted characters allowed.");
+                throw new InvalidExpressionException("Expression is too long; only 32 converted characters allowed.");
             else if (!containsAnyOperands(cE))
                 throw new InvalidOperandException("Expression does not have at least one valid operand.");
             else if (containsAnyConversionOperators(cE)) {
