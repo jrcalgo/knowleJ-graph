@@ -1,5 +1,5 @@
 package src.LogicExpressions.PropositionalLogic;
 
-public class LogicalEvaluator {
+public class PropositionalEvaluator {
     
 }
