@@ -207,10 +207,10 @@ public class LogicalPropositions implements Equivalencies {
         return this.truthTable[row];
     }
 
-    public String[][] getStringTableColumn(int col) {
-        String[][] column = new String[truthTable.length][1];
+    public String[] getStringTableColumn(int col) {
+        String[] column = new String[truthTable.length];
         for (int i = 0; i < truthTable.length; i++)
-            column[i][col] = truthTable[i][col];
+            column[i] = truthTable[i][col];
 
         return column;
     }
@@ -223,12 +223,12 @@ public class LogicalPropositions implements Equivalencies {
         return this.valueTable[row];
     }
 
-    public Boolean[][] getBooleanTableColumn(int col) {
-        Boolean[][] column = new Boolean[valueCount][1];
+    public Boolean[] getBooleanTableColumn(int col) {
+        Boolean[] column = new Boolean[valueCount];
         int columnElements = valueCount / valueCols;
 
         for (int i = 0; i < columnElements; i++)
-            column[i][col] = valueTable[i][col];
+            column[i] = valueTable[i][col];
 
         return column;
     }
@@ -273,23 +273,49 @@ public class LogicalPropositions implements Equivalencies {
     }
 
     @Override
-    public boolean isTautology() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isTautology'");
-        return this.valueTable.equals(true);
-
+    public boolean isTautology(String[] rowOrColumn) {
+        for (String s : rowOrColumn) {
+            if (s.equals("F"))
+                return false;
+        }
+        return true;
     }
 
     @Override
-    public boolean isContradiction() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isContradiction'");
+    public boolean isTautology(Boolean[] rowOrColumn) {
+        for (Boolean b : rowOrColumn) {
+            if (b == false)
+                return false;
+        }
+        return true;
     }
 
     @Override
-    public boolean isContingency() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isContingency'");
+    public boolean isContradiction(String[] rowOrColumn) {
+        for (String s : rowOrColumn) {
+            if (s.equals("T"))
+                return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isContradiction(Boolean[] rowOrColumn) {
+        for (Boolean b : rowOrColumn) {
+            if (b == true)
+                return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isContingency(String[] rowOrColumn) {
+        return !(isTautology(rowOrColumn) || isContradiction(rowOrColumn));
+    }
+
+    @Override
+    public boolean isContingency(Boolean[] rowOrColumn) {
+        return !(isTautology(rowOrColumn) || isContradiction(rowOrColumn));
     }
 
     /**
