@@ -1,0 +1,24 @@
+Do you use a stack or a queue for partitioning a math expression into its constituent parts based on order of operations, i.e. "((9 * 4)*3)+12" being split into "(9 * 4)", "((9 * 4)*3)" and ((9 * 4)*3)+12
+
+To partition a mathematical expression into its constituent parts based on the order of operations, we can use a stack data structure. A stack is a linear data structure that follows the Last In First Out (LIFO) principle, meaning that the last element added to the stack must be the first one to be removed.
+
+In the case of evaluating a mathematical expression, we can use two stacks: one for operands (numbers) and one for operators (such as +, -, *, /). We can then iterate through the expression from left to right, pushing operands onto the operand stack and operators onto the operator stack. When we encounter an operator with higher precedence than the one at the top of the operator stack, we push it onto the operator stack. Otherwise, we pop two operands and one operator from their respective stacks, perform the operation, and push the result back onto the operand stack. We repeat this process until we reach the end of the expression.
+
+For example, let’s consider your expression “((9 * 4)*3)+12”. We can use a stack to partition it into its constituent parts as follows:
+
+We start with an empty operand stack and an empty operator stack.
+We encounter the first opening parenthesis “(”, so we push it onto the operator stack.
+We encounter the second opening parenthesis “(”, so we push it onto the operator stack.
+We encounter the first operand “9”, so we push it onto the operand stack.
+We encounter the first operator “*”, so we push it onto the operator stack.
+We encounter the second operand “4”, so we push it onto the operand stack.
+We encounter the first closing parenthesis “)”, so we pop two operands “9” and “4” and one operator “*” from their respective stacks, perform the operation “9 * 4” = 36, and push the result back onto the operand stack.
+We encounter the second operator “*”, so we push it onto the operator stack.
+We encounter the third operand “3”, so we push it onto the operand stack.
+We encounter the second closing parenthesis “)”, so we pop two operands “36” and “3” and one operator “*” from their respective stacks, perform the operation “36 * 3” = 108, and push the result back onto the operand stack.
+We encounter the third operator “+”, so we push it onto the operator stack.
+We encounter the fourth operand “12”, so we push it onto the operand stack.
+We have reached the end of the expression, so we pop two operands “108” and “12” and one operator “+” from their respective stacks, perform the operation “108 + 12” = 120, and push the result back onto the operand stack.
+The final result is 120, which is stored in our operand stack.
+
+I hope this helps! Is there anything else you would like to know? 😊

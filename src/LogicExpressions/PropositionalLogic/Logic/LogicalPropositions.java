@@ -5,9 +5,10 @@ import src.LogicExpressions.PropositionalLogic.Laws.PropositionLaws;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Stack;
 
-import src.DataStructures.PartitionedParsingTree;
 import src.Exceptions.*;
 import src.Interfaces.Equivalencies;
 
@@ -20,7 +21,9 @@ public class LogicalPropositions implements Equivalencies {
 
     private LogicalSyntax syntax = new LogicalSyntax();
     /** collection of partitioned/parsed propositional statements */
-    private PartitionedParsingTree<String> partitions;
+    private LinkedList<String> partitions;
+
+    private Stack<String> partitionStack;
     /** count of partitions from expression */
     private int partitionCount;
     /** operands contained in expression's String */
@@ -81,7 +84,7 @@ public class LogicalPropositions implements Equivalencies {
      * @return
      */
     private void parsePartitions() {
-        this.partitions = new PartitionedParsingTree<String>(this.expression.getConvertedExpression());
+        
     }
 
     /**
