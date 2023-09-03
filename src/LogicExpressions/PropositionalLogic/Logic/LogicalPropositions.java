@@ -18,11 +18,11 @@ import src.Interfaces.Equivalencies;
 public class LogicalPropositions implements Equivalencies {
     /** Logical expression, its string and other functions */
     private LogicalExpression expression;
-
+    /** syntax for propositional logic */
     private LogicalSyntax syntax = new LogicalSyntax();
     /** collection of partitioned/parsed propositional statements */
     private LinkedList<String> partitions;
-
+    /** stack of partitioned/parsed propositional statements */
     private Stack<String> partitionStack;
     /** count of partitions from expression */
     private int partitionCount;
@@ -166,8 +166,8 @@ public class LogicalPropositions implements Equivalencies {
 
     }
 
-    private void evaluatePartitionValues(String e) {
-
+    private void evaluatePartitionValues() {
+        
     }
 
     private void setTruthTable() {
