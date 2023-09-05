@@ -15,7 +15,7 @@ import src.Interfaces.Equivalencies;
 /**
  * 
  */
-public class LogicalPropositions implements Equivalencies {
+public class Propositions implements Equivalencies {
     /** Logical expression, its string and other functions */
     private LogicalExpression expression;
     /** syntax for propositional logic */
@@ -47,7 +47,7 @@ public class LogicalPropositions implements Equivalencies {
     /** applicable laws evaluator */
     private PropositionLaws laws;
 
-    public LogicalPropositions()
+    public Propositions()
             throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
         this.expression = new LogicalExpression();
         setPropositions();
@@ -55,7 +55,7 @@ public class LogicalPropositions implements Equivalencies {
         this.laws = null;
     }
 
-    public LogicalPropositions(String e)
+    public Propositions(String e)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         this.expression = new LogicalExpression(e);
         setPropositions();
@@ -167,7 +167,7 @@ public class LogicalPropositions implements Equivalencies {
     }
 
     private void evaluatePartitionValues() {
-        
+
     }
 
     private void setTruthTable() {
@@ -324,7 +324,7 @@ public class LogicalPropositions implements Equivalencies {
     /**
      * 
      */
-    private class LogicalExpression {
+    private class Expression {
 
         /** logical expression String representing math equation */
         private String expression;
@@ -341,7 +341,7 @@ public class LogicalPropositions implements Equivalencies {
          * @throws InvalidOperandException
          * 
          */
-        public LogicalExpression()
+        public Expression()
                 throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
             loadExpression("(~P&Q)|~R "); // example expression
         }
@@ -356,7 +356,7 @@ public class LogicalPropositions implements Equivalencies {
          * @throws InvalidOperandException       thrown by
          *                                       checkExpressionForExceptions()
          */
-        public LogicalExpression(String e)
+        public Expression(String e)
                 throws InvalidExpressionException, InvalidLogicOperatorException, InvalidOperandException {
             loadExpression(e);
         }
