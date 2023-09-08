@@ -8,6 +8,13 @@
             "type": "java",
             "name": "Calculator",
             "request": "launch",
+            "mainClass": "calculator.Calculator",
+            "projectName": "Discrete-Logic_60bc7edf"
+        },
+        {
+            "type": "java",
+            "name": "Calculator",
+            "request": "launch",
             "mainClass": "targets.Calculator",
             "projectName": "Discrete-Logic_60bc7edf"
         },
