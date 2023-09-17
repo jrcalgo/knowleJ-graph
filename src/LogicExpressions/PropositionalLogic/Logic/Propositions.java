@@ -123,8 +123,6 @@ public class Propositions implements Equivalencies {
                  } else if (syntax.isOperand(cE.charAt(p))) {
                     partitionCharQueue.add(cE.charAt(p));
                  }
-
-                 if ()
             }
         }
         // then convert expressions back to original format
@@ -455,7 +453,15 @@ public class Propositions implements Equivalencies {
                 }
                 i = 0;
                 // check parenthesis count for bout ( and ), and then compare if they are equal
-                if ((cE.contains("(") && !cE.contains(")")) || (!cE.contains("(") && cE.contains(")")))
+                int leftParentheses = 0, rightParentheses = 0;
+                for (int j = 0; j < cE.length(); j++) {
+                    if (cE.charAt(j) == '(')
+                        leftParentheses++;
+                    else if (cE.charAt(j) == ')')
+                        rightParentheses++;
+                }
+
+                if (leftParentheses != rightParentheses)
                     throw new InvalidExpressionException("Expression is missing parenthesis.");
             }
         }
