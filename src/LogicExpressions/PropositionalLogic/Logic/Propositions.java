@@ -51,7 +51,6 @@ public class Propositions implements Equivalencies {
         this.expression = new Expression();
         setPropositions();
         setTruthTable();
-        this.laws = null;
     }
 
     public Propositions(String e)
@@ -59,7 +58,6 @@ public class Propositions implements Equivalencies {
         this.expression = new Expression(e);
         setPropositions();
         setTruthTable();
-        this.laws = null;
     }
 
     private void parseOperands() {
@@ -69,17 +67,14 @@ public class Propositions implements Equivalencies {
                 if (!operands.contains(c.toString())) {
                     operands.add(c.toString());
                     operandCount++;
-                    propositionCount++;
                 }
             }
         }
     }
 
     /**
-     * Utilizes a tree data structure to parse the expression into its constituent
-     * propositions
      * 
-     * @param e
+     * 
      * @return
      */
     private void parsePartitions() {
@@ -90,8 +85,22 @@ public class Propositions implements Equivalencies {
         String cE = this.expression.getConvertedExpression();
 
         for (int p = 0; p < cE.length(); p++) {
-            if (syntax.isConversionOperator(cE.charAt(p))) {
-                if (cE.contains("(")) {
+            if (cE.contains("(")) {
+                if (!partitionCharQueue.isEmpty() && cE.charAt(p) == '(') {
+                    if (syntax.isOperator(partitionCharQueue.peek() + "")) {
+                        while (!partitionCharQueue.isEmpty()) 
+                            partitionCharQueue.remove();
+                    } else if (syntax.isOperand(partitionCharQueue.peek())) {
+                        while (!partitionCharQueue.isEmpty()) {
+                            tempPartition += partitionCharQueue.peek();
+                            partitionCharQueue.remove();
+                        }
+                        partitions.add(tempPartition);
+                        tempPartition = "";
+                        partitionCount++;
+                    }
+                }
+                if (syntax.isOperator(cE.charAt(p) + "")) {
                     if (cE.charAt(p) == ')') {
                         partitionCharQueue.add(cE.charAt(p));
                         while (!partitionCharQueue.isEmpty()) {
@@ -105,23 +114,29 @@ public class Propositions implements Equivalencies {
                         tempQueue.add(cE.charAt(p));
                         partitionCharQueue.add(cE.charAt(p));
                     }
+                } else if (syntax.isOperand(cE.charAt(p))) {
+                    partitionCharQueue.add(cE.charAt(p));
                 }
-            } else if (syntax.isOperand(cE.charAt(p))) {
-                partitionCharQueue.add(cE.charAt(p));
             } else {
+                 if (syntax.isOperator(cE.charAt(p) + "")) {
+                    partitionCharQueue.add(cE.charAt(p));
+                 } else if (syntax.isOperand(cE.charAt(p))) {
+                    partitionCharQueue.add(cE.charAt(p));
+                 }
 
+                 if ()
             }
         }
-
-        if (!partitions.contains(cE)) {
-            partitions.add(this.expression.getExpression());
-            partitionCount++;
-        }
-
         // then convert expressions back to original format
         for (int i = 0; i < partitions.size(); i++) {
             partitions.set(i, this.expression.revertExpression(partitions.get(i)));
         }
+
+        if (!partitions.contains(expression.getExpression())) {
+            partitions.add(expression.getExpression());
+            partitionCount++;
+        }
+
     }
 
     /**
@@ -134,21 +149,14 @@ public class Propositions implements Equivalencies {
         parseOperands();
         for (int i = 0; i < this.operands.size(); i++) {
             propositions.add(this.operands.get(i));
+            propositionCount++;
         }
 
         parsePartitions();
         for (int i = 0; i < this.partitions.size(); i++) {
             propositions.add(this.partitions.get(i));
+            propositionCount++;
         }
-
-        // parsePartitions();
-        // for (int i = 0; i < this.partitions.size(); i++) {
-        // propositions.add(this.partitions.get(i));
-        // }
-
-        // for (int i = 0; i < this.partitions.size(); i++) {
-        // propositions.add(this.partitions.get(i));
-        // }
     }
 
     public String getExpression() {
@@ -171,7 +179,7 @@ public class Propositions implements Equivalencies {
             if (!(i == propositions.size() - 1))
                 statements += (propositions.get(i) + " , ");
             else
-                statements += (propositions.get(i));
+                statements += propositions.get(i);
         }
 
         return statements;
@@ -189,22 +197,22 @@ public class Propositions implements Equivalencies {
             return propositions.get(from);
     }
 
-    private void permuteOperandValues(int n, String prefix) {
+    private void combineOperandValues(int n, String prefix) {
         final char[] chars = { 'T', 'F' };
+
+
         // do {
-        if (n == 0) {
-            for (int i = 0; i < 1; i++) {
-                for (int j = 0; j < operandCount; j++) {
-                    truthTable[i + 1][j] = prefix.charAt(j) + "";
-                }
+        // if (n == 0) {
+        //     for (int i = 0; i < 1; i++) {
+        //         for (int j = 0; j < operandCount; j++) {
+        //             truthTable[i + 1][j] = prefix.charAt(j) + "";
+        //         }
+        //     }
+        //     return;
+        // }
 
-            }
-            return;
-
-        }
-
-        for (int i = 0; i < chars.length; i++)
-            permuteOperandValues(n - 1, prefix + chars[i]);
+        // for (int i = 0; i < chars.length; i++)
+        //     combineOperandValues(n - 1, prefix + chars[i]);
 
     }
 
@@ -223,8 +231,8 @@ public class Propositions implements Equivalencies {
             truthTable[0][i] = propositions.get(i) + ""; // titles each column with corresponding
                                                          // proposition/compound proposition
 
-        permuteOperandValues(operandCount, "");
-        int permutationCount = valueTable.length;
+        combineOperandValues(operandCount, "");
+        int combinationCount = valueTable.length;
 
         // for (int i = 1; i < permutationCount; i++) {
         // for(int j = 0; i < elements[i].length; j++) {
@@ -236,7 +244,7 @@ public class Propositions implements Equivalencies {
         // }
         // }
 
-        //
+        
         // for (int i = 0; i < valueTable.length; i++) {
         // for (int j = 0; j < operandCount; j++) {
         // }
@@ -360,14 +368,14 @@ public class Propositions implements Equivalencies {
     }
 
     private class PropositionEvaluator {
-        private Expression expression;
+        private Propositions props;
 
         public PropositionEvaluator() {
             super();
         }
 
-        public PropositionEvaluator(Expression e) {
-            this.expression = e;
+        public PropositionEvaluator(Propositions p) {
+            this.props = p;
         }
 
         public boolean and(String p, String q) {
@@ -379,7 +387,9 @@ public class Propositions implements Equivalencies {
         }
 
 
-
+        public void close() {
+            this.props = null;
+        }
 
     }
 
@@ -456,7 +466,6 @@ public class Propositions implements Equivalencies {
             cE = cE.replaceAll("->", syntax.getConversionValueFromOperatorKey("->"));
             cE = cE.replaceAll(">-<", syntax.getConversionValueFromOperatorKey(">-<"));
             cE = cE.replaceAll("<-", syntax.getConversionValueFromOperatorKey("<-"));
-            cE = cE.replaceAll("\s", syntax.getConversionValueFromOperatorKey("\s"));
             return cE;
         }
 
@@ -480,6 +489,7 @@ public class Propositions implements Equivalencies {
          */
         private void loadExpression(String e)
                 throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
+            e = e.replaceAll("\s", syntax.getConversionValueFromOperatorKey("\s"));
             String cE = convertExpression(e); // converts expression to valid, converted format
             checkSyntax(cE); // checks validity of converted expression argument
             this.expression = e;
@@ -728,7 +738,7 @@ public class Propositions implements Equivalencies {
             OPERAND_LIST.addAll(CUSTOM_OPERAND_LIST);
         }
 
-        public void resetOperands() {
+        public void defaultOperands() {
             CUSTOM_OPERAND_LIST.clear();
             OPERAND_LIST.clear();
             OPERAND_LIST.addAll(DEFAULT_OPERAND_LIST);
@@ -800,7 +810,7 @@ public class Propositions implements Equivalencies {
          * @return
          */
         public boolean isOperator(String s) {
-            return OPERATOR_MAPS.containsKey(s) || OPERATOR_MAPS.containsValue(s);
+            return OPERATOR_MAPS.containsKey(s) || OPERATOR_MAPS.values().contains(s);
         }
 
         /**
@@ -833,8 +843,8 @@ public class Propositions implements Equivalencies {
             return false;
         }
 
-        public boolean isConversionOperator(char c) {
-            return Character.toString(c).equals(getOperatorKeyFromValue(Character.toString(c)));
+        public boolean isConversionOperator(String s) {
+            return s.contains((CharSequence) OPERATOR_MAPS.get(OPERATOR_CONVERSION_INDEX));
         }
 
         public boolean containsAnyConversionOperators(String s) {

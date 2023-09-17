@@ -17,7 +17,9 @@ public class Calculator {
         System.out.println(e.getPropositions(0,3));
         System.out.println(e.getPropositions(3, 5));
         System.out.println(e.getPropositions(1,1));
-        e.printTruthTable();
-
+        String[] s = e.getStringTableRow(0);
+        for (String i : s) {
+            System.out.print(i + " ");
+        }
     }
 }
