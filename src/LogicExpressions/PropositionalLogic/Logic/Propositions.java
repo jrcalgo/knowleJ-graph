@@ -454,7 +454,7 @@ public class Propositions implements Equivalencies {
                     i++;
                 }
                 i = 0;
-
+                // check parenthesis count for bout ( and ), and then compare if they are equal
                 if ((cE.contains("(") && !cE.contains(")")) || (!cE.contains("(") && cE.contains(")")))
                     throw new InvalidExpressionException("Expression is missing parenthesis.");
             }
