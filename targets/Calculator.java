@@ -21,6 +21,6 @@ public class Calculator {
         for (String i : s) {
             System.out.print(i + " ");
         }
-        e.printTruthTable();
+        e.printTruthTable(5,5);
     }
 }

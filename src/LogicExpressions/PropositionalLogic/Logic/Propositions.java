@@ -299,7 +299,18 @@ public class Propositions implements Equivalencies {
         if (fromCol > toCol)
             throw new IndexOutOfBoundsException(fromCol + " is out of bounds.");
 
-        //for (int i = fromCol; i < toCol; i++)
+        for (int i = 0; i < truthTable[i].length; i++) {
+            System.out.print(i + ".\s");
+            System.out.print(truthTable[0][i] + "\s\s\s");
+        }
+
+        for (int i = 1; i < truthTable.length; i++) {
+            for (int j = fromCol; j < toCol; j++) {
+                System.out.print(i + "." + j + ".\s");
+                System.out.print(truthTable[i][j] + "\s\s\s");
+            }
+            System.out.println();
+        }
 
     }
 
