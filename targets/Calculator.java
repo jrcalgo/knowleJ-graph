@@ -2,6 +2,7 @@ package targets;
 
 import java.util.ArrayList;
 
+import java.io.IOException;
 import src.Exceptions.InvalidExpressionException;
 import src.Exceptions.InvalidLogicOperatorException;
 import src.Exceptions.InvalidOperandException;
@@ -9,7 +10,7 @@ import src.LogicExpressions.PropositionalLogic.Logic.Propositions;
 
 public class Calculator {
     
-    public static void main(String[] args) throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
+    public static void main(String[] args) throws IOException, InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
         Propositions e = new Propositions("(P&Q| ~F )->Z<>(Y&~R<>P>-<Q)");
         System.out.println(e.getExpression());
         System.out.println(e.getConvertedExpression());
@@ -22,5 +23,7 @@ public class Calculator {
             System.out.print(i + " ");
         }
         e.printTruthTable(5,5);
+
+        e.csvTable("test");
     }
 }

@@ -2,6 +2,11 @@ package src.LogicExpressions.PropositionalLogic.Logic;
 
 import src.LogicExpressions.PropositionalLogic.Laws.PropositionLaws;
 
+import java.io.FileWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -124,7 +129,7 @@ public class Propositions implements Equivalencies {
         }
         // then convert expressions back to original format
         for (int i = 0; i < partitions.size(); i++) {
-            partitions.set(i, this.expression.revertExpression(partitions.get(i)));
+            partitions.set(i, this.expression.revertConvertedExpression(partitions.get(i)));
         }
 
         if (!partitions.contains(expression.getExpression())) {
@@ -202,12 +207,12 @@ public class Propositions implements Equivalencies {
         if (operandCount == col)
             return;
         
-            int t = (int) Math.pow(2, col + 1);
-            for (int i = 0; i < rows; i++) {
-                valueTable[i][col] = i / t % 2 == 0;
-            }
-    
-            combineOperandValues(rows, col + 1);
+        int t = (int) Math.pow(2, col + 1);
+        for (int i = 0; i < rows; i++) {
+            valueTable[i][col] = i / t % 2 == 0;
+        }
+
+        combineOperandValues(rows, col + 1);
     }
 
     private void evaluatePartitionValues() {
@@ -314,6 +319,38 @@ public class Propositions implements Equivalencies {
 
     }
 
+    public void csvTable(String name) throws IOException {
+        FileWriter csvWriter = null;
+        Path path = Paths.get("./Discrete-Logic/src/LogicExpressions/PropositionalLogic/PropositionData/TableData/");
+
+        try {
+            Files.createDirectories(path);
+
+            csvWriter = new FileWriter(path.toString() + name + propositionCount + ".csv");
+            
+            for (int i = 0; i < truthTable.length; i++) {
+                for (int j = 0; j < truthTable[i].length; j++) {
+                    csvWriter.append(truthTable[i][j]);
+                    csvWriter.append(",");
+                }
+                csvWriter.append("\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                csvWriter.flush();
+                csvWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void csvExpressions(String e) {
+
+    }
+
     public String inverse(String p) {
 
     }
@@ -383,13 +420,34 @@ public class Propositions implements Equivalencies {
             this.props = p;
         }
 
-        public boolean and(String p, String q) {
-            return (p.equals("T") && q.equals("T"));
+        public boolean and(String left, String right) {
+            return (left.equals("T") && right.equals("T"));
         }
 
-        public boolean or(String p, String q) {
-            return (p.equals("T") || q.equals("T"));
+        public boolean or(String left, String right) {
+            return (left.equals("T") || right.equals("T"));
         }
+
+        public boolean implies(String left, String right) {
+            return (left.equals("T") && right.equals("F"));
+        }
+
+        public boolean iff(String left, String right) {
+            return (left.equals(right));
+        }
+        public boolean not(String operand) {
+            return (operand.equals("T") ? false : true);
+        }
+
+        public boolean xor(String left, String right) {
+            return (left.equals(right) ? false : true);
+        }
+
+        public boolean reduces(String left, String right) {
+            return (left.equals("F") && right.equals("T"));
+        }
+        
+        
 
 
         public void close() {
@@ -482,7 +540,7 @@ public class Propositions implements Equivalencies {
             return cE;
         }
 
-        public String revertExpression(String e) {
+        public String revertConvertedExpression(String e) {
             String rE = e; // reverted String variable
             rE = rE.replaceAll("i", syntax.getOperatorKeyFromValue("i"));
             rE = rE.replaceAll(syntax.getConversionValueFromOperatorKey("->"), "->");
