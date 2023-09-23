@@ -319,19 +319,30 @@ public class Propositions implements Equivalencies {
 
     }
 
-    public void csvTable(String name) throws IOException {
+    public void csvTable(String name, int create) throws IOException {
+        if (create < 0 || create > 1)
+            throw new IOException("new must be 0 or 1");
+        
         FileWriter csvWriter = null;
-        Path path = Paths.get("./Discrete-Logic/src/LogicExpressions/PropositionalLogic/PropositionData/TableData/");
+        Path path = Paths.get(".\\src\\LogicExpressions\\PropositionalLogic\\PropositionData\\TableData\\");
+        String file = name + propositionCount + ".csv";
+
+        if (create == 1) {
+        int i = 1;
+            while (Files.exists(path.resolve(file))) {
+                file = name + propositionCount + "(" + i + ")" + ".csv";
+                i++;
+            }
+        }
 
         try {
-            Files.createDirectories(path);
 
-            csvWriter = new FileWriter(path.toString() + name + propositionCount + ".csv");
+            csvWriter = new FileWriter(path.resolve(file).toString());
             
             for (int i = 0; i < truthTable.length; i++) {
                 for (int j = 0; j < truthTable[i].length; j++) {
                     csvWriter.append(truthTable[i][j]);
-                    csvWriter.append(",");
+                    csvWriter.append(", ");
                 }
                 csvWriter.append("\n");
             }

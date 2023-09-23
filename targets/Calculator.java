@@ -1,7 +1,7 @@
 package targets;
 
 import java.util.ArrayList;
-
+import java.io.File;
 import java.io.IOException;
 import src.Exceptions.InvalidExpressionException;
 import src.Exceptions.InvalidLogicOperatorException;
@@ -24,6 +24,8 @@ public class Calculator {
         }
         e.printTruthTable(5,5);
 
-        e.csvTable("test");
+        e.csvTable("test", 1);
+        System.out.println(new File(".").getAbsolutePath());
+
     }
 }
