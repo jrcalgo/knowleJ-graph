@@ -216,7 +216,7 @@ public class Propositions implements Equivalencies {
     }
 
     private void evaluatePartitionValues() {
-
+        PropositionEvaluator evaluator = new PropositionEvaluator();
     }
 
     private void setTruthTable() {
@@ -319,18 +319,18 @@ public class Propositions implements Equivalencies {
 
     }
 
-    public void csvTable(String name, int create) throws IOException {
-        if (create < 0 || create > 1)
+    public void csvTable(String name, int createNew) throws IOException {
+        if (createNew < 0 || createNew > 1)
             throw new IOException("new must be 0 or 1");
         
         FileWriter csvWriter = null;
         Path path = Paths.get(".\\src\\LogicExpressions\\PropositionalLogic\\PropositionData\\TableData\\");
-        String file = name + propositionCount + ".csv";
+        String file = name + propositionCount + "TT.csv";
 
-        if (create == 1) {
-        int i = 1;
+        if (createNew == 1) {
+            int i = 1;
             while (Files.exists(path.resolve(file))) {
-                file = name + propositionCount + "(" + i + ")" + ".csv";
+                file = name + propositionCount + "(" + i + ")" + "TT.csv";
                 i++;
             }
         }
@@ -358,7 +358,13 @@ public class Propositions implements Equivalencies {
         }
     }
 
-    public void csvExpressions(String e) {
+    public void csvExpressions(String e, int createNew) throws IOException {
+        if (createNew < 0 || createNew > 1)
+            throw new IOException("new must be 0 or 1");
+        
+        FileWriter csvWriter = null;
+        Path path = Paths.get(".\\src\\LogicExpressions\\PropositionalLogic\\PropositionData\\Expressions\\");
+        String file = e + propositionCount + "Expr.csv";
 
     }
 
