@@ -22,10 +22,7 @@ public class Calculator {
         for (String i : s) {
             System.out.print(i + " ");
         }
-        e.printTruthTable(5,5);
-
-        e.csvTable("test", 1);
-        System.out.println(new File(".").getAbsolutePath());
+        e.printTruthTable();
 
     }
 }

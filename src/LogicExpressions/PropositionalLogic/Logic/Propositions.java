@@ -136,7 +136,6 @@ public class Propositions implements Equivalencies {
             partitions.add(expression.getExpression());
             partitionCount++;
         }
-
     }
 
     /**
@@ -203,20 +202,37 @@ public class Propositions implements Equivalencies {
      * @param n
      * @param prefix
      */
-    private void combineOperandValues(int rows, int col) {
-        if (operandCount == col)
-            return;
-        
-        int t = (int) Math.pow(2, col + 1);
-        for (int i = 0; i < rows; i++) {
-            valueTable[i][col] = i / t % 2 == 0;
+    private void combineOperandValues() {
+        String[] operandValues = new String[operandCount];
+        for (int i = 0; i < operandCount; i++) {
+            operandValues[i] = "T";
         }
 
-        combineOperandValues(rows, col + 1);
+        for (int i = 0; i < valueRows; i++) {
+            for (int j = 0; j < operandCount; j++) {
+                if (operandValues[j].equals("T")) {
+                    operandValues[j] = "F";
+                    break;
+                } else {
+                    operandValues[j] = "T";
+                }
+            }
+            for (int j = 0; j < operandCount; j++) {
+                valueTable[i][j] = operandValues[j].equals("T") ? true : false;
+                truthTable[i + 1][j] = operandValues[j];
+            }
+        }
+    
     }
 
     private void evaluatePartitionValues() {
-        PropositionEvaluator evaluator = new PropositionEvaluator();
+        PropositionEvaluator<LinkedList<String>> evaluator = new PropositionEvaluator<>(partitions);
+
+        for(int i = 0; i < partitionCount; i++) {
+
+        }
+
+        
     }
 
     private void setTruthTable() {
@@ -230,7 +246,7 @@ public class Propositions implements Equivalencies {
             truthTable[0][i] = propositions.get(i) + ""; // titles each column with corresponding
                                                          // proposition/compound proposition
 
-        combineOperandValues(valueRows, 0);
+        combineOperandValues();
         int combinationCount = valueTable.length;
 
         // for (int i = 1; i < permutationCount; i++) {
@@ -316,7 +332,6 @@ public class Propositions implements Equivalencies {
             }
             System.out.println();
         }
-
     }
 
     public void csvTable(String name, int createNew) throws IOException {
@@ -370,6 +385,8 @@ public class Propositions implements Equivalencies {
 
     public String inverse(String p) {
 
+            
+        
     }
 
     public String converse(String p) {
@@ -426,14 +443,14 @@ public class Propositions implements Equivalencies {
         return !(isTautology(rowOrColumn) || isContradiction(rowOrColumn));
     }
 
-    private class PropositionEvaluator {
-        private Propositions props;
+    private class PropositionEvaluator<T extends LinkedList<String>> {
+        private T props;
 
         public PropositionEvaluator() {
             super();
         }
 
-        public PropositionEvaluator(Propositions p) {
+        public PropositionEvaluator(T p) {
             this.props = p;
         }
 
