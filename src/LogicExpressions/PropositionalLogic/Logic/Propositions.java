@@ -92,7 +92,7 @@ public class Propositions implements Equivalencies {
             if (cE.contains("(")) {
                 if (!partitionCharQueue.isEmpty() && cE.charAt(p) == '(') {
                     if (syntax.containsAnyConversionOperators(partitionCharQueue.peek() + "")) {
-                        while (!partitionCharQueue.isEmpty()) 
+                        while (!partitionCharQueue.isEmpty())
                             partitionCharQueue.remove();
                     } else if (syntax.isOperand(partitionCharQueue.peek())) {
                         while (!partitionCharQueue.isEmpty()) {
@@ -115,16 +115,16 @@ public class Propositions implements Equivalencies {
                         tempPartition = "";
                         partitionCount++;
                     } else
-                        partitionCharQueue.add(cE.charAt(p));         
+                        partitionCharQueue.add(cE.charAt(p));
                 } else if (syntax.isOperand(cE.charAt(p))) {
                     partitionCharQueue.add(cE.charAt(p));
                 }
             } else {
-                 if (syntax.containsAnyConversionOperators(cE.charAt(p) + "")) {
+                if (syntax.containsAnyConversionOperators(cE.charAt(p) + "")) {
                     partitionCharQueue.add(cE.charAt(p));
-                 } else if (syntax.isOperand(cE.charAt(p))) {
+                } else if (syntax.isOperand(cE.charAt(p))) {
                     partitionCharQueue.add(cE.charAt(p));
-                 }
+                }
             }
         }
         // then convert expressions back to original format
@@ -197,16 +197,18 @@ public class Propositions implements Equivalencies {
     }
 
     /**
-     * recursively combines sets of T and F values for each operand in expression, and then assigns them to the string truthTable and
-     * the boolean valueTable after all combinations are made in the recursive winding up.
+     * recursively combines sets of T and F values for each operand in expression,
+     * and then assigns them to the string truthTable and
+     * the boolean valueTable after all combinations are made in the recursive
+     * winding up.
+     * 
      * @param n
      * @param prefix
      */
     private void combineOperandValues() {
         String[] operandValues = new String[operandCount];
-        for (int i = 0; i < operandCount; i++) {
+        for (int i = 0; i < operandCount; i++)
             operandValues[i] = "T";
-        }
 
         for (int i = 0; i < valueRows; i++) {
             for (int j = 0; j < operandCount; j++) {
@@ -222,17 +224,49 @@ public class Propositions implements Equivalencies {
                 truthTable[i + 1][j] = operandValues[j];
             }
         }
-    
+
     }
 
     private void evaluatePartitionValues() {
         PropositionEvaluator<LinkedList<String>> evaluator = new PropositionEvaluator<>(partitions);
+        partitionCharQueue = new ArrayDeque<Character>();
 
-        for(int i = 0; i < partitionCount; i++) {
+        for (int i = 0; i < partitionCount; i++) {
+            char[] tempPartition = partitions.get(i).toCharArray();
+            for (int j = 0; j < tempPartition.length; j++) {
+                switch (tempPartition[j]) {
+                    case '(': {
+                        partitionCharQueue.add(tempPartition[j]);
+                        break;
+                    }
 
+                    case ')': {
+                        partitionCharQueue.add(tempPartition[j]);
+                        break;
+                    }
+
+                    case 'a': {
+
+                    }
+
+                    case 'o':
+
+                    case 'n':
+
+                    case 'r':
+
+                    case 'm':
+
+                    case 'x':
+
+                    case 'T':
+
+                    case 'F':
+
+                }
+            }
         }
 
-        
     }
 
     private void setTruthTable() {
@@ -259,7 +293,6 @@ public class Propositions implements Equivalencies {
         // }
         // }
 
-        
         // for (int i = 0; i < valueTable.length; i++) {
         // for (int j = 0; j < operandCount; j++) {
         // }
@@ -337,7 +370,7 @@ public class Propositions implements Equivalencies {
     public void csvTable(String name, int createNew) throws IOException {
         if (createNew < 0 || createNew > 1)
             throw new IOException("new must be 0 or 1");
-        
+
         FileWriter csvWriter = null;
         Path path = Paths.get(".\\src\\LogicExpressions\\PropositionalLogic\\PropositionData\\TableData\\");
         String file = name + propositionCount + "TT.csv";
@@ -353,7 +386,7 @@ public class Propositions implements Equivalencies {
         try {
 
             csvWriter = new FileWriter(path.resolve(file).toString());
-            
+
             for (int i = 0; i < truthTable.length; i++) {
                 for (int j = 0; j < truthTable[i].length; j++) {
                     csvWriter.append(truthTable[i][j]);
@@ -376,7 +409,7 @@ public class Propositions implements Equivalencies {
     public void csvExpressions(String e, int createNew) throws IOException {
         if (createNew < 0 || createNew > 1)
             throw new IOException("new must be 0 or 1");
-        
+
         FileWriter csvWriter = null;
         Path path = Paths.get(".\\src\\LogicExpressions\\PropositionalLogic\\PropositionData\\Expressions\\");
         String file = e + propositionCount + "Expr.csv";
@@ -385,8 +418,6 @@ public class Propositions implements Equivalencies {
 
     public String inverse(String p) {
 
-            
-        
     }
 
     public String converse(String p) {
@@ -469,6 +500,7 @@ public class Propositions implements Equivalencies {
         public boolean iff(String left, String right) {
             return (left.equals(right));
         }
+
         public boolean not(String operand) {
             return (operand.equals("T") ? false : true);
         }
@@ -480,9 +512,6 @@ public class Propositions implements Equivalencies {
         public boolean reduces(String left, String right) {
             return (left.equals("F") && right.equals("T"));
         }
-        
-        
-
 
         public void close() {
             this.props = null;
@@ -627,7 +656,6 @@ public class Propositions implements Equivalencies {
                 add('C');
                 add('D');
                 add('E');
-                add('F');
                 add('G');
                 add('H');
                 add('I');
@@ -641,7 +669,6 @@ public class Propositions implements Equivalencies {
                 add('Q');
                 add('R');
                 add('S');
-                add('T');
                 add('U');
                 add('V');
                 add('W');
@@ -659,7 +686,7 @@ public class Propositions implements Equivalencies {
         private ArrayList<Character> OPERAND_LIST = new ArrayList<Character>() {
             {
                 addAll(DEFAULT_OPERAND_LIST);
-            }   
+            }
         };
 
         /** Operator map index reference integers */
@@ -674,19 +701,19 @@ public class Propositions implements Equivalencies {
             {
                 put("&", new ArrayList<String>() {
                     {
-                        add("&");
+                        add("a");
                         add("and");
                     }
                 });
                 put("|", new ArrayList<String>() {
                     {
-                        add("|");
+                        add("o");
                         add("or");
                     }
                 });
                 put("->", new ArrayList<String>() {
                     {
-                        add(">");
+                        add("m");
                         add("implies");
                     }
                 });
@@ -698,7 +725,7 @@ public class Propositions implements Equivalencies {
                 });
                 put("~", new ArrayList<String>() {
                     {
-                        add("~");
+                        add("n");
                         add("not");
                     }
                 });
@@ -710,7 +737,7 @@ public class Propositions implements Equivalencies {
                 });
                 put("<-", new ArrayList<String>() {
                     {
-                        add("<");
+                        add("r");
                         add("reduces");
                     }
                 });
@@ -732,91 +759,79 @@ public class Propositions implements Equivalencies {
                         add("space");
                     }
                 });
-                put("T", new ArrayList<String>() {
-                    {
-                        add("T");
-                        add("true");
-                    }
-                });
-                put("F", new ArrayList<String>() {
-                    {
-                        add("F");
-                        add("false");
-                    }
-                });
             }
         };
 
         private final ArrayList<String> INVALID_OPERATOR_ORDER = new ArrayList<String>() {
             {
-            add("~&");
-            add("~|");
-            add("~>");
-            add("~<");
-            add("~x");
-            add("~)");
-            add("~i");
+                add("na");
+                add("no");
+                add("nm");
+                add("nr");
+                add("nx");
+                add("n)");
+                add("ni");
 
-            add("&&");
-            add("&&&");
-            add("&|");
-            add("&>");
-            add("&<");
-            add("&x");
-            add("&)");
-            add("&i");
+                add("aa");
+                add("aaa");
+                add("ao");
+                add("am");
+                add("ar");
+                add("ax");
+                add("a)");
+                add("ai");
 
-            add("||");
-            add("|||");
-            add("|&");
-            add("|>");
-            add("|<");
-            add("|x");
-            add("|)");
-            add("|i");
+                add("oo");
+                add("ooo");
+                add("oa");
+                add("om");
+                add("on");
+                add("ox");
+                add("o)");
+                add("oi");
 
-            add(">>");
-            add(">>>");
-            add(">|");
-            add(">&");
-            add(">x");
-            add(">)");
-            add(">i");
+                add("mm");
+                add("mmm");
+                add("mo");
+                add("ma");
+                add("mx");
+                add("m)");
+                add("mi");
 
-            add("xx");
-            add("xxx");
-            add("x&");
-            add("x|");
-            add("x>");
-            add("x<");
-            add("x)");
-            add("xi");
+                add("xx");
+                add("xxx");
+                add("xa");
+                add("xo");
+                add("xm");
+                add("xr");
+                add("x)");
+                add("xi");
 
-            add("<<");
-            add("<<<");
-            add("<|");
-            add("<&");
-            add("<x");
-            add("<)");
-            add("<i");
-            add("<>");
+                add("rr");
+                add("rrr");
+                add("ro");
+                add("ra");
+                add("rx");
+                add("r)");
+                add("ri");
+                add("rm");
 
-            add("ii");
-            add("iii");
-            add("i&");
-            add("i|");
-            add("i>");
-            add("i<");
-            add("i)");
-            add("ix");
+                add("ii");
+                add("iii");
+                add("ia");
+                add("io");
+                add("im");
+                add("ir");
+                add("i)");
+                add("ix");
 
-            add("()");
-            add("(|");
-            add("(&");
-            add("(>");
-            add("(<");
-            add("(x");
-            add("(i");
+                add("()");
+                add("(o");
+                add("(a");
+                add("(m");
+                add("(r");
+                add("(x");
+                add("(i");
             }
         };
 
@@ -836,7 +851,8 @@ public class Propositions implements Equivalencies {
             for (char c : ops) {
                 if (OPERATOR_MAPS.containsKey(Character.toString(c))) {
                     throw new IOException("Custom operands cannot contain operators");
-                }
+                } else if (c == 'T' || c == 'F')
+                    throw new IOException("Custom operands cannot contain truth values");
             }
             CUSTOM_OPERAND_LIST.clear();
             CUSTOM_OPERAND_LIST.addAll(ops);
@@ -944,7 +960,6 @@ public class Propositions implements Equivalencies {
                 }
             }
 
-            
             return false;
         }
 
@@ -1059,7 +1074,7 @@ public class Propositions implements Equivalencies {
         }
 
         // ~~~~~~~~LOGICAL METHODS~~~~~~~~
-        
+
         public int getInvalidOrderSize() {
             return INVALID_OPERATOR_ORDER.size();
         }
@@ -1071,4 +1086,3 @@ public class Propositions implements Equivalencies {
     }
 
 }
-

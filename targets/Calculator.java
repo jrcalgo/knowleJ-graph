@@ -11,7 +11,7 @@ import src.LogicExpressions.PropositionalLogic.Logic.Propositions;
 public class Calculator {
     
     public static void main(String[] args) throws IOException, InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
-        Propositions e = new Propositions("(P&Q| ~F )->Z<>(Y&~R<>P>-<Q)");
+        Propositions e = new Propositions("(P&Q| ~V )->Z<>(Y&~R<>P>-<Q)");
         System.out.println(e.getExpression());
         System.out.println(e.getConvertedExpression());
         System.out.println(e.getPropositions());
