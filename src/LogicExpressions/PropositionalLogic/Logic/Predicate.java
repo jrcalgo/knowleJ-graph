@@ -9,18 +9,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-public class LogicalPredicate extends Quantifiers implements Equivalencies {
+public class Predicate extends Quantifiers implements Equivalencies {
 
     private Map<String, Boolean> operands;
-    private LogicalPropositions expression;
+    private Propositions expression;
 
     private static final boolean TRUE = true;
     private static final boolean FALSE = false;
 
-    public LogicalPredicate(LogicalPropositions expression, Map<String, Boolean> operands) {
+    public Predicate(Propositions expression, Map<String, Boolean> operands) {
         this.operands = new HashMap<>(operands);
         this.expression = expression;
     }
+
+    
 
     public boolean universal(List<T> elements, Predicate predicate) {
         for (T element : elements) {
@@ -47,19 +49,37 @@ public class LogicalPredicate extends Quantifiers implements Equivalencies {
     }
 
     @Override
-    public boolean isTautology() {
+    public boolean isTautology(String[] s) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'isTautology'");
     }
 
     @Override
-    public boolean isContradiction() {
+    public boolean isTautology(Boolean[] b) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isTautology'");
+    }
+
+    @Override
+    public boolean isContradiction(String[] s) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'isContradiction'");
     }
 
     @Override
-    public boolean isContingency() {
+    public boolean isContradiction(Boolean[] b) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isContradiction'");
+    }
+
+    @Override
+    public boolean isContingency(String[] s) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isContingency'");
+    }
+
+    @Override
+    public boolean isContingency(Boolean[] b) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'isContingency'");
     }

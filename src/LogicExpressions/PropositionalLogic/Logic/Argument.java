@@ -3,25 +3,25 @@ package src.LogicExpressions.PropositionalLogic.Logic;
 import src.Interfaces.Equivalencies;
 import src.LogicExpressions.PropositionalLogic.Laws.InferenceLaws;
 
-public class LogicalArgument extends InferenceLaws implements Equivalencies {
-    private LogicalPropositions expression;
-    private LogicalPredicate predicate;
+public class Argument extends InferenceLaws implements Equivalencies {
+    private Propositions expression;
+    private Predicate predicate;
 
-    private LogicalPropositions[] propHypothesis;
-    private LogicalPropositions[] propConclusion;
-    private LogicalPredicate[] predHypothesis;
-    private LogicalPredicate[] predConclusion;
+    private Propositions[] propHypothesis;
+    private Propositions[] propConclusion;
+    private Predicate[] predHypothesis;
+    private Predicate[] predConclusion;
 
 
-    public LogicalArgument(LogicalPropositions expression) {
+    public Argument(Propositions expression) {
         this.expression = expression;
     }
 
-    public LogicalArgument(LogicalPredicate predicate) {
+    public Argument(Predicate predicate) {
         this.predicate = predicate;
     }
 
-    public LogicalArgument(LogicalPropositions expression, LogicalPredicate predicate) {
+    public Argument(Propositions expression, Predicate predicate) {
         this.expression = expression;
         this.predicate = predicate;
     }
