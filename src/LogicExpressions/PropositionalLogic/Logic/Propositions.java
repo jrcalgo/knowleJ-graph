@@ -27,16 +27,14 @@ public class Propositions implements Equivalencies {
     /** syntax for propositional logic */
     private LogicalSyntax syntax = new LogicalSyntax();
     /** collection of partitioned/parsed propositional statements */
-    private LinkedList<String> partitions;
-    /** queue of partitioned/parsed propositional statements */
-    private Queue<Character> partitionCharQueue;
-    /** count of partitions from expression */
-    private int partitionCount;
+    private LinkedList<String> statements;
+    /** count of statements from expression */
+    private int statementCount;
     /** operands contained in expression's String */
     private ArrayList<String> operands;
     /** count of operands in expression */
     private int operandCount;
-    /** combination of operands and partition propositional statements */
+    /** combination of operands and statement propositional statements */
     private ArrayList<String> propositions;
     /** count of propositions in expression */
     private int propositionCount;
@@ -53,9 +51,7 @@ public class Propositions implements Equivalencies {
 
     public Propositions()
             throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
-        this.expression = new Expression();
-        setPropositions();
-        setTruthTable();
+        super();
     }
 
     public Propositions(String e)
@@ -78,69 +74,69 @@ public class Propositions implements Equivalencies {
     }
 
     /**
-     * 
+     * Writing this method gave me a headache. Parsed statements based off of parentheses
      * 
      * @return
      */
-    private void parsePartitions() {
-        partitionCharQueue = new ArrayDeque<Character>();
-        partitions = new LinkedList<String>();
+    private void parseStatements() {
+        Queue<Character> statementCharQueue = new ArrayDeque<Character>();
+        statements = new LinkedList<String>();
         String tempPartition = "";
         String cE = this.expression.getConvertedExpression();
 
         for (int p = 0; p < cE.length(); p++) {
             if (cE.contains("(")) {
-                if (!partitionCharQueue.isEmpty() && cE.charAt(p) == '(') {
-                    if (syntax.containsAnyConversionOperators(partitionCharQueue.peek() + "")) {
-                        while (!partitionCharQueue.isEmpty())
-                            partitionCharQueue.remove();
-                    } else if (syntax.isOperand(partitionCharQueue.peek())) {
-                        while (!partitionCharQueue.isEmpty()) {
-                            tempPartition += partitionCharQueue.peek();
-                            partitionCharQueue.remove();
+                if (!statementCharQueue.isEmpty() && cE.charAt(p) == '(') {
+                    if (syntax.containsAnyConversionOperators(statementCharQueue.peek() + "")) {
+                        while (!statementCharQueue.isEmpty())
+                            statementCharQueue.remove();
+                    } else if (syntax.isOperand(statementCharQueue.peek())) {
+                        while (!statementCharQueue.isEmpty()) {
+                            tempPartition += statementCharQueue.peek();
+                            statementCharQueue.remove();
                         }
-                        partitions.add(tempPartition);
+                        statements.add(tempPartition);
                         tempPartition = "";
-                        partitionCount++;
+                        statementCount++;
                     }
                 }
                 if (syntax.containsAnyConversionOperators(cE.charAt(p) + "")) {
                     if (cE.charAt(p) == ')') {
-                        partitionCharQueue.add(cE.charAt(p));
-                        while (!partitionCharQueue.isEmpty()) {
-                            tempPartition += partitionCharQueue.peek();
-                            partitionCharQueue.remove();
+                        statementCharQueue.add(cE.charAt(p));
+                        while (!statementCharQueue.isEmpty()) {
+                            tempPartition += statementCharQueue.peek();
+                            statementCharQueue.remove();
                         }
-                        partitions.add(tempPartition);
+                        statements.add(tempPartition);
                         tempPartition = "";
-                        partitionCount++;
+                        statementCount++;
                     } else
-                        partitionCharQueue.add(cE.charAt(p));
+                        statementCharQueue.add(cE.charAt(p));
                 } else if (syntax.isOperand(cE.charAt(p))) {
-                    partitionCharQueue.add(cE.charAt(p));
+                    statementCharQueue.add(cE.charAt(p));
                 }
             } else {
                 if (syntax.containsAnyConversionOperators(cE.charAt(p) + "")) {
-                    partitionCharQueue.add(cE.charAt(p));
+                    statementCharQueue.add(cE.charAt(p));
                 } else if (syntax.isOperand(cE.charAt(p))) {
-                    partitionCharQueue.add(cE.charAt(p));
+                    statementCharQueue.add(cE.charAt(p));
                 }
             }
         }
         // then convert expressions back to original format
-        for (int i = 0; i < partitions.size(); i++) {
-            partitions.set(i, this.expression.revertConvertedExpression(partitions.get(i)));
+        for (int i = 0; i < statements.size(); i++) {
+            statements.set(i, this.expression.revertConvertedExpression(statements.get(i)));
         }
 
-        if (!partitions.contains(expression.getExpression())) {
-            partitions.add(expression.getExpression());
-            partitionCount++;
+        if (!statements.contains(expression.getExpression())) {
+            statements.add(expression.getExpression());
+            statementCount++;
         }
     }
 
     /**
      * Helper method for parsePropositions() method, balances tree expression
-     * partitions
+     * statements
      */
     private void setPropositions() {
         propositions = new ArrayList<String>();
@@ -151,49 +147,11 @@ public class Propositions implements Equivalencies {
             propositionCount++;
         }
 
-        parsePartitions();
-        for (int i = 0; i < this.partitions.size(); i++) {
-            propositions.add(this.partitions.get(i));
+        parseStatements();
+        for (int i = 0; i < this.statements.size(); i++) {
+            propositions.add(this.statements.get(i));
             propositionCount++;
         }
-    }
-
-    public String getExpression() {
-        return this.expression.getExpression();
-    }
-
-    public String getConvertedExpression() {
-        return this.expression.getConvertedExpression();
-    }
-
-    public void setExpression(String e)
-            throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
-        this.expression.setExpression(e);
-    }
-
-    public String getPropositions() {
-        String statements = "";
-
-        for (int i = 0; i < propositions.size(); i++) {
-            if (!(i == propositions.size() - 1))
-                statements += (propositions.get(i) + " , ");
-            else
-                statements += propositions.get(i);
-        }
-
-        return statements;
-    }
-
-    public String getPropositions(int from, int to) throws IndexOutOfBoundsException {
-        if ((from < 0) || (to > propositions.size()))
-            throw new IndexOutOfBoundsException(to + " is out of bounds.");
-
-        if (from > to)
-            return "";
-        else if (!(from == to))
-            return propositions.get(from) + " , " + getPropositions(from + 1, to);
-        else
-            return propositions.get(from);
     }
 
     /**
@@ -224,49 +182,6 @@ public class Propositions implements Equivalencies {
                 truthTable[i + 1][j] = operandValues[j];
             }
         }
-
-    }
-
-    private void evaluatePartitionValues() {
-        PropositionEvaluator<LinkedList<String>> evaluator = new PropositionEvaluator<>(partitions);
-        partitionCharQueue = new ArrayDeque<Character>();
-
-        for (int i = 0; i < partitionCount; i++) {
-            char[] tempPartition = partitions.get(i).toCharArray();
-            for (int j = 0; j < tempPartition.length; j++) {
-                switch (tempPartition[j]) {
-                    case '(': {
-                        partitionCharQueue.add(tempPartition[j]);
-                        break;
-                    }
-
-                    case ')': {
-                        partitionCharQueue.add(tempPartition[j]);
-                        break;
-                    }
-
-                    case 'a': {
-
-                    }
-
-                    case 'o':
-
-                    case 'n':
-
-                    case 'r':
-
-                    case 'm':
-
-                    case 'x':
-
-                    case 'T':
-
-                    case 'F':
-
-                }
-            }
-        }
-
     }
 
     private void setTruthTable() {
@@ -283,21 +198,110 @@ public class Propositions implements Equivalencies {
         combineOperandValues();
         int combinationCount = valueTable.length;
 
-        // for (int i = 1; i < permutationCount; i++) {
-        // for(int j = 0; i < elements[i].length; j++) {
-        // truthTable[i][j] = elements[i][j];
-        // // if (elements[i][j].equals("T"))
-        // valueTable[i][j] = true;
-        // else
-        // // valueTable[i][j] = false;
-        // }
-        // }
+        // HashMap<Character, Character> valueMap = new HashMap<>();
+        // int row = 0;
+        // do {
+        //     for (int i = 0; i < operandCount; i++) 
+        //         valueMap.put(operands.get(i).charAt(0), truthTable[row+1][i].charAt(0));
 
-        // for (int i = 0; i < valueTable.length; i++) {
-        // for (int j = 0; j < operandCount; j++) {
-        // }
+        //     for (int i = 0; i < statementCount; i++) {
+        //         valueTable[row][i+operandCount] = evaluateExpression(statements.get(i), valueMap);
+        //         truthTable[row+1][i+operandCount] = valueTable[row][i+operandCount] ? "T" : "F";
+        //     }
 
-        // }
+        //     row++;
+        //     valueMap.clear();
+        // } while (row < valueRows);
+
+    }
+
+    public boolean evaluateExpression(String expression, HashMap<Character, Character> valueMap) {
+        PropositionEvaluator evaluator = new PropositionEvaluator();
+        boolean answer = false;
+
+        expression = this.expression.convertExpression(expression);
+
+        String markedParentheses = "";
+        if (expression.contains("("))
+            markedParentheses = expression;
+
+        Integer rp, lp = 1;
+        for (int i = 0; i < expression.length(); i++) {
+            if (syntax.isOperand(expression.charAt(i) + ""))
+                expression.replace(expression.charAt(i) + "", valueMap.get(expression.charAt(i)) + "");
+            else if (expression.charAt(i) == '(') {
+                markedParentheses.replaceFirst("(", lp.toString());
+                lp++;
+            }
+
+            if (expression.contains("(") && !markedParentheses.contains("(")) {
+
+                markedParentheses = markedParentheses.replaceFirst(")", rp.toString());
+                lp--;
+            }
+        }
+
+        int opCount = 0;
+        if (expression.contains("n")) {
+            opCount = (int) expression.chars().filter(c -> c == 'n').count();
+            for ( ; opCount > 0; opCount--) {
+                if (expression.contains("nT")) {
+                    expression = expression.replace("nT", "F");
+                } else if (expression.contains("nF")) {
+                    expression = expression.replace("nF", "T");
+                } else if (markedParentheses.contains("n" + )) {
+
+                }
+            }
+        }
+
+        for (int i = 0; i < expression.length(); i++) {
+
+        }
+
+
+        return answer;
+
+    }
+
+    public String getExpression() {
+        return this.expression.getExpression();
+    }
+
+    public String getConvertedExpression() {
+        return this.expression.getConvertedExpression();
+    }
+
+    public void setExpression(String e)
+            throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+        this.expression.setExpression(e);
+        setPropositions();
+        setTruthTable();
+    }
+
+    public String getPropositions() {
+        String statements = "";
+
+        for (int i = 0; i < propositions.size(); i++) {
+            if (!(i == propositions.size() - 1))
+                statements += (propositions.get(i) + " , ");
+            else
+                statements += propositions.get(i);
+        }
+
+        return statements;
+    }
+
+    public String getPropositions(int from, int to) throws IndexOutOfBoundsException {
+        if ((from < 0) || (to > propositions.size()))
+            throw new IndexOutOfBoundsException(to + " is out of bounds.");
+
+        if (from > to)
+            return "";
+        else if (!(from == to))
+            return propositions.get(from) + " , " + getPropositions(from + 1, to);
+        else
+            return propositions.get(from);
     }
 
     public String[][] getTruthTable() {
@@ -416,16 +420,37 @@ public class Propositions implements Equivalencies {
 
     }
 
-    public String inverse(String p) {
+    public String inverse(String p) throws InvalidExpressionException {
+        if (!p.contains("->") || !p.contains("m"))
+            throw new InvalidExpressionException("Invalid proposition; must contain implication");
 
+        if (p.contains("->")) {
+
+        } else if (p.contains("m")) {
+
+        }
     }
 
-    public String converse(String p) {
+    public String converse(String p) throws InvalidExpressionException {
+        if (!p.contains("->") || !p.contains("m"))
+            throw new InvalidExpressionException("Invalid proposition; must contain implication");
 
+        if (p.contains("->")) {
+
+        } else if (p.contains("m")) {
+            
+        }
     }
 
-    public String contrapositive(String p) {
+    public String contrapositive(String p) throws InvalidExpressionException {
+        if (!p.contains("->") || !p.contains("m"))
+            throw new InvalidExpressionException("Invalid proposition; must contain implication");
 
+        if (p.contains("->")) {
+
+        } else if (p.contains("m")) {
+            
+        }
     }
 
     @Override
@@ -474,47 +499,45 @@ public class Propositions implements Equivalencies {
         return !(isTautology(rowOrColumn) || isContradiction(rowOrColumn));
     }
 
-    private class PropositionEvaluator<T extends LinkedList<String>> {
-        private T props;
+    private class PropositionEvaluator {
 
         public PropositionEvaluator() {
             super();
         }
 
-        public PropositionEvaluator(T p) {
-            this.props = p;
+        public boolean not(boolean operand) {
+            return (operand == true ? false : true);
         }
 
-        public boolean and(String left, String right) {
-            return (left.equals("T") && right.equals("T"));
+        public boolean and(boolean left, boolean right) {
+            return (left && right);
         }
 
-        public boolean or(String left, String right) {
-            return (left.equals("T") || right.equals("T"));
+        public boolean or(boolean left, boolean right) {
+            return (left || right);
         }
 
-        public boolean implies(String left, String right) {
-            return (left.equals("T") && right.equals("F"));
+        public boolean implies(boolean left, boolean right) {
+            if (right == false && left == true)
+                return false;
+            else
+                return true;
         }
 
-        public boolean iff(String left, String right) {
-            return (left.equals(right));
+        public boolean iff(boolean left, boolean right) {
+            if (left == right)
+                return true;
+            else
+                return false;
         }
 
-        public boolean not(String operand) {
-            return (operand.equals("T") ? false : true);
-        }
-
-        public boolean xor(String left, String right) {
-            return (left.equals(right) ? false : true);
-        }
-
-        public boolean reduces(String left, String right) {
-            return (left.equals("F") && right.equals("T"));
-        }
-
-        public void close() {
-            this.props = null;
+        public boolean xor(boolean left, boolean right) {
+            if (left == true && right == false)
+                return true;
+            else if (left == false && right == true)
+                return true;
+            else
+                return false;
         }
 
     }
@@ -580,7 +603,7 @@ public class Propositions implements Equivalencies {
                     i++;
                 }
                 i = 0;
-                // check parenthesis count for bout ( and ), and then compare if they are equal
+                // check parenthesis count for both ( and ), and then compare if they are equal
                 int leftParentheses = 0, rightParentheses = 0;
                 for (int j = 0; j < cE.length(); j++) {
                     if (cE.charAt(j) == '(')
@@ -590,7 +613,7 @@ public class Propositions implements Equivalencies {
                 }
 
                 if (leftParentheses != rightParentheses)
-                    throw new InvalidExpressionException("Expression is missing parenthesis.");
+                    throw new InvalidExpressionException("left-and-right parentheses count is not equal.");
             }
         }
 
@@ -599,7 +622,6 @@ public class Propositions implements Equivalencies {
             cE = cE.replaceAll("<>", syntax.getConversionValueFromOperatorKey("<>"));
             cE = cE.replaceAll("->", syntax.getConversionValueFromOperatorKey("->"));
             cE = cE.replaceAll(">-<", syntax.getConversionValueFromOperatorKey(">-<"));
-            cE = cE.replaceAll("<-", syntax.getConversionValueFromOperatorKey("<-"));
             return cE;
         }
 
@@ -608,7 +630,6 @@ public class Propositions implements Equivalencies {
             rE = rE.replaceAll("i", syntax.getOperatorKeyFromValue("i"));
             rE = rE.replaceAll(syntax.getConversionValueFromOperatorKey("->"), "->");
             rE = rE.replaceAll(syntax.getConversionValueFromOperatorKey(">-<"), ">-<");
-            rE = rE.replaceAll(syntax.getConversionValueFromOperatorKey("<-"), "<-");
             return rE;
         }
 
@@ -647,9 +668,9 @@ public class Propositions implements Equivalencies {
     protected static class LogicalSyntax {
 
         /**
-         * Default operand list for propositional logic
+         * custom/default loaded operand list for propositional logic
          */
-        private final ArrayList<Character> DEFAULT_OPERAND_LIST = new ArrayList<Character>() {
+        private final ArrayList<Character> OPERAND_LIST = new ArrayList<Character>() {
             {
                 add('A');
                 add('B');
@@ -675,17 +696,6 @@ public class Propositions implements Equivalencies {
                 add('X');
                 add('Y');
                 add('Z');
-            }
-        };
-
-        private ArrayList<Character> CUSTOM_OPERAND_LIST = new ArrayList<Character>();
-
-        /**
-         * custom/default loaded operand list for propositional logic
-         */
-        private ArrayList<Character> OPERAND_LIST = new ArrayList<Character>() {
-            {
-                addAll(DEFAULT_OPERAND_LIST);
             }
         };
 
@@ -735,12 +745,6 @@ public class Propositions implements Equivalencies {
                         add("xor");
                     }
                 });
-                put("<-", new ArrayList<String>() {
-                    {
-                        add("r");
-                        add("reduces");
-                    }
-                });
                 put("(", new ArrayList<String>() {
                     {
                         add("(");
@@ -767,7 +771,6 @@ public class Propositions implements Equivalencies {
                 add("na");
                 add("no");
                 add("nm");
-                add("nr");
                 add("nx");
                 add("n)");
                 add("ni");
@@ -776,7 +779,6 @@ public class Propositions implements Equivalencies {
                 add("aaa");
                 add("ao");
                 add("am");
-                add("ar");
                 add("ax");
                 add("a)");
                 add("ai");
@@ -803,25 +805,14 @@ public class Propositions implements Equivalencies {
                 add("xa");
                 add("xo");
                 add("xm");
-                add("xr");
                 add("x)");
                 add("xi");
-
-                add("rr");
-                add("rrr");
-                add("ro");
-                add("ra");
-                add("rx");
-                add("r)");
-                add("ri");
-                add("rm");
 
                 add("ii");
                 add("iii");
                 add("ia");
                 add("io");
                 add("im");
-                add("ir");
                 add("i)");
                 add("ix");
 
@@ -829,7 +820,6 @@ public class Propositions implements Equivalencies {
                 add("(o");
                 add("(a");
                 add("(m");
-                add("(r");
                 add("(x");
                 add("(i");
             }
@@ -843,27 +833,6 @@ public class Propositions implements Equivalencies {
         }
 
         // ~~~~~~~~OPERAND METHODS~~~~~~~~
-        public void customOperands(ArrayList<Character> ops) throws IOException {
-            final int MAX_OPERANDS = 30;
-            if (ops.size() > MAX_OPERANDS) {
-                throw new IOException("Custom operands cannot exceed " + MAX_OPERANDS + " characters");
-            }
-            for (char c : ops) {
-                if (OPERATOR_MAPS.containsKey(Character.toString(c))) {
-                    throw new IOException("Custom operands cannot contain operators");
-                } else if (c == 'T' || c == 'F')
-                    throw new IOException("Custom operands cannot contain truth values");
-            }
-            CUSTOM_OPERAND_LIST.clear();
-            CUSTOM_OPERAND_LIST.addAll(ops);
-            OPERAND_LIST.addAll(CUSTOM_OPERAND_LIST);
-        }
-
-        public void defaultOperands() {
-            CUSTOM_OPERAND_LIST.clear();
-            OPERAND_LIST.clear();
-            OPERAND_LIST.addAll(DEFAULT_OPERAND_LIST);
-        }
 
         /**
          * 
@@ -924,7 +893,7 @@ public class Propositions implements Equivalencies {
 
         // ~~~~~~~~OPERATOR METHODS~~~~~~~~
         /**
-         * Used to check if a specific, partitioned string/sequence of characters IS an
+         * Used to check if a specific, statemented string/sequence of characters IS an
          * operator/key
          * 
          * @param s
@@ -935,7 +904,7 @@ public class Propositions implements Equivalencies {
         }
 
         /**
-         * Used to check if a specific, partitioned string/sequence of characters HAS a
+         * Used to check if a specific, statemented string/sequence of characters HAS a
          * given operator/key
          * 
          * @param s
@@ -947,7 +916,7 @@ public class Propositions implements Equivalencies {
         }
 
         /**
-         * Used to check if a specific, partitioned string/sequence of characters HAS
+         * Used to check if a specific, statemented string/sequence of characters HAS
          * ANY operators/keys
          * 
          * @param s
