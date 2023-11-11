@@ -4,7 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="81c458ba-f751-4b24-9835-2ab9122604c5" name="Changes" comment="" />
+    <list default="true" id="81c458ba-f751-4b24-9835-2ab9122604c5" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/LogicExpressions/PropositionalLogic/PropositionData/TableData/test9(1)TT.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/LogicExpressions/PropositionalLogic/PropositionData/TableData/test9(2)TT.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/LogicExpressions/PropositionalLogic/PropositionData/TableData/test9(3)TT.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/LogicExpressions/PropositionalLogic/PropositionData/TableData/test9TT.csv" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -16,6 +22,9 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 3
+}]]></component>
   <component name="ProjectId" id="2STuwNx1AAc6EbSPsiTO5ksCLnK" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -25,7 +34,13 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main"
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "LogicExpressions/PropositionalLogic",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -53,7 +68,11 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1689183130093</updated>
+      <workItem from="1697944994907" duration="3713000" />
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
 </project>
