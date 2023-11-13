@@ -74,8 +74,9 @@ public class Propositions implements Equivalencies {
     }
 
     /**
-     * Writing this method gave me a headache. Parsed statements based off of parentheses
+     * Writing this method gave me a headache. Parsed statements based off of parentheses. 
      * 
+     * METHOD MUST BE REWRITTEN TO ACCOUNT FOR NUMERICAL REPRESENTATION ON PARENTHESES.
      * @return
      */
     private void parseStatements() {
@@ -83,6 +84,8 @@ public class Propositions implements Equivalencies {
         statements = new LinkedList<String>();
         String tempPartition = "";
         String cE = this.expression.getConvertedExpression();
+
+
 
         for (int p = 0; p < cE.length(); p++) {
             if (cE.contains("(")) {
@@ -221,35 +224,21 @@ public class Propositions implements Equivalencies {
 
         expression = this.expression.convertExpression(expression);
 
-        String markedParentheses = "";
-        if (expression.contains("("))
-            markedParentheses = expression;
-
-        Integer rp, lp = 1;
+        String markedExpression = "";
         for (int i = 0; i < expression.length(); i++) {
             if (syntax.isOperand(expression.charAt(i) + ""))
-                expression.replace(expression.charAt(i) + "", valueMap.get(expression.charAt(i)) + "");
-            else if (expression.charAt(i) == '(') {
-                markedParentheses.replaceFirst("(", lp.toString());
-                lp++;
-            }
-
-            if (expression.contains("(") && !markedParentheses.contains("(")) {
-
-                markedParentheses = markedParentheses.replaceFirst(")", rp.toString());
-                lp--;
-            }
+                markedExpression.replace(expression.charAt(i) + "", valueMap.get(expression.charAt(i)) + "");
         }
 
         int opCount = 0;
         if (expression.contains("n")) {
             opCount = (int) expression.chars().filter(c -> c == 'n').count();
             for ( ; opCount > 0; opCount--) {
-                if (expression.contains("nT")) {
+                if (markedExpression.contains("nT")) {
                     expression = expression.replace("nT", "F");
-                } else if (expression.contains("nF")) {
+                } else if (markedExpression.contains("nF")) {
                     expression = expression.replace("nF", "T");
-                } else if (markedParentheses.contains("n" + )) {
+                } else if (expression.contains("n(")) {
 
                 }
             }
@@ -564,7 +553,7 @@ public class Propositions implements Equivalencies {
          */
         public Expression()
                 throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
-            loadExpression("(~P&Q)|~R "); // example expression
+            super();
         }
 
         /**
@@ -603,6 +592,7 @@ public class Propositions implements Equivalencies {
                     i++;
                 }
                 i = 0;
+                // TODO: CHANGE SYNTAX CHECKER TO ACCOUNT FOR NUMERICAL REPRESENTATION ON PARENTHESES
                 // check parenthesis count for both ( and ), and then compare if they are equal
                 int leftParentheses = 0, rightParentheses = 0;
                 for (int j = 0; j < cE.length(); j++) {
@@ -622,6 +612,26 @@ public class Propositions implements Equivalencies {
             cE = cE.replaceAll("<>", syntax.getConversionValueFromOperatorKey("<>"));
             cE = cE.replaceAll("->", syntax.getConversionValueFromOperatorKey("->"));
             cE = cE.replaceAll(">-<", syntax.getConversionValueFromOperatorKey(">-<"));
+            cE = cE.replaceAll("~", syntax.getConversionValueFromOperatorKey("~"));
+            cE = cE.replaceAll("&", syntax.getConversionValueFromOperatorKey("&"));
+            cE = cE.replaceAll("|", syntax.getConversionValueFromOperatorKey("|"));
+
+            if (e.contains("(")) {
+                Integer lp = 1;
+                Integer rp = 0;
+                for (int i = 0; i < e.length(); i++) {
+                    if (e.charAt(i) == '(') {
+                        cE.replaceFirst("(", lp.toString());
+                        lp++;
+                    }
+                    
+                    if (!cE.contains("(")) {
+                        rp = lp - 1;
+                        cE.replaceFirst(")", rp.toString());
+                        lp--;
+                    }
+                }
+            }
             return cE;
         }
 
@@ -630,6 +640,10 @@ public class Propositions implements Equivalencies {
             rE = rE.replaceAll("i", syntax.getOperatorKeyFromValue("i"));
             rE = rE.replaceAll(syntax.getConversionValueFromOperatorKey("->"), "->");
             rE = rE.replaceAll(syntax.getConversionValueFromOperatorKey(">-<"), ">-<");
+            rE = rE.replaceAll(syntax.getConversionValueFromOperatorKey("~"), "~");
+            rE = rE.replaceAll(syntax.getConversionValueFromOperatorKey("&"), "&");
+            rE = rE.replaceAll(syntax.getConversionValueFromOperatorKey("|"), "|");
+
             return rE;
         }
 
