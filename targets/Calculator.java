@@ -12,9 +12,11 @@ public class Calculator {
     
     public static void main(String[] args) throws IOException, InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
         //Proposition e = new Proposition("(P&Q| ~V )->Z<>(Y&~R<>P>-<Q)");
-        //Proposition e = new Proposition("~(P&~(~Q|(~V->~Y)))");
-        //Proposition e = new Proposition("(Q&P)->(P&Q)");
-        Proposition e = new Proposition("~((P&Q)|(~(V|Y)&U))&((R<>W)&(Z>-<L))|(P&G)|(~B&(X&N))");
+        Proposition e = new Proposition("~(P&~(~Q|(~V->~Y)))");
+        //Proposition e = new Proposition("(Q&P)->~(P&Q)");
+        //Proposition e = new Proposition("~((P&Q)|(~(V|Y)&U))&((R<>W)&(Z>-<L))|(P&G)|(~B&(X&N))");
+        //Proposition e = new Proposition("P&Q&R");
+        //Proposition e = new Proposition("P|Q|(P&Q)");
         System.out.println(e.getExpression());
         System.out.println(e.getConvertedExpression());
         System.out.println(e.getPropositions());

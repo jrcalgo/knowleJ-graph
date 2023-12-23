@@ -71,7 +71,8 @@ public class Proposition implements Equivalencies {
                     operandCount++;
                     if (operandCount > 13) {
                         this.expression = null;
-                        throw new InvalidExpressionException("Too many operands; only 13 allowed; there are " + operandCount + " operands.");
+                        throw new InvalidExpressionException(
+                                "Too many operands; only 13 allowed; there are " + operandCount + " operands.");
                     }
                 }
             }
@@ -81,6 +82,7 @@ public class Proposition implements Equivalencies {
     /**
      * Helper method for parsePropositions() method, balances tree expression
      * sentences
+     * 
      * @throws InvalidExpressionException
      */
     private void setPropositions() throws InvalidExpressionException {
@@ -136,41 +138,25 @@ public class Proposition implements Equivalencies {
         for (int i = 0; i < propositions.size(); i++)
             truthTable[0][i] = propositions.get(i) + ""; // titles each column with corresponding
                                                          // proposition/compound proposition
-
         combineOperandValues();
-        int combinationCount = valueTable.length;
 
         HashMap<Character, Character> valueMap = new HashMap<>();
-
-        for (int i = 0; i < operandCount; i++) {
-            valueMap.put(operands.get(i).charAt(0), truthTable[1][i].charAt(0));
+        for (int rows = 0; rows < valueRowsCount; rows++) {
+            for (int i = 0; i < operandCount; i++) 
+                valueMap.put(operands.get(i).charAt(0), truthTable[rows+1][i].charAt(0));
+            
+            truthTable[rows+1][valueColsCount - 1] = evaluateExpression(valueMap) ? "T" : "F";
+            valueTable[rows][valueColsCount - 1] = truthTable[rows+1][valueColsCount - 1].equals("T") ? true : false;
+            valueMap.clear();
         }
-
-        for (int i = 0; i < valueRowsCount; i++) {
-            valueTable[i][valueColsCount-1] = evaluateExpression(valueMap);
-            truthTable[i+1][valueColsCount-1] = valueTable[i][valueColsCount-1].equals(true) ? "T" : "F";
-        }
-
-
-
-        // int row = 0;
-        // do {
-        // for (int i = 0; i < operandCount; i++)
-        // valueMap.put(operands.get(i).charAt(0), truthTable[row+1][i].charAt(0));
-
-        // for (int i = 0; i < sentenceCount; i++) {
-        // valueTable[row][i+operandCount] = evaluateExpression(sentences.get(i),
-        // valueMap);
-        // truthTable[row+1][i+operandCount] = valueTable[row][i+operandCount] ? "T" :
-        // "F";
-        // }
-
-        // row++;
-        // valueMap.clear();
-        // } while (row < valueRowsCount);
-
     }
 
+    /**
+     * incredibly inefficient but at least it works for now, will optimize later
+     * @param valueMap
+     * @return
+     * @throws InvalidExpressionException
+     */
     public boolean evaluateExpression(HashMap<Character, Character> valueMap) throws InvalidExpressionException {
         PropositionOperators operator = new PropositionOperators();
         boolean answer = false;
@@ -197,16 +183,16 @@ public class Proposition implements Equivalencies {
                         char[] mEChars = mE.toCharArray();
                         Integer parenthesesValue = 0;
                         int index = mE.indexOf("n");
-                        if (!(mE.charAt(index+1) == 0))
-                                parenthesesValue = Integer.parseInt(mE.charAt(index+1) + "");
+                        if (!(mE.charAt(index + 1) == 0))
+                            parenthesesValue = Integer.parseInt(mE.charAt(index + 1) + "");
 
                         index += 2;
                         while (index != mE.lastIndexOf(parenthesesValue.toString())) {
                             if (mE.charAt(index) == 'T')
                                 mEChars[index] = operator.not("T").charAt(0);
-                            else if (mE.charAt(index) == 'F') 
+                            else if (mE.charAt(index) == 'F')
                                 mEChars[index] = operator.not("F").charAt(0);
-                            
+
                             index++;
                         }
                         mE = new String(mEChars);
@@ -222,34 +208,39 @@ public class Proposition implements Equivalencies {
             for (String op : operators) {
                 if (expression.contains(op)) {
                     int opCount = (int) expression.chars().filter(c -> c == op.charAt(0)).count();
-                    for ( ; opCount > 0; opCount--) {
+                    for (; opCount > 0; opCount--) {
                         int index = expression.indexOf(op);
                         String leftOperand = expression.charAt(index - 1) + "";
                         String rightOperand = expression.charAt(index + 1) + "";
-                        switch(op) {
+                        switch (op) {
                             case "a": {
                                 result = operator.and(leftOperand, rightOperand);
-                                expression = expression.replaceFirst(expression.substring(index - 1, index + 2), result);
+                                expression = expression.replaceFirst(expression.substring(index - 1, index + 2),
+                                        result);
                                 break;
                             }
                             case "o": {
                                 result = operator.or(leftOperand, rightOperand);
-                                expression = expression.replaceFirst(expression.substring(index - 1, index + 2), result);
+                                expression = expression.replaceFirst(expression.substring(index - 1, index + 2),
+                                        result);
                                 break;
                             }
                             case "m": {
                                 result = operator.implies(leftOperand, rightOperand);
-                                expression = expression.replaceFirst(expression.substring(index - 1, index + 2), result);
+                                expression = expression.replaceFirst(expression.substring(index - 1, index + 2),
+                                        result);
                                 break;
                             }
                             case "i": {
                                 result = operator.iff(leftOperand, rightOperand);
-                                expression = expression.replaceFirst(expression.substring(index - 1, index + 2), result);
+                                expression = expression.replaceFirst(expression.substring(index - 1, index + 2),
+                                        result);
                                 break;
                             }
                             case "x": {
                                 result = operator.xor(leftOperand, rightOperand);
-                                expression = expression.replaceFirst(expression.substring(index - 1, index + 2), result);
+                                expression = expression.replaceFirst(expression.substring(index - 1, index + 2),
+                                        result);
                                 break;
                             }
                             default:
@@ -269,7 +260,7 @@ public class Proposition implements Equivalencies {
         do {
             OptionalInt max = mE.chars().filter(Character::isDigit).map(Character::getNumericValue).max();
             if (max.isPresent()) {
-                for(int m = max.getAsInt() ; m >= 0; m--) {
+                for (int m = max.getAsInt(); m >= 0; m--) {
                     String mString = String.valueOf(m);
                     replacement = mE.substring(mE.indexOf(mString), mE.lastIndexOf(mString) + mString.length());
                     mE = mE.replace(replacement, evaluate.apply(replacement));
@@ -704,9 +695,11 @@ public class Proposition implements Equivalencies {
             else if (e.charAt(0) == ')' || cE.charAt(0) == 'a' || cE.charAt(0) == 'o' || cE.charAt(0) == 'i'
                     || cE.charAt(0) == 'x' || cE.charAt(0) == 'm')
                 throw new InvalidLogicOperatorException("Expression cannot begin with invalid operator.");
-            else if (e.charAt(e.length()-1) == '(' || cE.charAt(cE.length()-1) == 'a' || cE.charAt(cE.length()-1) == 'o'
-                    || cE.charAt(cE.length()-1) == 'i' || cE.charAt(cE.length()-1) == 'x' || cE.charAt(cE.length()-1) == 'm'
-                    || cE.charAt(cE.length()-1) == 'n')
+            else if (e.charAt(e.length() - 1) == '(' || cE.charAt(cE.length() - 1) == 'a'
+                    || cE.charAt(cE.length() - 1) == 'o'
+                    || cE.charAt(cE.length() - 1) == 'i' || cE.charAt(cE.length() - 1) == 'x'
+                    || cE.charAt(cE.length() - 1) == 'm'
+                    || cE.charAt(cE.length() - 1) == 'n')
                 throw new InvalidLogicOperatorException("Expression cannot end with invalid operator.");
             else if (syntax.containsAnyConversionOperators(cE)) {
                 while (i < syntax.getInvalidOperatorPairsSize()) {
