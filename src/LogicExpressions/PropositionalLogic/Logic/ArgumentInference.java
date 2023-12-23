@@ -3,7 +3,7 @@ package src.LogicExpressions.PropositionalLogic.Logic;
 import src.Interfaces.Equivalencies;
 import src.LogicExpressions.PropositionalLogic.Laws.InferenceLaws;
 
-public class Argument extends InferenceLaws implements Equivalencies {
+public class ArgumentInference extends InferenceLaws implements Equivalencies {
     private Propositions expression;
     private Predicate predicate;
 
@@ -42,6 +42,42 @@ public class Argument extends InferenceLaws implements Equivalencies {
 
     @Override
     public boolean isContingency() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isContingency'");
+    }
+
+    @Override
+    public boolean isTautology(String[] s) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isTautology'");
+    }
+
+    @Override
+    public boolean isTautology(Boolean[] b) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isTautology'");
+    }
+
+    @Override
+    public boolean isContradiction(String[] s) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isContradiction'");
+    }
+
+    @Override
+    public boolean isContradiction(Boolean[] b) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isContradiction'");
+    }
+
+    @Override
+    public boolean isContingency(String[] s) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isContingency'");
+    }
+
+    @Override
+    public boolean isContingency(Boolean[] b) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'isContingency'");
     }
