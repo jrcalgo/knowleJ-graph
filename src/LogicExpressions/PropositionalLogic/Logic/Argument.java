@@ -3,7 +3,7 @@ package src.LogicExpressions.PropositionalLogic.Logic;
 import src.Interfaces.Equivalencies;
 import src.LogicExpressions.PropositionalLogic.Laws.InferenceLaws;
 
-public class ArgumentInference extends InferenceLaws implements Equivalencies {
+public class Argument extends InferenceLaws implements Equivalencies {
     private Propositions expression;
     private Predicate predicate;
 
