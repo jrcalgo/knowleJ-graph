@@ -1,18 +1,13 @@
 package src.LogicExpressions.PropositionalLogic.Logic;
 
-import src.DataStructures.PartitionedParsingTree;
 import src.Exceptions.InvalidExpressionException;
 import src.Exceptions.InvalidLogicOperatorException;
 import src.Exceptions.InvalidOperandException;
 import src.LogicExpressions.PropositionalLogic.Characters.Quantifiers;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
+
 import java.util.Map;
 import java.util.Stack;
-import java.util.function.Predicate;
-
 public class Model extends Quantifiers {
     private String modelName;
     public Proposition expression;
@@ -177,8 +172,9 @@ public class Model extends Quantifiers {
         StringBuilder sb = new StringBuilder();
 
         Stack<Integer> parenthesesStack = new Stack<>();
-        for(int i = 0; i < this.symbolicModel.length(); i++) {
-            if(Character.isDigit(this.symbolicModel.charAt(i)) && !parenthesesStack.contains(this.symbolicModel.charAt(i) - '0')) {
+        for (int i = 0; i < this.symbolicModel.length(); i++) {
+            if (Character.isDigit(this.symbolicModel.charAt(i))
+                    && !parenthesesStack.contains(this.symbolicModel.charAt(i) - '0')) {
                 parenthesesStack.push(this.symbolicModel.charAt(i) - '0');
                 this.symbolicModel = this.symbolicModel.replaceFirst(this.symbolicModel.charAt(i) + "", '(' + "");
             } else if (parenthesesStack.contains(this.symbolicModel.charAt(i) - '0')) {
@@ -190,7 +186,7 @@ public class Model extends Quantifiers {
 
         for (int i = 0; i < this.symbolicModel.length(); i++) {
             if (this.operandSymbolicRepresentation.containsKey(this.symbolicModel.charAt(i))) {
-                if (this.symbolicModel.charAt(i+1) == ')') {
+                if (this.symbolicModel.charAt(i + 1) == ')') {
                     sb.append("'" + this.operandSymbolicRepresentation.get(this.symbolicModel.charAt(i)) + "'");
                 } else
                     sb.append("'" + this.operandSymbolicRepresentation.get(this.symbolicModel.charAt(i)) + "' ");
