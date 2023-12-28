@@ -2,8 +2,8 @@ package src.LogicExpressions.PropositionalLogic.Logic;
 
 public class Equivalencies {
     public boolean isTautology(char[] rowOrColumn) {
-        for (String s : rowOrColumn) {
-            if (s.equals("F"))
+        for (char c : rowOrColumn) {
+            if (c == 'F')
                 return false;
         }
         return true;
@@ -18,8 +18,8 @@ public class Equivalencies {
     }
 
     public boolean isContradiction(char[] rowOrColumn) {
-        for (String s : rowOrColumn) {
-            if (s.equals("T"))
+        for (char c : rowOrColumn) {
+            if (c == 'T')
                 return false;
         }
         return true;
