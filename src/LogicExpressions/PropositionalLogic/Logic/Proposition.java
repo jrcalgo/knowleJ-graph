@@ -14,18 +14,15 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.OptionalInt;
-import java.util.PriorityQueue;
-import java.util.Queue;
 import java.util.Stack;
 import java.util.function.Function;
 
 import src.Exceptions.*;
-import src.Interfaces.Equivalencies;
 
 /**
  * 
  */
-public class Proposition implements Equivalencies {
+public class Proposition {
     /** syntax for propositional logic */
     private LogicalSyntax syntax;
     /** Logical expression, its string and other functions */
@@ -69,10 +66,10 @@ public class Proposition implements Equivalencies {
                 if (!operands.contains(c.toString())) {
                     operands.add(c.toString());
                     operandCount++;
-                    if (operandCount > 13) {
+                    if (operandCount > 15) {
                         this.expression = null;
                         throw new InvalidExpressionException(
-                                "Too many operands; only 13 allowed; there are " + operandCount + " operands.");
+                                "Too many operands; only 15 allowed; there are " + operandCount + " operands.");
                     }
                 }
             }
@@ -142,22 +139,23 @@ public class Proposition implements Equivalencies {
 
         HashMap<Character, Character> valueMap = new HashMap<>();
         for (int rows = 0; rows < valueRowsCount; rows++) {
-            for (int i = 0; i < operandCount; i++) 
-                valueMap.put(operands.get(i).charAt(0), truthTable[rows+1][i].charAt(0));
-            
-            truthTable[rows+1][valueColsCount - 1] = evaluateExpression(valueMap) ? "T" : "F";
-            valueTable[rows][valueColsCount - 1] = truthTable[rows+1][valueColsCount - 1].equals("T") ? true : false;
+            for (int i = 0; i < operandCount; i++)
+                valueMap.put(operands.get(i).charAt(0), truthTable[rows + 1][i].charAt(0));
+
+            truthTable[rows + 1][valueColsCount - 1] = evaluateExpression(valueMap) ? "T" : "F";
+            valueTable[rows][valueColsCount - 1] = truthTable[rows + 1][valueColsCount - 1].equals("T") ? true : false;
             valueMap.clear();
         }
     }
 
     /**
      * incredibly inefficient but at least it works for now, will optimize later
+     * 
      * @param valueMap
      * @return
      * @throws InvalidExpressionException
      */
-    public boolean evaluateExpression(HashMap<Character, Character> valueMap) throws InvalidExpressionException {
+    public boolean evaluateExpression(Map<Character, Character> valueMap) throws InvalidExpressionException {
         PropositionOperators operator = new PropositionOperators();
         boolean answer = false;
 
@@ -322,29 +320,36 @@ public class Proposition implements Equivalencies {
         setTruthTable();
     }
 
-    public String getPropositions() {
-        String sentences = "";
-
-        for (int i = 0; i < propositions.size(); i++) {
-            if (!(i == propositions.size() - 1))
-                sentences += (propositions.get(i) + " , ");
-            else
-                sentences += propositions.get(i);
-        }
-
-        return sentences;
+    public ArrayList<String> getPropositions() {
+        return this.propositions;
     }
 
-    public String getPropositions(int from, int to) throws IndexOutOfBoundsException {
-        if ((from < 0) || (to > propositions.size()))
-            throw new IndexOutOfBoundsException("either from or to is out of bounds.");
+    public String getProposition(int index) {
+        if (index >= 0 && index < propositions.size()) {
+            return propositions.get(index);
+        } else {
+            throw new IndexOutOfBoundsException("Index " + index + " is out of bounds");
+        }
+    }
 
-        if (from > to)
-            return "";
-        else if (!(from == to))
-            return propositions.get(from) + " , " + getPropositions(from + 1, to);
-        else
-            return propositions.get(from);
+    public ArrayList<String> getPropositions(int from, int to) throws IndexOutOfBoundsException {
+        if ((from < 0) || (to > propositions.size()))
+            throw new IndexOutOfBoundsException("either 'from' or 'to' is out of bounds.");
+
+        ArrayList<String> subPropositions = new ArrayList<>();
+        for (; from < to; from++) {
+            subPropositions.add(this.propositions.get(from));
+        }
+
+        return subPropositions;
+    }
+
+    public int getOperandCount() {
+        return this.operandCount;
+    }
+
+    public int getPropositionCount() {
+        return this.propositionCount;
     }
 
     public String[][] getTruthTable() {
@@ -476,52 +481,6 @@ public class Proposition implements Equivalencies {
 
     }
 
-    @Override
-    public boolean isTautology(String[] rowOrColumn) {
-        for (String s : rowOrColumn) {
-            if (s.equals("F"))
-                return false;
-        }
-        return true;
-    }
-
-    @Override
-    public boolean isTautology(Boolean[] rowOrColumn) {
-        for (Boolean b : rowOrColumn) {
-            if (b == false)
-                return false;
-        }
-        return true;
-    }
-
-    @Override
-    public boolean isContradiction(String[] rowOrColumn) {
-        for (String s : rowOrColumn) {
-            if (s.equals("T"))
-                return false;
-        }
-        return true;
-    }
-
-    @Override
-    public boolean isContradiction(Boolean[] rowOrColumn) {
-        for (Boolean b : rowOrColumn) {
-            if (b == true)
-                return false;
-        }
-        return true;
-    }
-
-    @Override
-    public boolean isContingency(String[] rowOrColumn) {
-        return !(isTautology(rowOrColumn) || isContradiction(rowOrColumn));
-    }
-
-    @Override
-    public boolean isContingency(Boolean[] rowOrColumn) {
-        return !(isTautology(rowOrColumn) || isContradiction(rowOrColumn));
-    }
-
     private class PropositionOperators {
 
         public PropositionOperators() {
@@ -622,7 +581,7 @@ public class Proposition implements Equivalencies {
     /**
      * 
      */
-    private class Expression {
+    protected class Expression {
 
         /** logical expression String representing math equation */
         private String expression;
