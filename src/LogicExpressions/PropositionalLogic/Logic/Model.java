@@ -147,7 +147,8 @@ public class Model extends Quantifiers {
 
     private void setTotalPredicateTruthValues() {
         this.totalPredicateCharValues = new char[this.operandTruthValues.size() + 1];
-        for (int i = 0; i < this.operandTruthValues.size() - 1; i++) {
+        this.totalPredicateBooleanValues = new boolean[this.operandTruthValues.size() + 1];
+        for (int i = 0; i < this.operandTruthValues.size(); i++) {
             this.totalPredicateCharValues[i] = this.operandTruthValues.get(this.operands[i]);
             this.totalPredicateBooleanValues[i] = this.totalPredicateCharValues[i] == 'T' ? true : false;
         }
