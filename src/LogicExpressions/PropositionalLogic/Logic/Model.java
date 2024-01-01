@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Stack;
 public class Model extends Quantifiers {
     private String modelName;
-    public Proposition expression;
+    private Proposition expression;
 
     private char[] operands;
     private Map<Character, Character> operandTruthValues;
@@ -166,11 +166,12 @@ public class Model extends Quantifiers {
             this.equivalencyEvaluation = "Contradiction";
         else if (equivalencies.isContingency(this.totalPredicateCharValues))
             this.equivalencyEvaluation = "Contingency";
+        else
+            this.equivalencyEvaluation = null;
     }
 
     private void setSymbolicString(Map<Character, String> operandSymbolicRepresentation) {
         this.symbolicModel = this.expression.getConvertedExpression();
-        StringBuilder sb = new StringBuilder();
 
         Stack<Integer> parenthesesStack = new Stack<>();
         for (int i = 0; i < this.symbolicModel.length(); i++) {
@@ -185,6 +186,7 @@ public class Model extends Quantifiers {
         }
         parenthesesStack.clear();
 
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < this.symbolicModel.length(); i++) {
             if (this.operandSymbolicRepresentation.containsKey(this.symbolicModel.charAt(i))) {
                 if (this.symbolicModel.charAt(i + 1) == ')') {
@@ -238,8 +240,19 @@ public class Model extends Quantifiers {
         return this.expression.getExpression();
     }
 
+    public String[][] getTruthTable() {
+        return this.expression.getTruthTable();
+    }
+
     public char[] getOperands() {
         return this.operands;
+    }
+    
+    public char getOperand(int index) {
+        if (index < 0 || index >= this.operands.length)
+            throw new IllegalArgumentException("Operand index out of bounds");
+
+        return this.operands[index];
     }
 
     public Map<Character, Character> getOperandTruthValues() {
