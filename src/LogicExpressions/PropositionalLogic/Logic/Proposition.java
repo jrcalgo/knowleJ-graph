@@ -1,7 +1,5 @@
 package src.LogicExpressions.PropositionalLogic.Logic;
 
-import src.LogicExpressions.PropositionalLogic.Laws.PropositionLaws;
-
 import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -62,7 +60,7 @@ public class Proposition {
     private void parseOperands() throws InvalidExpressionException {
         operands = new ArrayList<String>();
         for (Character c : this.expression.getConvertedExpression().toCharArray()) {
-            if (syntax.isOperand(c)) {
+            if (syntax.isOperand(c) && !c.equals('T') && !c.equals('F')) {
                 if (!operands.contains(c.toString())) {
                     operands.add(c.toString());
                     operandCount++;
@@ -150,6 +148,7 @@ public class Proposition {
 
     /**
      * incredibly inefficient but at least it works for now, will optimize later
+     * (maybe)
      * 
      * @param valueMap
      * @return
@@ -590,7 +589,7 @@ public class Proposition {
         /** converted logical expression string for easier back-end operations */
         private String convertedExpression;
         /** Maximum number of characters accepted in converted expression String */
-        private final int MAX_CHARACTERS = 64;
+        private final int MAX_CHARACTERS = 256;
 
         /**
          * @throws InvalidExpressionException
@@ -648,7 +647,7 @@ public class Proposition {
             int i = 0;
 
             if (e.length() > MAX_CHARACTERS)
-                throw new InvalidExpressionException("Expression is too long; only 64 characters allowed.");
+                throw new InvalidExpressionException("Expression is too long; only 256 characters allowed.");
             else if (!syntax.containsAnyOperands(cE))
                 throw new InvalidOperandException("Expression does not have at least one valid operand.");
             else if (e.charAt(0) == ')' || cE.charAt(0) == 'a' || cE.charAt(0) == 'o' || cE.charAt(0) == 'i'
@@ -760,6 +759,9 @@ public class Proposition {
                 add('X');
                 add('Y');
                 add('Z');
+                /** below are treated as true and false, not as normal operands */
+                add('T');
+                add('F');
             }
         };
 
@@ -891,6 +893,18 @@ public class Proposition {
             super();
         }
 
+        public ArrayList<Character> getOperandList() {
+            return this.OPERAND_LIST;
+        }
+
+        public Map<String, ArrayList<String>> getOperatorMaps() {
+            return this.OPERATOR_MAPS;
+        }
+
+        public ArrayList<String> getInvalidOperatorPairs() {
+            return this.INVALID_OPERATOR_PAIRS;
+        }
+
         // ~~~~~~~~OPERAND METHODS~~~~~~~~
 
         /**
@@ -899,6 +913,9 @@ public class Proposition {
          * @return
          */
         public boolean isOperand(char c) {
+            if (c == 'T' || c == 'F') {
+                return false;
+            }
             return OPERAND_LIST.contains(c);
         }
 
@@ -908,6 +925,9 @@ public class Proposition {
          * @return
          */
         public boolean isOperand(String s) {
+            if (s == "T" || s == "F") {
+                return false;
+            }
             return OPERAND_LIST.contains(s);
         }
 
@@ -918,6 +938,7 @@ public class Proposition {
          * @return
          */
         public boolean containsOperand(String s, char operand) {
+
             return s.contains(Character.toString(operand));
         }
 
@@ -935,7 +956,7 @@ public class Proposition {
          */
         public boolean containsAnyOperands(String s) {
             for (char c : OPERAND_LIST) {
-                if (s.contains(Character.toString(c))) {
+                if (s.contains(Character.toString(c)) && (c != 'T' && c != 'F')) {
                     return true;
                 }
             }
