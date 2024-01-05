@@ -18,7 +18,7 @@ public class Calculator {
         //Proposition e = new Proposition("(Q&P)->~(P&Q)");
         // //Proposition e = new Proposition("~((P&Q)|(~(V|Y)&U))&((R<>W)&(Z>-<L))|(P&G)|(~B&(X&N))");
         // //Proposition e = new Proposition("P&Q&R");
-        // Proposition e = new Proposition("P|Q|(P&~R)");
+        // Proposition e = new Proposition("P|~Q|(~P&~R)");
         // System.out.println(e.getExpression());
         // System.out.println(e.getConvertedExpression());
         // System.out.println(e.getPropositions());
@@ -27,7 +27,7 @@ public class Calculator {
         // for (String i : s) {
         //     System.out.print(i + " ");
         // }
-        //e.printTruthTable();
+        // e.printTruthTable();
 
         Random r = new Random();
         int randomNum1 = r.nextInt(100);
@@ -36,17 +36,18 @@ public class Calculator {
         int randomNum4 = r.nextInt(100);
         Character b1 = exampleBoolean1(randomNum1);
         Character b2 = exampleBoolean2(randomNum2);
-        Model cleaning = new Model("Cleaning", "(P&Q) | (R&Y)", new HashMap<Character, Character>() {{put('P', b1); put ('Q', b2); put('R', exampleBoolean1(randomNum3)); put('Y', exampleBoolean1(randomNum4));}},
+        Model cleaning = new Model("Cleaning", "(P&Q) | (R&Y)", new HashMap<Character, Character>() {{put('P', b1); put ('Q', b2); put('R', exampleBoolean2(randomNum3)); put('Y', exampleBoolean1(randomNum4));}},
                          new HashMap<Character, String>() {{put('P', "I will clean my room"); put('Q', "I will clean the kitchen"); put('R', "I will clean the bathroom"); put('Y', "I will clean the living room");}});
         System.out.println(cleaning.getExpression());
         System.out.println(cleaning.getPredicateModel());
+        System.out.println(cleaning.getModelName());
         System.out.println(cleaning.getSymbolicModel());
-        System.out.println(cleaning.expression.getExpression());
+        System.out.println(cleaning.getOperands());
 
     }
 
     public static Character exampleBoolean1(int i) {
-        if (i % 2 == 0) {
+        if (i % 3 == 0) {
             return 'T';
         } else {
             return 'F';
