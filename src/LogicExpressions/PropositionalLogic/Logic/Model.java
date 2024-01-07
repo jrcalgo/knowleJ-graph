@@ -24,32 +24,6 @@ public class Model extends Quantifiers {
     private String symbolicModel;
     private Map<Character, String> operandSymbolicRepresentation;
 
-    /**
-     * 
-     * @param expression must obey Proposition object format rules
-     * @param operands
-     * @throws InvalidLogicOperatorException
-     * @throws InvalidOperandException
-     * @throws InvalidExpressionException
-     */
-    public Model(String modelName, String expression)
-            throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
-        if (expression == null || expression.isEmpty())
-            throw new IllegalArgumentException("Expression cannot be null or empty.");
-
-        this.modelName = modelName;
-        this.expression = new Proposition(expression);
-    }
-
-    public Model(String modelName, Proposition expression)
-            throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
-        if (expression == null)
-            throw new IllegalArgumentException("Expression cannot be null or empty.");
-
-        this.modelName = modelName;
-        this.expression = expression;
-    }
-
     public Model(String modelName, String expression, Map<Character, Character> operandTruthValues)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null || expression.isEmpty())
@@ -228,6 +202,10 @@ public class Model extends Quantifiers {
         this.symbolicModel = sb.toString();
     }
 
+    public void setModelName(String modelName) {
+        this.modelName = modelName;
+    }
+
     public String getModelName() {
         return this.modelName;
     }
@@ -283,7 +261,7 @@ public class Model extends Quantifiers {
         return this.symbolicModel;
     }
 
-    public boolean getPredicateEvaluation() {
+    public Boolean getPredicateEvaluation() {
         return this.predicateEvaluation;
     }
 
