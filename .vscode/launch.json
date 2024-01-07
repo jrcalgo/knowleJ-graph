@@ -8,6 +8,13 @@
             "type": "java",
             "name": "Calculator",
             "request": "launch",
+            "mainClass": "targets.Calculator",
+            "projectName": "Propositional-Knowledge-System_69d548d0"
+        },
+        {
+            "type": "java",
+            "name": "Calculator",
+            "request": "launch",
             "mainClass": "calculator.Calculator",
             "projectName": "Discrete-Logic_60bc7edf"
         },
