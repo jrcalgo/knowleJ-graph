@@ -1,14 +1,15 @@
-package src.LogicExpressions.PropositionalLogic.Logic;
+package src.LogicExpressions.PropositionalLogic.Models;
 
 import src.Exceptions.InvalidExpressionException;
 import src.Exceptions.InvalidLogicOperatorException;
 import src.Exceptions.InvalidOperandException;
-import src.LogicExpressions.PropositionalLogic.Characters.Quantifiers;
-
+import src.Interfaces.ModelInterface;
+import src.LogicExpressions.PropositionalLogic.Logic.Equivalencies;
+import src.LogicExpressions.PropositionalLogic.Logic.Proposition;
 
 import java.util.Map;
 import java.util.Stack;
-public class Model extends Quantifiers {
+public class DeterminedModel extends Model {
     private String modelName;
     private Proposition expression;
 
@@ -24,7 +25,7 @@ public class Model extends Quantifiers {
     private String symbolicModel;
     private Map<Character, String> operandSymbolicRepresentation;
 
-    public Model(String modelName, String expression, Map<Character, Character> operandTruthValues)
+    public DeterminedModel(String modelName, String expression, Map<Character, Character> operandTruthValues)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null || expression.isEmpty())
             throw new IllegalArgumentException("Expression cannot be null or empty.");
@@ -41,7 +42,7 @@ public class Model extends Quantifiers {
         setEquivalencyEvaluation();
     }
 
-    public Model(String modelName, Proposition expression, Map<Character, Character> operandTruthValues)
+    public DeterminedModel(String modelName, Proposition expression, Map<Character, Character> operandTruthValues)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null)
             throw new IllegalArgumentException("Expression cannot be null or empty.");
@@ -58,7 +59,7 @@ public class Model extends Quantifiers {
         setEquivalencyEvaluation();
     }
 
-    public Model(String modelName, String expression, Map<Character, Character> operandTruthValues,
+    public DeterminedModel(String modelName, String expression, Map<Character, Character> operandTruthValues,
             Map<Character, String> operandSymbolicRepresentation)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null || expression.isEmpty())
@@ -79,7 +80,7 @@ public class Model extends Quantifiers {
         setSymbolicString(this.operandSymbolicRepresentation);
     }
 
-    public Model(String modelName, Proposition expression, Map<Character, Character> operandTruthValues,
+    public DeterminedModel(String modelName, Proposition expression, Map<Character, Character> operandTruthValues,
             Map<Character, String> operandSymbolicRepresentation)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null)
@@ -289,5 +290,4 @@ public class Model extends Quantifiers {
     // }
     // return FALSE;
     // }
-
 }

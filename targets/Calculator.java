@@ -9,6 +9,7 @@ import src.Exceptions.InvalidExpressionException;
 import src.Exceptions.InvalidLogicOperatorException;
 import src.Exceptions.InvalidOperandException;
 import src.LogicExpressions.PropositionalLogic.Logic.*;
+import src.LogicExpressions.PropositionalLogic.Models.DeterminedModel;
 
 public class Calculator {
 
@@ -36,7 +37,7 @@ public class Calculator {
         int randomNum4 = r.nextInt(100);
         Character b1 = exampleBoolean1(randomNum1);
         Character b2 = exampleBoolean2(randomNum2);
-        Model cleaning = new Model("Cleaning", "(P&Q) | (R&Y)", new HashMap<Character, Character>() {{put('P', b1); put ('Q', b2); put('R', exampleBoolean2(randomNum3)); put('Y', exampleBoolean1(randomNum4));}},
+        DeterminedModel cleaning = new DeterminedModel("Cleaning", "(P&Q) | (R&Y)", new HashMap<Character, Character>() {{put('P', b1); put ('Q', b2); put('R', exampleBoolean2(randomNum3)); put('Y', exampleBoolean1(randomNum4));}},
                          new HashMap<Character, String>() {{put('P', "I will clean my room"); put('Q', "I will clean the kitchen"); put('R', "I will clean the bathroom"); put('Y', "I will clean the living room");}});
         System.out.println(cleaning.getExpression());
         System.out.println(cleaning.getPredicateModel());

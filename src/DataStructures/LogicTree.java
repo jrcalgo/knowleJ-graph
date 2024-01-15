@@ -2,7 +2,13 @@ package src.DataStructures;
 
 import src.Interfaces.Tree;
 
-public class PropositionConversionTree<T extends Comparable<T>> implements Tree<T> {
+public class LogicTree implements Tree<LogicTreeNode>{
+    private LogicTreeNode root; // initial expression / root
+    private int totalSize;
+
+    public LogicTree(String expression, int parentExpressionStartIndex) {
+        this.rootExpression = new LogicTreeNode(expression);
+    }
 
     @Override
     public boolean isEmpty() {
@@ -57,7 +63,5 @@ public class PropositionConversionTree<T extends Comparable<T>> implements Tree<
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'traversePostOrder'");
     }
-
-
     
 }
