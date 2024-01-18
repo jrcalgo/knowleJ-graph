@@ -3,18 +3,17 @@ package src.LogicExpressions.PropositionalLogic.Models;
 import src.Exceptions.InvalidExpressionException;
 import src.Exceptions.InvalidLogicOperatorException;
 import src.Exceptions.InvalidOperandException;
-import src.Interfaces.ModelInterface;
 import src.LogicExpressions.PropositionalLogic.Logic.Equivalencies;
 import src.LogicExpressions.PropositionalLogic.Logic.Proposition;
 
 import java.util.Map;
 import java.util.Stack;
-public class DeterminedModel extends Model {
+public class DeterministicModel extends Model {
     private String modelName;
     private Proposition expression;
 
     private char[] operands;
-    private Map<Character, Character> operandTruthValues;
+    private Map<Character, Character> defaultOperandTruthValues;
 
     private String predicateModel;
     private boolean predicateEvaluation;
@@ -22,10 +21,10 @@ public class DeterminedModel extends Model {
     private boolean[] totalPredicateBooleanValues;
     private String equivalencyEvaluation;
 
-    private String symbolicModel;
+    private String symbolRepresentation;
     private Map<Character, String> operandSymbolicRepresentation;
 
-    public DeterminedModel(String modelName, String expression, Map<Character, Character> operandTruthValues)
+    public DeterministicModel(String modelName, String expression, Map<Character, Character> defaultOperandTruthValues)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null || expression.isEmpty())
             throw new IllegalArgumentException("Expression cannot be null or empty.");
@@ -33,16 +32,16 @@ public class DeterminedModel extends Model {
         this.modelName = modelName;
         this.expression = new Proposition(expression);
 
-        setOperands(operandTruthValues);
-        this.operandTruthValues = operandTruthValues;
+        setOperands(defaultOperandTruthValues);
+        this.defaultOperandTruthValues = defaultOperandTruthValues;
 
-        setPredicateString(this.operandTruthValues);
-        this.predicateEvaluation = this.expression.evaluateExpression(this.operandTruthValues);
+        setPredicateString(this.defaultOperandTruthValues);
+        this.predicateEvaluation = this.expression.evaluateExpression(this.defaultOperandTruthValues);
         setTotalPredicateTruthValues();
         setEquivalencyEvaluation();
     }
 
-    public DeterminedModel(String modelName, Proposition expression, Map<Character, Character> operandTruthValues)
+    public DeterministicModel(String modelName, Proposition expression, Map<Character, Character> defaultOperandTruthValues)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null)
             throw new IllegalArgumentException("Expression cannot be null or empty.");
@@ -50,16 +49,16 @@ public class DeterminedModel extends Model {
         this.modelName = modelName;
         this.expression = expression;
 
-        setOperands(this.operandTruthValues);
-        this.operandTruthValues = operandTruthValues;
+        setOperands(this.defaultOperandTruthValues);
+        this.defaultOperandTruthValues = defaultOperandTruthValues;
 
-        setPredicateString(this.operandTruthValues);
-        this.predicateEvaluation = this.expression.evaluateExpression(this.operandTruthValues);
+        setPredicateString(this.defaultOperandTruthValues);
+        this.predicateEvaluation = this.expression.evaluateExpression(this.defaultOperandTruthValues);
         setTotalPredicateTruthValues();
         setEquivalencyEvaluation();
     }
 
-    public DeterminedModel(String modelName, String expression, Map<Character, Character> operandTruthValues,
+    public DeterministicModel(String modelName, String expression, Map<Character, Character> defaultOperandTruthValues,
             Map<Character, String> operandSymbolicRepresentation)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null || expression.isEmpty())
@@ -68,11 +67,11 @@ public class DeterminedModel extends Model {
         this.modelName = modelName;
         this.expression = new Proposition(expression);
 
-        setOperands(operandTruthValues);
-        this.operandTruthValues = operandTruthValues;
+        setOperands(defaultOperandTruthValues);
+        this.defaultOperandTruthValues = defaultOperandTruthValues;
 
-        setPredicateString(this.operandTruthValues);
-        this.predicateEvaluation = this.expression.evaluateExpression(this.operandTruthValues);
+        setPredicateString(this.defaultOperandTruthValues);
+        this.predicateEvaluation = this.expression.evaluateExpression(this.defaultOperandTruthValues);
         setTotalPredicateTruthValues();
         setEquivalencyEvaluation();
 
@@ -80,7 +79,7 @@ public class DeterminedModel extends Model {
         setSymbolicString(this.operandSymbolicRepresentation);
     }
 
-    public DeterminedModel(String modelName, Proposition expression, Map<Character, Character> operandTruthValues,
+    public DeterministicModel(String modelName, Proposition expression, Map<Character, Character> defaultOperandTruthValues,
             Map<Character, String> operandSymbolicRepresentation)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null)
@@ -89,11 +88,11 @@ public class DeterminedModel extends Model {
         this.modelName = modelName;
         this.expression = expression;
 
-        setOperands(operandTruthValues);
-        this.operandTruthValues = operandTruthValues;
+        setOperands(defaultOperandTruthValues);
+        this.defaultOperandTruthValues = defaultOperandTruthValues;
 
-        setPredicateString(this.operandTruthValues);
-        this.predicateEvaluation = this.expression.evaluateExpression(this.operandTruthValues);
+        setPredicateString(this.defaultOperandTruthValues);
+        this.predicateEvaluation = this.expression.evaluateExpression(this.defaultOperandTruthValues);
         setTotalPredicateTruthValues();
         setEquivalencyEvaluation();
 
@@ -101,7 +100,7 @@ public class DeterminedModel extends Model {
         setSymbolicString(this.operandSymbolicRepresentation);
     }
 
-    private void setOperands(Map<Character, Character> operandTruthValues) throws InvalidOperandException {
+    private void setOperands(Map<Character, Character> defaultOperandTruthValues) throws InvalidOperandException {
         operands = new char[this.expression.getOperandCount()];
         for (int i = 0; i < this.expression.getOperandCount(); i++) {
             String operand = this.expression.getProposition(i);
@@ -109,27 +108,27 @@ public class DeterminedModel extends Model {
         }
         // check if map contains all and only all expression operands
         for (int i = 0; i < operands.length; i++) {
-            if (!operandTruthValues.containsKey(operands[i]))
+            if (!defaultOperandTruthValues.containsKey(operands[i]))
                 throw new InvalidOperandException(operands[i] + " not in expression.");
         }
     }
 
-    private void setPredicateString(Map<Character, Character> operandTruthValues) {
+    private void setPredicateString(Map<Character, Character> defaultOperandTruthValues) {
         this.predicateModel = this.expression.getExpression();
         for (char operand : this.operands)
-            this.predicateModel = this.predicateModel.replace(operand, operandTruthValues.get(operand));
+            this.predicateModel = this.predicateModel.replace(operand, defaultOperandTruthValues.get(operand));
     }
 
     private void setTotalPredicateTruthValues() {
-        this.totalPredicateCharValues = new char[this.operandTruthValues.size() + 1];
-        this.totalPredicateBooleanValues = new boolean[this.operandTruthValues.size() + 1];
-        for (int i = 0; i < this.operandTruthValues.size(); i++) {
-            this.totalPredicateCharValues[i] = this.operandTruthValues.get(this.operands[i]);
+        this.totalPredicateCharValues = new char[this.defaultOperandTruthValues.size() + 1];
+        this.totalPredicateBooleanValues = new boolean[this.defaultOperandTruthValues.size() + 1];
+        for (int i = 0; i < this.defaultOperandTruthValues.size(); i++) {
+            this.totalPredicateCharValues[i] = this.defaultOperandTruthValues.get(this.operands[i]);
             this.totalPredicateBooleanValues[i] = this.totalPredicateCharValues[i] == 'T' ? true : false;
         }
 
-        this.totalPredicateCharValues[this.operandTruthValues.size()] = this.predicateEvaluation ? 'T' : 'F';
-        this.totalPredicateBooleanValues[this.operandTruthValues.size()] = this.predicateEvaluation;
+        this.totalPredicateCharValues[this.defaultOperandTruthValues.size()] = this.predicateEvaluation ? 'T' : 'F';
+        this.totalPredicateBooleanValues[this.defaultOperandTruthValues.size()] = this.predicateEvaluation;
     }
 
     private void setEquivalencyEvaluation() {
@@ -146,30 +145,30 @@ public class DeterminedModel extends Model {
     }
 
     private void setSymbolicString(Map<Character, String> operandSymbolicRepresentation) {
-        this.symbolicModel = this.expression.getConvertedExpression();
+        this.symbolRepresentation = this.expression.getConvertedExpression();
 
         Stack<Integer> parenthesesStack = new Stack<>();
-        for (int i = 0; i < this.symbolicModel.length(); i++) {
-            if (Character.isDigit(this.symbolicModel.charAt(i))
-                    && !parenthesesStack.contains(this.symbolicModel.charAt(i) - '0')) {
-                parenthesesStack.push(this.symbolicModel.charAt(i) - '0');
-                this.symbolicModel = this.symbolicModel.replaceFirst(this.symbolicModel.charAt(i) + "", '(' + "");
-            } else if (parenthesesStack.contains(this.symbolicModel.charAt(i) - '0')) {
+        for (int i = 0; i < this.symbolRepresentation.length(); i++) {
+            if (Character.isDigit(this.symbolRepresentation.charAt(i))
+                    && !parenthesesStack.contains(this.symbolRepresentation.charAt(i) - '0')) {
+                parenthesesStack.push(this.symbolRepresentation.charAt(i) - '0');
+                this.symbolRepresentation = this.symbolRepresentation.replaceFirst(this.symbolRepresentation.charAt(i) + "", '(' + "");
+            } else if (parenthesesStack.contains(this.symbolRepresentation.charAt(i) - '0')) {
                 parenthesesStack.pop();
-                this.symbolicModel = this.symbolicModel.replaceFirst(this.symbolicModel.charAt(i) + "", ')' + "");
+                this.symbolRepresentation = this.symbolRepresentation.replaceFirst(this.symbolRepresentation.charAt(i) + "", ')' + "");
             }
         }
         parenthesesStack.clear();
 
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < this.symbolicModel.length(); i++) {
-            if (this.operandSymbolicRepresentation.containsKey(this.symbolicModel.charAt(i))) {
-                if (this.symbolicModel.charAt(i + 1) == ')') {
-                    sb.append("'" + this.operandSymbolicRepresentation.get(this.symbolicModel.charAt(i)) + "'");
+        for (int i = 0; i < this.symbolRepresentation.length(); i++) {
+            if (this.operandSymbolicRepresentation.containsKey(this.symbolRepresentation.charAt(i))) {
+                if (this.symbolRepresentation.charAt(i + 1) == ')') {
+                    sb.append("'" + this.operandSymbolicRepresentation.get(this.symbolRepresentation.charAt(i)) + "'");
                 } else
-                    sb.append("'" + this.operandSymbolicRepresentation.get(this.symbolicModel.charAt(i)) + "' ");
+                    sb.append("'" + this.operandSymbolicRepresentation.get(this.symbolRepresentation.charAt(i)) + "' ");
             } else {
-                switch (this.symbolicModel.charAt(i)) {
+                switch (this.symbolRepresentation.charAt(i)) {
                     case '(':
                         sb.append("(");
                         break;
@@ -200,7 +199,7 @@ public class DeterminedModel extends Model {
             }
         }
 
-        this.symbolicModel = sb.toString();
+        this.symbolRepresentation = sb.toString();
     }
 
     public void setModelName(String modelName) {
@@ -214,13 +213,13 @@ public class DeterminedModel extends Model {
     public Proposition getProposition() {
         return this.expression;
     }
+    
+    public String[][] getTruthTable() {
+        return this.expression.getTruthTable();
+    }
 
     public String getExpression() {
         return this.expression.getExpression();
-    }
-
-    public String[][] getTruthTable() {
-        return this.expression.getTruthTable();
     }
 
     public char[] getOperands() {
@@ -235,18 +234,18 @@ public class DeterminedModel extends Model {
     }
 
     public Map<Character, Character> getOperandTruthValues() {
-        return this.operandTruthValues;
+        return this.defaultOperandTruthValues;
     }
 
     public Map<Character, String> getOperandSymbolicRepresentation() {
         return this.operandSymbolicRepresentation;
     }
 
-    public char[] getTotalPredicateTruthValues() {
+    public char[] getAllPredicateTruthValues() {
         return this.totalPredicateCharValues;
     }
 
-    public boolean[] getTotalPredicateBooleanValues() {
+    public boolean[] getAllPredicateBooleanValues() {
         return this.totalPredicateBooleanValues;
     }
 
@@ -258,36 +257,11 @@ public class DeterminedModel extends Model {
         return this.predicateModel;
     }
 
-    public String getSymbolicModel() {
-        return this.symbolicModel;
+    public String getSymbolicRepresentation() {
+        return this.symbolRepresentation;
     }
 
     public Boolean getPredicateEvaluation() {
         return this.predicateEvaluation;
     }
-
-    // public boolean universal(List<T> elements, Model predicate) {
-    // for (T element : elements) {
-    // if (!predicate.test(element))
-    // return FALSE;
-    // }
-    // return TRUE;
-    // }
-
-    // public boolean universal(PartitionedParsingTree<T> elements, Model predicate)
-    // {
-    // for (T element : elements) {
-    // if (!predicate.test(element))
-    // return FALSE;
-    // }
-    // return TRUE;
-    // }
-
-    // public boolean existential(List<T> elements, Model<T> predicate) {
-    // for (T element : elements) {
-    // if (predicate.test(element))
-    // return TRUE;
-    // }
-    // return FALSE;
-    // }
 }
