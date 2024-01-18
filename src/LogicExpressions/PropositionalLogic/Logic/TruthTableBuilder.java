@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * Used for building a truth table that includes only operands.
  */
 public class TruthTableBuilder {
-    private ArrayList<String> operands;
+    private char[] operands;
     private int operandCount;
     private int boolRowsCount;
     private int boolColsCount;
@@ -15,10 +15,19 @@ public class TruthTableBuilder {
     private String[][] truthTable;
 
     public TruthTableBuilder(ArrayList<String> operands, int boolRowsCount, int boolColsCount) {
-        this.operands = operands;
+        this.operands = String.join("", operands).toCharArray();
         this.boolRowsCount = boolRowsCount;
         this.boolColsCount = boolColsCount;
         this.operandCount = operands.size();
+        this.boolCount = boolRowsCount * boolColsCount;
+        buildTruthTable();
+    }
+
+    public TruthTableBuilder(char[] operands, int boolRowsCount, int boolColsCount) {
+        this.operands = operands;
+        this.boolRowsCount = boolRowsCount;
+        this.boolColsCount = boolColsCount;
+        this.operandCount = operands.length;
         this.boolCount = boolRowsCount * boolColsCount;
         buildTruthTable();
     }
@@ -27,8 +36,8 @@ public class TruthTableBuilder {
         valueTable = new Boolean[boolRowsCount][boolColsCount];
         truthTable = new String[boolRowsCount + 1][boolColsCount]; // +1 for index 0 column titles
 
-        for (int i = 0; i < operands.size(); i++)
-            truthTable[0][i] = operands.get(i) + ""; // titles each column with corresponding
+        for (int i = 0; i < operandCount; i++)
+            truthTable[0][i] = operands[i] + ""; // titles each column with corresponding
                                                          // proposition/compound proposition
         combineOperandValues();
     }
