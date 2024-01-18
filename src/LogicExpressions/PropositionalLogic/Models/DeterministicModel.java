@@ -17,7 +17,7 @@ public class DeterministicModel extends Model {
 
     private String predicateModel;
     private boolean predicateEvaluation;
-    private char[] totalPredicateCharValues;
+    private char[] allPredicateCharValues;
     private boolean[] totalPredicateBooleanValues;
     private String equivalencyEvaluation;
 
@@ -37,7 +37,7 @@ public class DeterministicModel extends Model {
 
         setPredicateString(this.defaultOperandTruthValues);
         this.predicateEvaluation = this.expression.evaluateExpression(this.defaultOperandTruthValues);
-        setTotalPredicateTruthValues();
+        setAllPredicateTruthValues();
         setEquivalencyEvaluation();
     }
 
@@ -54,7 +54,7 @@ public class DeterministicModel extends Model {
 
         setPredicateString(this.defaultOperandTruthValues);
         this.predicateEvaluation = this.expression.evaluateExpression(this.defaultOperandTruthValues);
-        setTotalPredicateTruthValues();
+        setAllPredicateTruthValues();
         setEquivalencyEvaluation();
     }
 
@@ -72,7 +72,7 @@ public class DeterministicModel extends Model {
 
         setPredicateString(this.defaultOperandTruthValues);
         this.predicateEvaluation = this.expression.evaluateExpression(this.defaultOperandTruthValues);
-        setTotalPredicateTruthValues();
+        setAllPredicateTruthValues();
         setEquivalencyEvaluation();
 
         this.operandSymbolicRepresentation = operandSymbolicRepresentation;
@@ -93,7 +93,7 @@ public class DeterministicModel extends Model {
 
         setPredicateString(this.defaultOperandTruthValues);
         this.predicateEvaluation = this.expression.evaluateExpression(this.defaultOperandTruthValues);
-        setTotalPredicateTruthValues();
+        setAllPredicateTruthValues();
         setEquivalencyEvaluation();
 
         this.operandSymbolicRepresentation = operandSymbolicRepresentation;
@@ -119,26 +119,26 @@ public class DeterministicModel extends Model {
             this.predicateModel = this.predicateModel.replace(operand, defaultOperandTruthValues.get(operand));
     }
 
-    private void setTotalPredicateTruthValues() {
-        this.totalPredicateCharValues = new char[this.defaultOperandTruthValues.size() + 1];
+    private void setAllPredicateTruthValues() {
+        this.allPredicateCharValues = new char[this.defaultOperandTruthValues.size() + 1];
         this.totalPredicateBooleanValues = new boolean[this.defaultOperandTruthValues.size() + 1];
         for (int i = 0; i < this.defaultOperandTruthValues.size(); i++) {
-            this.totalPredicateCharValues[i] = this.defaultOperandTruthValues.get(this.operands[i]);
-            this.totalPredicateBooleanValues[i] = this.totalPredicateCharValues[i] == 'T' ? true : false;
+            this.allPredicateCharValues[i] = this.defaultOperandTruthValues.get(this.operands[i]);
+            this.totalPredicateBooleanValues[i] = this.allPredicateCharValues[i] == 'T' ? true : false;
         }
 
-        this.totalPredicateCharValues[this.defaultOperandTruthValues.size()] = this.predicateEvaluation ? 'T' : 'F';
+        this.allPredicateCharValues[this.defaultOperandTruthValues.size()] = this.predicateEvaluation ? 'T' : 'F';
         this.totalPredicateBooleanValues[this.defaultOperandTruthValues.size()] = this.predicateEvaluation;
     }
 
     private void setEquivalencyEvaluation() {
         Equivalencies equivalencies = new Equivalencies();
 
-        if (equivalencies.isTautology(this.totalPredicateCharValues))
+        if (equivalencies.isTautology(this.allPredicateCharValues))
             this.equivalencyEvaluation = "Tautology";
-        else if (equivalencies.isContradiction(this.totalPredicateCharValues))
+        else if (equivalencies.isContradiction(this.allPredicateCharValues))
             this.equivalencyEvaluation = "Contradiction";
-        else if (equivalencies.isContingency(this.totalPredicateCharValues))
+        else if (equivalencies.isContingency(this.allPredicateCharValues))
             this.equivalencyEvaluation = "Contingency";
         else
             this.equivalencyEvaluation = null;
@@ -242,7 +242,7 @@ public class DeterministicModel extends Model {
     }
 
     public char[] getAllPredicateTruthValues() {
-        return this.totalPredicateCharValues;
+        return this.allPredicateCharValues;
     }
 
     public boolean[] getAllPredicateBooleanValues() {
