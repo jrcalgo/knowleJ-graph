@@ -3,7 +3,7 @@ package src.LogicExpressions.PropositionalLogic.Logic;
 import java.util.ArrayList;
 
 /**
- * Used for building a truth table that includes only operands.
+ * Used for building a basic truth table that includes only operands.
  */
 public class TruthTableBuilder {
     private char[] operands;

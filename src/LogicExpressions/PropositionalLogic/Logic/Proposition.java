@@ -101,6 +101,8 @@ public class Proposition {
         truthTable = ttb.getTruthTable();
         valueCount = ttb.getBoolCount();
 
+        truthTable[0][boolColsCount - 1] = this.expression.getExpression();
+
         HashMap<Character, Character> valueMap = new HashMap<>();
         for (int rows = 0; rows < boolRowsCount; rows++) {
             for (int i = 0; i < operandCount; i++)
@@ -195,7 +197,7 @@ public class Proposition {
                                         result);
                                 break;
                             }
-                            case "i": {
+                            case "i": { // TODO: Needs to be debugged, not outputting correct results
                                 result = operator.iff(leftOperand, rightOperand);
                                 expression = expression.replaceFirst(expression.substring(index - 1, index + 2),
                                         result);
@@ -377,8 +379,7 @@ public class Proposition {
         return column;
     }
 
-    public void printTruthTable() throws xpressionException {
-     {
+    public void printTruthTable() throws InvalidExpressionException {
         if (this.tableValues == null || this.truthTable == null) {
             setTruthTable();
         }
@@ -622,7 +623,7 @@ public class Proposition {
                 throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
             e = e.replaceAll("\s", "");
             String cE = convertExpression(e); // converts expression to valid, converted format
-            checkSyntax(e, cE); // checks validity of converted expression argument
+            validateSyntax(e, cE); // checks validity of converted expression argument
             this.expression = e;
             this.convertedExpression = cE;
         }
@@ -634,7 +635,7 @@ public class Proposition {
          * @throws InvalidOperandException
          * @throws InvalidLogicOperatorException
          */
-        private void checkSyntax(String e, String cE)
+        private void validateSyntax(String e, String cE)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             int i = 0;
 
@@ -725,9 +726,37 @@ public class Proposition {
         /**
          * custom/default loaded operand list for propositional logic
          */
-        private final ArrayList<Character> OPERAND_LIST=new ArrayList<Character>(){{add('A');add('B');add('C');add('D');add('E');add('G');add('H');add('I');add('J');add('K');add('L');add('M');add('N');add('O');add('P');add('Q');add('R');add('S');add('U');add('V');add('W');add('X');add('Y');add('Z');
-        /** below are treated as true and false, not as normal operands */
-        add('T');add('F');}};
+        private final ArrayList<Character> OPERAND_LIST = new ArrayList<Character>() {
+            {
+                add('A');
+                add('B');
+                add('C');
+                add('D');
+                add('E');
+                add('G');
+                add('H');
+                add('I');
+                add('J');
+                add('K');
+                add('L');
+                add('M');
+                add('N');
+                add('O');
+                add('P');
+                add('Q');
+                add('R');
+                add('S');
+                add('U');
+                add('V');
+                add('W');
+                add('X');
+                add('Y');
+                add('Z');
+                /** below are treated as true and false, not as normal operands */
+                add('T');
+                add('F');
+            }
+        };
 
         /** Operator map index reference integers */
         private static final int OPERATOR_CONVERSION_INDEX = 0;
@@ -737,23 +766,118 @@ public class Proposition {
          * Operator map for all hand-typed operators and their corresponding conversion
          * values and names
          */
-        private final Map<String, ArrayList<String>> OPERATOR_MAPS=new HashMap<String,ArrayList<String>>(){{put("&",new ArrayList<String>(){{add("a");add("and");}});put("|",new ArrayList<String>(){{add("o");add("or");}});put("->",new ArrayList<String>(){{add("m");add("implies");}});put("<>",new ArrayList<String>(){{add("i");add("iff");}});put("~",new ArrayList<String>(){{add("n");add("not");}});put(">-<",new ArrayList<String>(){{add("x");add("xor");}});put("(",new ArrayList<String>(){{add("(");add("left-parenthesis");}});put(")",new ArrayList<String>(){{add(")");add("right-parenthesis");}});}};
+        private final Map<String, ArrayList<String>> OPERATOR_MAPS = new HashMap<String, ArrayList<String>>() {
+            {
+                put("&", new ArrayList<String>() {
+                    {
+                        add("a");
+                        add("and");
+                    }
+                });
+                put("|", new ArrayList<String>() {
+                    {
+                        add("o");
+                        add("or");
+                    }
+                });
+                put("->", new ArrayList<String>() {
+                    {
+                        add("m");
+                        add("implies");
+                    }
+                });
+                put("<>", new ArrayList<String>() {
+                    {
+                        add("i");
+                        add("iff");
+                    }
+                });
+                put("~", new ArrayList<String>() {
+                    {
+                        add("n");
+                        add("not");
+                    }
+                });
+                put(">-<", new ArrayList<String>() {
+                    {
+                        add("x");
+                        add("xor");
+                    }
+                });
+                put("(", new ArrayList<String>() {
+                    {
+                        add("(");
+                        add("left-parenthesis");
+                    }
+                });
+                put(")", new ArrayList<String>() {
+                    {
+                        add(")");
+                        add("right-parenthesis");
+                    }
+                });
+            }
+        };
 
-        private final ArrayList<String> INVALID_OPERATOR_PAIRS=new ArrayList<String>(){{add("na");add("no");add("nm");add("nx");add("n)");add("ni");
+        private final ArrayList<String> INVALID_OPERATOR_PAIRS = new ArrayList<String>() {
+            {
+                add("na");
+                add("no");
+                add("nm");
+                add("nx");
+                add("n)");
+                add("ni");
 
-        add("aa");add("aaa");add("ao");add("am");add("ax");add("a)");add("ai");
+                add("aa");
+                add("aaa");
+                add("ao");
+                add("am");
+                add("ax");
+                add("a)");
+                add("ai");
 
-        add("oo");add("ooo");add("oa");add("om");add("ox");add("o)");add("oi");
+                add("oo");
+                add("ooo");
+                add("oa");
+                add("om");
+                add("ox");
+                add("o)");
+                add("oi");
 
-        add("mm");add("mmm");add("mo");add("ma");add("mx");add("m)");add("mi");
+                add("mm");
+                add("mmm");
+                add("mo");
+                add("ma");
+                add("mx");
+                add("m)");
+                add("mi");
 
-        add("xx");add("xxx");add("xa");add("xo");add("xm");add("x)");add("xi");
+                add("xx");
+                add("xxx");
+                add("xa");
+                add("xo");
+                add("xm");
+                add("x)");
+                add("xi");
 
-        add("ii");add("iii");add("ia");add("io");add("im");add("i)");add("ix");
+                add("ii");
+                add("iii");
+                add("ia");
+                add("io");
+                add("im");
+                add("i)");
+                add("ix");
 
-        add("()");add("(o");add("(a");add("(m");add("(x");add("(i");
+                add("()");
+                add("(o");
+                add("(a");
+                add("(m");
+                add("(x");
+                add("(i");
 
-        add(")(");}};
+                add(")(");
+            }
+        };
 
         /**
          * default constructor calls super()/Object constructor
