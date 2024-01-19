@@ -17,7 +17,7 @@ public class TruthTableBuilder {
     public TruthTableBuilder(ArrayList<String> operands, int boolRowsCount, int boolColsCount) {
         this.operands = String.join("", operands).toCharArray();
         this.boolRowsCount = boolRowsCount;
-        this.boolColsCount = boolColsCount;
+        this.boolColsCount = Math.max(boolColsCount, this.operands.length);
         this.operandCount = operands.size();
         this.boolCount = boolRowsCount * boolColsCount;
         buildTruthTable();
@@ -26,7 +26,7 @@ public class TruthTableBuilder {
     public TruthTableBuilder(char[] operands, int boolRowsCount, int boolColsCount) {
         this.operands = operands;
         this.boolRowsCount = boolRowsCount;
-        this.boolColsCount = boolColsCount;
+        this.boolColsCount = Math.max(boolColsCount, this.operands.length);
         this.operandCount = operands.length;
         this.boolCount = boolRowsCount * boolColsCount;
         buildTruthTable();
@@ -73,5 +73,15 @@ public class TruthTableBuilder {
 
     public int getBoolCount() {
         return this.boolCount;
+    }
+
+    public void close() {
+        this.operands = null;
+        this.operandCount = 0;
+        this.boolRowsCount = 0;
+        this.boolColsCount = 0;
+        this.boolCount = 0;
+        this.valueTable = null;
+        this.truthTable = null;
     }
 }
