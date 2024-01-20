@@ -2,30 +2,30 @@ package src.DataStructures;
 
 import src.Interfaces.Tree;
 
-public class LogicTree implements Tree<LogicTreeNode>{
-    private LogicTreeNode root; // initial expression / root
-    private int totalSize;
+public class PropositionTree<T extends Comparable<T>> implements Tree<T> {
+    private PropositionTreeNode root; // initial expression / root
+    private int nodeCount = 0;
 
-    public LogicTree(String expression, int parentExpressionStartIndex) {
-        this.rootExpression = new LogicTreeNode(expression);
+    public LogicTree(String expression) {
+        this.root = new PropositionTreeNode(expression);
+        this.nodeCount++;
     }
 
     @Override
     public boolean isEmpty() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isEmpty'");
+        return this.root == null;
     }
 
     @Override
     public int size() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'size'");
+        return this.nodeCount;
     }
 
     @Override
     public void insert(T element) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'insert'");
+        
     }
 
     @Override
@@ -63,5 +63,5 @@ public class LogicTree implements Tree<LogicTreeNode>{
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'traversePostOrder'");
     }
-    
+
 }

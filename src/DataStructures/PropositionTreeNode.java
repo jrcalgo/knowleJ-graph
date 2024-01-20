@@ -3,27 +3,27 @@ package src.DataStructures;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LogicTreeNode {
+public class PropositionTreeNode {
     private String expression;
     private int parentExpressionIndex;
-    private List<LogicTreeNode> children;
+    private List<PropositionTreeNode> children;
 
-    public LogicTreeNode(String expression) {
+    public PropositionTreeNode(String expression) {
         this.expression = expression;
         this.parentExpressionIndex = -1;
         this.children = null;
     }
 
-    public LogicTreeNode(String expression, int parentExpressionStartIndex) {
+    public PropositionTreeNode(String expression, int parentExpressionStartIndex) {
         this.expression = expression;
         this.parentExpressionIndex = parentExpressionStartIndex;
         this.children = null;
     }
 
-    public LogicTreeNode(String expression, int parentExpressionStartIndex, LogicTreeNode child) {
+    public PropositionTreeNode(String expression, int parentExpressionStartIndex, PropositionTreeNode child) {
         this.expression = expression;
         this.parentExpressionIndex = parentExpressionStartIndex;
-        this.children = new ArrayList<LogicTreeNode>() {
+        this.children = new ArrayList<PropositionTreeNode>() {
             {
                 add(child);
             }
@@ -49,22 +49,22 @@ public class LogicTreeNode {
         this.parentExpressionIndex = parentExpressionIndex;
     }
 
-    public List<LogicTreeNode> getChildren() {
+    public List<PropositionTreeNode> getChildren() {
         return this.children;
     }
 
-    public LogicTreeNode getChild(int index) {
+    public PropositionTreeNode getChild(int index) {
         return this.children.get(index);
     }
 
-    public void addChild(LogicTreeNode child) {
+    public void addChild(PropositionTreeNode child) {
         if (this.children == null)
-            this.children = new ArrayList<LogicTreeNode>();
+            this.children = new ArrayList<PropositionTreeNode>();
 
         this.children.add(child);
     }
 
-    public void removeChild(LogicTreeNode child) {
+    public void removeChild(PropositionTreeNode child) {
         this.children.remove(child);
     }
 
