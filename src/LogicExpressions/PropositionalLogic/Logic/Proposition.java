@@ -100,6 +100,7 @@ public class Proposition {
         tableValues = ttb.getValueTable();
         truthTable = ttb.getTruthTable();
         valueCount = ttb.getBoolCount();
+        ttb.close();
 
         truthTable[0][boolColsCount - 1] = this.expression.getExpression();
 
