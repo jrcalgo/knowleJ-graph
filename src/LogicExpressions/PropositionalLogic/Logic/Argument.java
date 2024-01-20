@@ -1,81 +1,174 @@
 package src.LogicExpressions.PropositionalLogic.Logic;
 
-import src.DataStructures.LogicTree;
-import src.DataStructures.LogicTreeNode;
+import java.util.HashMap;
+
+import src.DataStructures.PropositionTree;
+import src.DataStructures.PropositionTreeNode;
 import src.Exceptions.InvalidExpressionException;
 import src.Exceptions.InvalidLogicOperatorException;
 import src.Exceptions.InvalidOperandException;
-import src.Interfaces.ModelInterface;
 import src.LogicExpressions.PropositionalLogic.Models.*;
 
 public class Argument<M extends Model> {
-    private M[] models;
-    private M query;
-    private char[] modelCharEvaluations;
-    private boolean[] modelBooleanEvaluations;
-    private char argumentCharEvaluation;
-    private boolean argumentBooleanEvaluation;
-    private String[] truthTable;
-    private Boolean[] tableValues;
+    private M[] knowledgeBase;
+    private Proposition query;
 
-    public Argument(Model[] models, Model query) {
-        this.models = models;
-        this.query = query;
+    private char[] operands;
+    private int operandCount;
+
+    private String[][] truthTable;
+    private Boolean[][] tableValues;
+    private String[][] trueKBModels;
+
+    public Argument(M[] knowledgeBase) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+        validateKnowledgeBase(knowledgeBase);
         setTruthTable();
     }
 
-    public Argument(Model[] models, String query) {
-        this.models = models;
-        this.query = new M("Query", query);
-        setTruthTable();
-    }
-    
-    public void checkModels() {
-        
-    }
+    private void validateKnowledgeBase(M[] kb) {
+        if (kb == null || kb.length == 0)
+            throw new IllegalArgumentException("Knowledge base cannot be null or empty.");
 
-    public void setTruthTable() {
-        this.truthTable = new String[this.models.length + 1];
-        for (int i = 0; i < this.models.length; i++) {
-            this.truthTable[i] = this.models[i].getExpression() + " : " + this.models[i].getPredicateEvaluation();
+        StringBuilder operandString = new StringBuilder();
+        for (M m : kb) {
+            char[] modelOperands = m.getOperands();
+            for (int j = 0; j < modelOperands.length; j++) {
+                if (operandString.indexOf(String.valueOf(modelOperands[j])) == -1) {
+                    operandString.append(modelOperands[j]);
+                }
+            }
         }
-        this.truthTable[this.truthTable.length] = query.getExpression() + " : " + evaluateArgument();
+        if (operandString.length() > 15)
+            throw new IllegalArgumentException("Too many total operands in knowledge base; only 15 total allowed.");
+
+        this.operands = operandString.toString().toCharArray();
+        this.operandCount = operandString.length();
+        this.knowledgeBase = kb;
     }
 
-    public boolean evaluateArgument() {
-        boolean answer = false;
+    private void setTruthTable() throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+        int boolRowsCount = (int) Math.pow(2, this.operandCount);
+        int boolColsCount = this.operandCount + this.knowledgeBase.length + 1;
 
-        return answer;
-        // this.modelCharEvaluations = new char[this.models.length];
-        // this.modelBooleanEvaluations = new boolean[this.models.length];
-        // for (int i = 0; i < this.models.length; i++) {
-        //     this.modelCharEvaluations[i] = this.models[i].getPredicateEvaluation() ? 'T' : 'F';
-        //     this.modelBooleanEvaluations[i] = this.models[i].getPredicateEvaluation();
-        // }
+        TruthTableBuilder ttb = new TruthTableBuilder(this.operands, boolRowsCount, boolColsCount);
+        this.truthTable = ttb.getTruthTable();
+        this.tableValues = ttb.getValueTable();
+        ttb.close();
+
+        for (int i = operandCount, j = 0; j < this.knowledgeBase.length; i++, j++)
+            this.truthTable[0][i] = this.knowledgeBase[j].getExpression();
         
-        // Boolean modelEvaluation = this.modelBooleanEvaluations[0];
-        // for (int i = 1; i < this.models.length; i++)
-        //         modelEvaluation = modelEvaluation && this.modelBooleanEvaluations[i];
+        this.truthTable[0][boolColsCount-1] = "KB";
 
-        // if (modelEvaluation == true && this.query.get)
+        HashMap<Character, Character> valueMap = new HashMap<>();
+        boolean[] modelEvaluations = new boolean[this.knowledgeBase.length];
+        for (int rows = 0; rows < boolRowsCount; rows++) {
+            for (int i = 0; i < operandCount; i++)
+                valueMap.put(operands[i], truthTable[rows + 1][i].charAt(0));
+
+            for (int i = 0; i < this.knowledgeBase.length; i++) {
+                Proposition p = new Proposition(this.knowledgeBase[i].getExpression());
+                tableValues[rows][operandCount+i] = p.evaluateExpression(valueMap);
+                truthTable[rows+1][operandCount+i] = tableValues[rows][operandCount+i] ? "T" : "F";
+            }
+            valueMap.clear();
+
+            int i = 0;
+            while (operandCount+i < tableValues[rows].length-1) {
+                modelEvaluations[i] = tableValues[rows][operandCount+i];
+                i++;
+            }
+            tableValues[rows][boolColsCount-1] = evaluateKnowledgeBase(modelEvaluations);
+            truthTable[rows+1][boolColsCount-1] = tableValues[rows][boolColsCount-1] ? "T" : "F";
+        }  
     }
 
-    public String[] getTruthTable() {
+    private boolean evaluateKnowledgeBase(boolean[] modelEvaluations) {
+        boolean rowAnswer = true;
+        
+        for (int i = 0; i < modelEvaluations.length; i++) 
+            rowAnswer = rowAnswer && modelEvaluations[i];
+        
+        return rowAnswer;
+    }
+
+    public void checkAllModels(String query) {
+
+    }
+
+    public void checkAllModels(Proposition query) {
+
+    }
+
+
+    public void checkPresentModels(String query) {
+
+    }
+
+    public void checkPresentModels(Proposition query) {
+
+    }
+
+    public String[][] getTruthTable() {
         return this.truthTable;
     }
 
-    public Boolean[] getTableValues() {
+    public Boolean[][] getTableValues() {
         return this.tableValues;
     }
 
-    public Model[] getModels() {
-        return this.models;
+    public void printTruthTable() throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+        if (this.tableValues == null || this.truthTable == null) {
+            setTruthTable();
+        }
+        System.out.print("\s\s\s\s\s");
+        for (int i = 0; i < truthTable[i].length; i++) {
+            System.out.print(i + "\s\s\s");
+        }
+        System.out.println();
+        for (int i = 0; i < truthTable[i].length; i++) {
+            System.out.print("\s\s\s\s\s");
+            System.out.print(truthTable[0][i]);
+        }
+        System.out.println();
+        for (int i = 1; i < truthTable.length; i++) {
+            for (int j = 0; j < truthTable[i].length; j++) {
+                System.out.print(i + "." + j + ".\s");
+                System.out.print(truthTable[i][j] + "\s\s\s");
+            }
+            System.out.println();
+        }
     }
 
-    public String[] getArgumentExpressions() {
-        String[] expressions = new String[this.models.length];
-        for (int i = 0; i < this.models.length; i++) {
-            expressions[i] = this.models[i].getExpression();
+    public void printTruthTable(int fromCol, int toCol) throws IndexOutOfBoundsException, InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+        if (this.tableValues == null || this.truthTable == null) {
+            setTruthTable();
+        }
+        if (fromCol > toCol)
+            throw new IndexOutOfBoundsException(fromCol + " is out of bounds.");
+
+        for (int i = 0; i < truthTable[i].length; i++) {
+            System.out.print(i + ".\s");
+            System.out.print(truthTable[0][i] + "\s\s\s");
+        }
+
+        for (int i = 1; i < truthTable.length; i++) {
+            for (int j = fromCol; j < toCol; j++) {
+                System.out.print(i + "." + j + ".\s");
+                System.out.print(truthTable[i][j] + "\s\s\s");
+            }
+            System.out.println();
+        }
+    }
+
+    public M[] getKnowledgeBase() {
+        return this.knowledgeBase;
+    }
+
+    public String[] getKBExpressions() {
+        String[] expressions = new String[this.knowledgeBase.length];
+        for (int i = 0; i < this.knowledgeBase.length; i++) {
+            expressions[i] = this.knowledgeBase[i].getExpression();
         }
         return expressions;
     }
@@ -89,13 +182,13 @@ public class Argument<M extends Model> {
         // converted expression
         private String cE;
 
-        public LogicTreeNode<String> checkPropositionLaws(Proposition p)
+        public LogicTreeNode checkPropositionLaws(Proposition p)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             e = p.getExpression();
             cE = p.getConvertedExpression();
         }
 
-        public LogicTreeNode<String> checkArgumentLaws(Argument a) {
+        public LogicTreeNode checkArgumentLaws(Argument a) {
 
         }
 
