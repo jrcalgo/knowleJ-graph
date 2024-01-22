@@ -293,7 +293,7 @@ public class Proposition {
         return this.sentences;
     }
 
-    public String getProposition(int index) {
+    public String getSentence(int index) {
         if (index >= 0 && index < sentences.size()) {
             return sentences.get(index);
         } else {
@@ -301,7 +301,7 @@ public class Proposition {
         }
     }
 
-    public ArrayList<String> getPropositions(int from, int to) throws IndexOutOfBoundsException {
+    public ArrayList<String> getSentences(int from, int to) throws IndexOutOfBoundsException {
         if ((from < 0) || (to > sentences.size()))
             throw new IndexOutOfBoundsException("either 'from' or 'to' is out of bounds.");
 
