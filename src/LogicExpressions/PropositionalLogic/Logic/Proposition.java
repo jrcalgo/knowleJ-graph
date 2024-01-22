@@ -28,11 +28,11 @@ public class Proposition {
     /** operands contained in expression's String */
     private ArrayList<String> operands;
     /** count of operands in expression */
-    private int operandCount;
+    private byte operandCount;
     /** combination of operands and statement propositional sentences */
     private ArrayList<String> sentences;
     /** count of total sentences (operands + sentences/expressions) */
-    private int sentenceCount;
+    private byte sentenceCount;
     /** truth table for expression */
     private String[][] truthTable;
     /** boolean value table for truth table (excludes title row) */
@@ -313,11 +313,11 @@ public class Proposition {
         return subPropositions;
     }
 
-    public int getOperandCount() {
+    public byte getOperandCount() {
         return this.operandCount;
     }
 
-    public int getSentenceCount() {
+    public byte getSentenceCount() {
         return this.sentenceCount;
     }
 
@@ -583,7 +583,7 @@ public class Proposition {
         /** converted logical expression string for easier back-end operations */
         private String convertedExpression;
         /** Maximum number of characters accepted in converted expression String */
-        private final int MAX_CHARACTERS = 256;
+        private final short MAX_CHARACTERS = 256;
 
         /**
          * @throws InvalidExpressionException
