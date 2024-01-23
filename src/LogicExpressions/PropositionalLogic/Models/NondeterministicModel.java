@@ -4,7 +4,7 @@ import java.util.Map;
 
 import src.LogicExpressions.PropositionalLogic.Logic.Proposition;
 
-public class StochasticModel extends Model {
+public class NondeterministicModel extends Model {
 
     @Override
     public String getModelName() {
