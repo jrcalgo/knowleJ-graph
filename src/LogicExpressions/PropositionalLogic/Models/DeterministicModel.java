@@ -3,11 +3,12 @@ package src.LogicExpressions.PropositionalLogic.Models;
 import src.Exceptions.InvalidExpressionException;
 import src.Exceptions.InvalidLogicOperatorException;
 import src.Exceptions.InvalidOperandException;
-import src.LogicExpressions.PropositionalLogic.Logic.Equivalencies;
+import src.LogicExpressions.PropositionalLogic.Logic.Validity;
 import src.LogicExpressions.PropositionalLogic.Logic.Proposition;
 
 import java.util.Map;
 import java.util.Stack;
+
 public class DeterministicModel extends Model {
     private String modelName;
     private Proposition expression;
@@ -24,7 +25,7 @@ public class DeterministicModel extends Model {
     private String symbolRepresentation;
     private Map<Character, String> operandSymbolicRepresentation;
 
-    public DeterministicModel(String modelName, String expression, Map<Character, Character> defaultOperandTruthValues)
+    public DeterministicModel(String modelName, Map<Character, Character> defaultOperandTruthValues, String expression)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null || expression.isEmpty())
             throw new IllegalArgumentException("Expression cannot be null or empty.");
@@ -38,10 +39,11 @@ public class DeterministicModel extends Model {
         setPredicateString(this.defaultOperandTruthValues);
         this.predicateEvaluation = this.expression.evaluateExpression(this.defaultOperandTruthValues);
         setAllPredicateTruthValues();
-        setEquivalencyEvaluation();
+        setValidityEvaluation();
     }
 
-    public DeterministicModel(String modelName, Proposition expression, Map<Character, Character> defaultOperandTruthValues)
+    public DeterministicModel(String modelName, Map<Character, Character> defaultOperandTruthValues,
+            Proposition expression)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null)
             throw new IllegalArgumentException("Expression cannot be null or empty.");
@@ -55,11 +57,11 @@ public class DeterministicModel extends Model {
         setPredicateString(this.defaultOperandTruthValues);
         this.predicateEvaluation = this.expression.evaluateExpression(this.defaultOperandTruthValues);
         setAllPredicateTruthValues();
-        setEquivalencyEvaluation();
+        setValidityEvaluation();
     }
 
-    public DeterministicModel(String modelName, String expression, Map<Character, Character> defaultOperandTruthValues,
-            Map<Character, String> operandSymbolicRepresentation)
+    public DeterministicModel(String modelName, Map<Character, String> operandSymbolicRepresentation,
+            Map<Character, Character> defaultOperandTruthValues, String expression)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null || expression.isEmpty())
             throw new IllegalArgumentException("Expression cannot be null or empty.");
@@ -73,14 +75,14 @@ public class DeterministicModel extends Model {
         setPredicateString(this.defaultOperandTruthValues);
         this.predicateEvaluation = this.expression.evaluateExpression(this.defaultOperandTruthValues);
         setAllPredicateTruthValues();
-        setEquivalencyEvaluation();
+        setValidityEvaluation();
 
         this.operandSymbolicRepresentation = operandSymbolicRepresentation;
         setSymbolicString(this.operandSymbolicRepresentation);
     }
 
-    public DeterministicModel(String modelName, Proposition expression, Map<Character, Character> defaultOperandTruthValues,
-            Map<Character, String> operandSymbolicRepresentation)
+    public DeterministicModel(String modelName, Map<Character, String> operandSymbolicRepresentation,
+            Map<Character, Character> defaultOperandTruthValues, Proposition expression)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null)
             throw new IllegalArgumentException("Expression cannot be null or empty.");
@@ -94,7 +96,7 @@ public class DeterministicModel extends Model {
         setPredicateString(this.defaultOperandTruthValues);
         this.predicateEvaluation = this.expression.evaluateExpression(this.defaultOperandTruthValues);
         setAllPredicateTruthValues();
-        setEquivalencyEvaluation();
+        setValidityEvaluation();
 
         this.operandSymbolicRepresentation = operandSymbolicRepresentation;
         setSymbolicString(this.operandSymbolicRepresentation);
@@ -103,7 +105,7 @@ public class DeterministicModel extends Model {
     private void setOperands(Map<Character, Character> defaultOperandTruthValues) throws InvalidOperandException {
         operands = new char[this.expression.getOperandCount()];
         for (int i = 0; i < this.expression.getOperandCount(); i++) {
-            String operand = this.expression.getProposition(i);
+            String operand = this.expression.getSentence(i);
             operands[i] = operand.charAt(0);
         }
         // check if map contains all and only all expression operands
@@ -123,22 +125,24 @@ public class DeterministicModel extends Model {
         this.allPredicateCharValues = new char[this.defaultOperandTruthValues.size() + 1];
         this.totalPredicateBooleanValues = new boolean[this.defaultOperandTruthValues.size() + 1];
         for (int i = 0; i < this.defaultOperandTruthValues.size(); i++) {
-            this.allPredicateCharValues[i] = this.defaultOperandTruthValues.get(this.operands[i]);
-            this.totalPredicateBooleanValues[i] = this.allPredicateCharValues[i] == 'T' ? true : false;
+            if (i < this.operands.length && i < this.allPredicateCharValues.length) {
+                this.allPredicateCharValues[i] = this.defaultOperandTruthValues.get(this.operands[i]);
+                this.totalPredicateBooleanValues[i] = this.allPredicateCharValues[i] == 'T' ? true : false;
+            }
         }
 
         this.allPredicateCharValues[this.defaultOperandTruthValues.size()] = this.predicateEvaluation ? 'T' : 'F';
         this.totalPredicateBooleanValues[this.defaultOperandTruthValues.size()] = this.predicateEvaluation;
     }
 
-    private void setEquivalencyEvaluation() {
-        Equivalencies equivalencies = new Equivalencies();
+    private void setValidityEvaluation() {
+        Validity validity = new Validity();
 
-        if (equivalencies.isTautology(this.allPredicateCharValues))
+        if (validity.isTautology(this.allPredicateCharValues))
             this.equivalencyEvaluation = "Tautology";
-        else if (equivalencies.isContradiction(this.allPredicateCharValues))
+        else if (validity.isContradiction(this.allPredicateCharValues))
             this.equivalencyEvaluation = "Contradiction";
-        else if (equivalencies.isContingency(this.allPredicateCharValues))
+        else if (validity.isContingency(this.allPredicateCharValues))
             this.equivalencyEvaluation = "Contingency";
         else
             this.equivalencyEvaluation = null;
@@ -152,10 +156,12 @@ public class DeterministicModel extends Model {
             if (Character.isDigit(this.symbolRepresentation.charAt(i))
                     && !parenthesesStack.contains(this.symbolRepresentation.charAt(i) - '0')) {
                 parenthesesStack.push(this.symbolRepresentation.charAt(i) - '0');
-                this.symbolRepresentation = this.symbolRepresentation.replaceFirst(this.symbolRepresentation.charAt(i) + "", '(' + "");
+                this.symbolRepresentation = this.symbolRepresentation
+                        .replaceFirst(this.symbolRepresentation.charAt(i) + "", '(' + "");
             } else if (parenthesesStack.contains(this.symbolRepresentation.charAt(i) - '0')) {
                 parenthesesStack.pop();
-                this.symbolRepresentation = this.symbolRepresentation.replaceFirst(this.symbolRepresentation.charAt(i) + "", ')' + "");
+                this.symbolRepresentation = this.symbolRepresentation
+                        .replaceFirst(this.symbolRepresentation.charAt(i) + "", ')' + "");
             }
         }
         parenthesesStack.clear();
@@ -163,7 +169,7 @@ public class DeterministicModel extends Model {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < this.symbolRepresentation.length(); i++) {
             if (this.operandSymbolicRepresentation.containsKey(this.symbolRepresentation.charAt(i))) {
-                if (this.symbolRepresentation.charAt(i + 1) == ')') {
+                if ((i+1 < this.symbolRepresentation.length()) && this.symbolRepresentation.charAt(i + 1) == ')') {
                     sb.append("'" + this.operandSymbolicRepresentation.get(this.symbolRepresentation.charAt(i)) + "'");
                 } else
                     sb.append("'" + this.operandSymbolicRepresentation.get(this.symbolRepresentation.charAt(i)) + "' ");
@@ -213,7 +219,7 @@ public class DeterministicModel extends Model {
     public Proposition getProposition() {
         return this.expression;
     }
-    
+
     public String[][] getTruthTable() {
         return this.expression.getTruthTable();
     }
@@ -225,7 +231,7 @@ public class DeterministicModel extends Model {
     public char[] getOperands() {
         return this.operands;
     }
-    
+
     public char getOperand(int index) {
         if (index < 0 || index >= this.operands.length)
             throw new IllegalArgumentException("Operand index out of bounds");
