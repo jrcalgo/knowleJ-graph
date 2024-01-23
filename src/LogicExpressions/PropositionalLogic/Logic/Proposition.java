@@ -89,7 +89,7 @@ public class Proposition {
 
         sentences.add(this.expression.getExpression());
 
-        sentenceCount = operandCount + 1;
+        sentenceCount = (byte) ((int) operandCount + 1);
     }
 
     private void setTruthTable() throws InvalidExpressionException {
