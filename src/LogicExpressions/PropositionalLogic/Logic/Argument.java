@@ -1,6 +1,7 @@
 package src.LogicExpressions.PropositionalLogic.Logic;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import src.DataStructures.PropositionTree;
@@ -15,7 +16,7 @@ public class Argument<M extends Model> {
     private ArrayList<ArrayList<String>> trueKBModels;
 
     private char[] operands;
-    private int operandCount;
+    private byte operandCount;
 
     private String[][] truthTable;
     private Boolean[][] tableValues;
@@ -42,7 +43,7 @@ public class Argument<M extends Model> {
             throw new IllegalArgumentException("Too many total operands in knowledge base; only 15 total allowed.");
 
         this.operands = operandString.toString().toCharArray();
-        this.operandCount = operandString.length();
+        this.operandCount = (byte) operandString.length();
         this.knowledgeBase = kb;
     }
 
@@ -67,12 +68,11 @@ public class Argument<M extends Model> {
 
         this.trueKBModels.add(titleRow);
         titleRow = null;
-
         HashMap<Character, Character> valueMap = new HashMap<>();
         boolean[] modelEvaluations = new boolean[this.knowledgeBase.length];
         ArrayList<String> trueKBModelPlaceholder;
-        int trueKBRows = 0;
         for (int rows = 0; rows < boolRowsCount; rows++) {
+            // setting base table values
             for (int i = 0; i < operandCount; i++)
                 valueMap.put(operands[i], this.truthTable[rows + 1][i].charAt(0));
 
@@ -82,7 +82,8 @@ public class Argument<M extends Model> {
                 this.truthTable[rows+1][operandCount+i] = this.tableValues[rows][operandCount+i] ? "T" : "F";
             }
             valueMap.clear();
-
+            
+            // setting KB table values, including KB evaluation(s)
             int i = 0;
             while (operandCount+i < tableValues[rows].length-1) {
                 modelEvaluations[i] = this.tableValues[rows][operandCount+i];
@@ -109,25 +110,80 @@ public class Argument<M extends Model> {
         return rowAnswer;
     }
 
-    public void checkAllModels(String query) {
+    public String checkAllTTModels(String query) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (query == null || query.length() == 0)
             throw new IllegalArgumentException("String query cannot be null or empty.");
+
+        return checkAllTTModels(new Proposition(query));
     }
 
-    public void checkAllModels(Proposition query) {
+    public String checkAllTTModels(Proposition query) throws InvalidExpressionException {
         if (query == null)
             throw new IllegalArgumentException("Proposition query cannot be null or empty.");
+
+        // ArrayList<String> qOperands = query.getSentences(0, query.getOperandCount()-1);
+        // boolean commonOperand = false;
+        // for (String qOp : qOperands) {
+        //     for (char op : this.operands) {
+        //         if (qOp.charAt(0) == op)
+        //             commonOperand = true;
+        //             continue;
+        //     }
+        //     if (commonOperand)
+        //         continue;
+        // }
+        // if (commonOperand == false)
+        //     throw new IllegalArgumentException("No common operand found in query when compared with knowledge base.");
+        
+        String answer = null;
+        this.trueKBModels.get(0).add(query.getExpression());
+        HashMap<Character, Character> valueMap = new HashMap<>();
+        int valueRows = 1;
+        do {
+            for (int i = 0; i < operandCount; i++) {
+                valueMap.put(this.operands[i], this.trueKBModels.get(valueRows).get(i).charAt(0));
+            }
+            this.trueKBModels.get(valueRows).add(query.evaluateExpression(valueMap) ? "T" : "F");
+            if (this.trueKBModels.get(valueRows).get(this.trueKBModels.get(valueRows).size()-1).equals("T") && answer == null)
+                answer = "True";
+            else if (this.trueKBModels.get(valueRows).get(this.trueKBModels.get(valueRows).size()-1).equals("F") && answer == null)
+                answer = "False";
+            else
+                answer = "Uncertain";
+            valueRows++;
+        } while (valueRows < this.trueKBModels.size());
+
+        return answer;
+
     }
 
 
-    public void checkPresentModels(String query) {
+    public String checkPresentTTModels(String query) {
         if (query == null)
             throw new IllegalArgumentException("String query cannot be null or empty.");
+
+        return checkPresentTTModels(new Proposition(query));
     }
 
-    public void checkPresentModels(Proposition query) {
+    public String checkPresentTTModels(Proposition query) {
         if (query == null)
             throw new IllegalArgumentException("Proposition query cannot be null");
+
+        
+    }
+
+    public String deduce(String query) {
+        if (query == null || query.length() == 0)
+            throw new IllegalArgumentException("String query cannot be null or empty.");
+        
+        return performDeduction(new Proposition(query));
+    }
+
+    public String deduce(Proposition query) {
+        if (query == null)
+            throw new IllegalArgumentException("Proposition query cannot be null or empty.");
+        
+        
     }
 
     public String[][] getTruthTable() {
@@ -213,7 +269,42 @@ public class Argument<M extends Model> {
 
         }
 
-        /**
+        /* Rules of Argument Inference */
+        private Argument[] modusPonens() {
+            if
+        }
+
+        private Argument[] modusTollens() {
+            if
+        }
+
+        private Argument[] addition() {
+            if
+        }
+
+        private Argument[] simplification() {
+            if
+        }
+
+        private Argument[] conjunction() {
+            if
+        }
+
+        private Argument[] hypotheticalSyllogism() {
+            if
+        }
+
+        private Argument[] disjunctiveSyllogism() {
+            if
+        }
+
+        private Argument[] resolution() {
+            if
+        }
+    }
+
+    public class LogicalEquivalencies {
+                /**
          * Laws of Propositional Logic
          * 
          * @throws InvalidLogicOperatorException
@@ -371,39 +462,10 @@ public class Argument<M extends Model> {
             }
             return iL;
         }
+    }
 
-        /* Rules of Argument Inference */
-        private Argument[] modusPonens() {
-            if
-        }
+    public class LogicalFallacies {
 
-        private Argument[] modusTollens() {
-            if
-        }
-
-        private Argument[] addition() {
-            if
-        }
-
-        private Argument[] simplification() {
-            if
-        }
-
-        private Argument[] conjunction() {
-            if
-        }
-
-        private Argument[] hypotheticalSyllogism() {
-            if
-        }
-
-        private Argument[] disjunctiveSyllogism() {
-            if
-        }
-
-        private Argument[] resolution() {
-            if
-        }
     }
 
 }
