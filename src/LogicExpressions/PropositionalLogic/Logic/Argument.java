@@ -18,8 +18,11 @@ public class Argument<M extends Model> {
     private char[] operands;
     private byte operandCount;
 
-    private String[][] truthTable;
-    private Boolean[][] tableValues;
+    private String[][] allTruthTable;
+    private Boolean[][] allTruthValues;
+
+    // private String[][] currentTruthTable;
+    // private Boolean[][] currentTruthValues;
 
     public Argument(M[] knowledgeBase) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         validateKnowledgeBase(knowledgeBase);
@@ -51,20 +54,21 @@ public class Argument<M extends Model> {
         int boolRowsCount = (int) Math.pow(2, this.operandCount);
         int boolColsCount = this.operandCount + this.knowledgeBase.length + 1;
 
+        // set all truth table
         TruthTableBuilder ttb = new TruthTableBuilder(this.operands, boolRowsCount, boolColsCount);
-        this.truthTable = ttb.getTruthTable();
-        this.tableValues = ttb.getValueTable();
+        this.allTruthTable = ttb.getTruthTable();
+        this.allTruthValues = ttb.getValueTable();
         ttb.close();
 
         for (int i = operandCount, j = 0; j < this.knowledgeBase.length; i++, j++)
-            this.truthTable[0][i] = this.knowledgeBase[j].getExpression();
+            this.allTruthTable[0][i] = this.knowledgeBase[j].getExpression();
         
-        this.truthTable[0][boolColsCount-1] = "KB";
+        this.allTruthTable[0][boolColsCount-1] = "KB";
 
         this.trueKBModels = new ArrayList<>();
         ArrayList<String> titleRow = new ArrayList<>();
         for (int i = 0; i < boolColsCount; i++)
-            titleRow.add(this.truthTable[0][i]);
+            titleRow.add(this.allTruthTable[0][i]);
 
         this.trueKBModels.add(titleRow);
         titleRow = null;
@@ -74,28 +78,28 @@ public class Argument<M extends Model> {
         for (int rows = 0; rows < boolRowsCount; rows++) {
             // setting base table values
             for (int i = 0; i < operandCount; i++)
-                valueMap.put(operands[i], this.truthTable[rows + 1][i].charAt(0));
+                valueMap.put(operands[i], this.allTruthTable[rows + 1][i].charAt(0));
 
             for (int i = 0; i < this.knowledgeBase.length; i++) {
                 Proposition p = new Proposition(this.knowledgeBase[i].getExpression());
-                this.tableValues[rows][operandCount+i] = p.evaluateExpression(valueMap);
-                this.truthTable[rows+1][operandCount+i] = this.tableValues[rows][operandCount+i] ? "T" : "F";
+                this.allTruthValues[rows][operandCount+i] = p.evaluateExpression(valueMap);
+                this.allTruthTable[rows+1][operandCount+i] = this.allTruthValues[rows][operandCount+i] ? "T" : "F";
             }
             valueMap.clear();
             
             // setting KB table values, including KB evaluation(s)
             int i = 0;
-            while (operandCount+i < tableValues[rows].length-1) {
-                modelEvaluations[i] = this.tableValues[rows][operandCount+i];
+            while (operandCount+i < allTruthValues[rows].length-1) {
+                modelEvaluations[i] = this.allTruthValues[rows][operandCount+i];
                 i++;
             }
-            this.tableValues[rows][boolColsCount-1] = evaluateKnowledgeBase(modelEvaluations);
-            this.truthTable[rows+1][boolColsCount-1] = this.tableValues[rows][boolColsCount-1] ? "T" : "F";
+            this.allTruthValues[rows][boolColsCount-1] = evaluateKnowledgeBase(modelEvaluations);
+            this.allTruthTable[rows+1][boolColsCount-1] = this.allTruthValues[rows][boolColsCount-1] ? "T" : "F";
 
-            if (tableValues[rows][boolColsCount-1]) {
+            if (allTruthValues[rows][boolColsCount-1]) {
                 trueKBModelPlaceholder = new ArrayList<>();
                 for (int j = 0; j < boolColsCount; j++)
-                    trueKBModelPlaceholder.add(this.tableValues[rows][j] ? "T" : "F");
+                    trueKBModelPlaceholder.add(this.allTruthValues[rows][j] ? "T" : "F");
 
                 this.trueKBModels.add(trueKBModelPlaceholder);
             }
@@ -157,29 +161,42 @@ public class Argument<M extends Model> {
         } while (valueRows < this.trueKBModels.size()-1);
 
         return answer;
-
     }
 
 
-    public String checkPresentTTModels(String query) {
-        if (query == null)
-            throw new IllegalArgumentException("String query cannot be null or empty.");
+    // public String checkCurrentTTModels(String query) {
+    //     if (query == null)
+    //         throw new IllegalArgumentException("String query cannot be null or empty.");
 
-        return checkPresentTTModels(new Proposition(query));
-    }
+    //     return checkCurrentTTModels(new Proposition(query));
+    // }
 
-    public String checkPresentTTModels(Proposition query) {
-        if (query == null)
-            throw new IllegalArgumentException("Proposition query cannot be null");
-
+    // public String checkCurrentTTModels(Proposition query) {
+    //     if (query == null)
+    //         throw new IllegalArgumentException("Proposition query cannot be null");
         
-    }
+    //     ArrayList<String> qOperands = query.getSentences(0, query.getOperandCount()-1);
+    //     boolean commonOperand = false;
+    //     for (String qOp : qOperands) {
+    //         for (char op : this.operands) {
+    //             if (qOp.charAt(0) == op) {
+    //                 commonOperand = true;
+    //                 continue;
+    //             }
+    //         }
+    //         if (commonOperand)
+    //             continue;
+    //     }
+    //     if (!commonOperand)
+    //         throw new IllegalArgumentException("No common operand found in query when compared with knowledge base.");
+
+    // }
 
     public String deduce(String query) {
         if (query == null || query.length() == 0)
             throw new IllegalArgumentException("String query cannot be null or empty.");
         
-        return performDeduction(new Proposition(query));
+        return deduce(new Proposition(query));
     }
 
     public String deduce(Proposition query) {
@@ -189,23 +206,23 @@ public class Argument<M extends Model> {
         
     }
 
-    public String[][] getTruthTable() {
-        return this.truthTable;
+    public String[][] getAllTruthTable() {
+        return this.allTruthTable;
     }
 
-    public Boolean[][] getTableValues() {
-        return this.tableValues;
+    public Boolean[][] getAllTableValues() {
+        return this.allTruthValues;
     }
 
     public void printTruthTable() {
         System.out.println();
-        for (int i = 0; i < truthTable[i].length; i++) {
-            System.out.print(truthTable[0][i] + "\s\s\s");
+        for (int i = 0; i < allTruthTable[i].length; i++) {
+            System.out.print(allTruthTable[0][i] + "\s\s\s");
         }
         System.out.println();
-        for (int i = 1; i < truthTable.length; i++) {
-            for (int j = 0; j < truthTable[i].length; j++) {
-                System.out.print(truthTable[i][j] + "\s\s\s\s\s");
+        for (int i = 1; i < allTruthTable.length; i++) {
+            for (int j = 0; j < allTruthTable[i].length; j++) {
+                System.out.print(allTruthTable[i][j] + "\s\s\s\s\s");
             }
             System.out.println();
         }
@@ -215,14 +232,14 @@ public class Argument<M extends Model> {
         if (fromCol > toCol)
             throw new IndexOutOfBoundsException(fromCol + " is out of bounds.");
 
-        for (int i = 0; i < truthTable[i].length; i++) {
+        for (int i = 0; i < allTruthTable[i].length; i++) {
             System.out.print(i + ".\s");
-            System.out.print(truthTable[0][i] + "\s\s\s");
+            System.out.print(allTruthTable[0][i] + "\s\s\s");
         }
 
-        for (int i = 1; i < truthTable.length; i++) {
+        for (int i = 1; i < allTruthTable.length; i++) {
             for (int j = fromCol; j < toCol; j++) {
-                System.out.print(truthTable[i][j] + "\s\s\s\s\s");
+                System.out.print(allTruthTable[i][j] + "\s\s\s\s\s");
             }
             System.out.println();
         }
