@@ -113,17 +113,59 @@ public class demo {
                 put('R','T');
                 put('Y','T');
             }
-        },"(Q->Y)|(Y->Q)|(~R->Q)|(~R->Y)");
+        },"(Q->Y)|(Y->Q)|(~R->Q)&(~R->Y)");
 
     Model[] carMovement = new Model[] {
             forwardOrBackward,
             turn,
             stop
     };
-    String q = "P";
-    Argument<Model> a = new Argument<>(carMovement);
+
+    DeterministicModel schoolOrWork = new DeterministicModel("schwork", new HashMap<Character, String>() {
+        {
+            put('P', "Programming");
+            put('C', "Collaboration");
+            put('W', "At work/school");
+            put('D', "Driving");
+            put('L', "Lunchbreak");
+        }
+    },
+    new HashMap<Character, Character>() {
+        {
+            put('P', 'T');
+            put('C', 'T');
+            put('W', 'T');
+            put('D', 'T');
+            put('L', 'T');
+        }
+    }, "((P|C)&W)->(~D&~L)");
+
+    DeterministicModel sleeping = new DeterministicModel("sleeping", new HashMap<Character, String>() {
+        {
+            put('S', "Sleeping");
+            put('W', "At work/school");
+            put('D', "Driving");
+            put('N', "Doing nothing");
+        }
+    },
+    new HashMap<Character, Character>() {
+        {
+            put('S', 'T');
+            put('W', 'T');
+            put('D', 'T');
+            put('N', 'T');
+        }
+    }, "S->N&~(D|W)");
+
+    Model[] determinedActivities = new Model[] {
+            schoolOrWork,
+            sleeping
+    };
+
+    Argument<Model> a = new Argument<>(determinedActivities);
     a.printTruthTable();
     a.printAllTrueKBModels();
+    System.out.println(a.checkAllTTModels("L"));
     }
 
     public static Character exampleBoolean1(int i) {
