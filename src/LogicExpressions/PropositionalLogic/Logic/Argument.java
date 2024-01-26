@@ -121,37 +121,40 @@ public class Argument<M extends Model> {
         if (query == null)
             throw new IllegalArgumentException("Proposition query cannot be null or empty.");
 
-        // ArrayList<String> qOperands = query.getSentences(0, query.getOperandCount()-1);
-        // boolean commonOperand = false;
-        // for (String qOp : qOperands) {
-        //     for (char op : this.operands) {
-        //         if (qOp.charAt(0) == op)
-        //             commonOperand = true;
-        //             continue;
-        //     }
-        //     if (commonOperand)
-        //         continue;
-        // }
-        // if (commonOperand == false)
-        //     throw new IllegalArgumentException("No common operand found in query when compared with knowledge base.");
+        ArrayList<String> qOperands = query.getSentences(0, query.getOperandCount()-1);
+        boolean commonOperand = false;
+        for (String qOp : qOperands) {
+            for (char op : this.operands) {
+                if (qOp.charAt(0) == op) {
+                    commonOperand = true;
+                    continue;
+                }
+            }
+            if (commonOperand)
+                continue;
+        }
+        if (!commonOperand)
+            throw new IllegalArgumentException("No common operand found in query when compared with knowledge base.");
         
         String answer = null;
-        this.trueKBModels.get(0).add(query.getExpression());
+        ArrayList<Boolean> queryValues = new ArrayList<>();
         HashMap<Character, Character> valueMap = new HashMap<>();
         int valueRows = 1;
         do {
             for (int i = 0; i < operandCount; i++) {
                 valueMap.put(this.operands[i], this.trueKBModels.get(valueRows).get(i).charAt(0));
             }
-            this.trueKBModels.get(valueRows).add(query.evaluateExpression(valueMap) ? "T" : "F");
-            if (this.trueKBModels.get(valueRows).get(this.trueKBModels.get(valueRows).size()-1).equals("T") && answer == null)
+            queryValues.add(query.evaluateExpression(valueMap));
+            if (queryValues.get(valueRows-1))
                 answer = "True";
-            else if (this.trueKBModels.get(valueRows).get(this.trueKBModels.get(valueRows).size()-1).equals("F") && answer == null)
-                answer = "False";
             else
-                answer = "Uncertain";
+                answer = "False";
+            
+            if (valueRows > 1 && queryValues.get(valueRows-1) != queryValues.get(valueRows-2)) {
+                return "Uncertain";
+            }
             valueRows++;
-        } while (valueRows < this.trueKBModels.size());
+        } while (valueRows < this.trueKBModels.size()-1);
 
         return answer;
 
