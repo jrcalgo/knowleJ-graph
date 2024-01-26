@@ -1,6 +1,6 @@
 package src.LogicExpressions.PropositionalLogic.Logic;
 
-public class Equivalencies {
+public class Validity {
     public boolean isTautology(char[] rowOrColumn) {
         for (char c : rowOrColumn) {
             if (c == 'F')

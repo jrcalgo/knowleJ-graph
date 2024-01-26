@@ -1,7 +1,5 @@
 package src.LogicExpressions.PropositionalLogic.Logic;
 
-import src.LogicExpressions.PropositionalLogic.Laws.PropositionLaws;
-
 import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,21 +28,21 @@ public class Proposition {
     /** operands contained in expression's String */
     private ArrayList<String> operands;
     /** count of operands in expression */
-    private int operandCount;
+    private byte operandCount;
     /** combination of operands and statement propositional sentences */
-    private ArrayList<String> propositions;
-    /** count of total propositions (operands + sentences/expressions) */
-    private int propositionCount;
+    private ArrayList<String> sentences;
+    /** count of total sentences (operands + sentences/expressions) */
+    private byte sentenceCount;
     /** truth table for expression */
     private String[][] truthTable;
     /** boolean value table for truth table (excludes title row) */
-    private Boolean[][] valueTable;
+    private Boolean[][] tableValues;
     /** total count of boolean values in truth table */
     private int valueCount;
     /** count of rows in truth table excluding title row */
-    private int valueRowsCount;
+    private int boolRowsCount;
     /** count of columns in truth table */
-    private int valueColsCount;
+    private int boolColsCount;
 
     public Proposition()
             throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
@@ -55,14 +53,13 @@ public class Proposition {
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         this.syntax = new LogicalSyntax();
         this.expression = new Expression(e);
-        setPropositions();
-        setTruthTable();
+        setSentences();
     }
 
     private void parseOperands() throws InvalidExpressionException {
         operands = new ArrayList<String>();
         for (Character c : this.expression.getConvertedExpression().toCharArray()) {
-            if (syntax.isOperand(c)) {
+            if (syntax.isOperand(c) && !c.equals('T') && !c.equals('F')) {
                 if (!operands.contains(c.toString())) {
                     operands.add(c.toString());
                     operandCount++;
@@ -82,74 +79,46 @@ public class Proposition {
      * 
      * @throws InvalidExpressionException
      */
-    private void setPropositions() throws InvalidExpressionException {
-        propositions = new ArrayList<String>();
+    private void setSentences() throws InvalidExpressionException {
+        sentences = new ArrayList<String>();
 
         parseOperands();
         for (int i = 0; i < this.operands.size(); i++) {
-            propositions.add(this.operands.get(i));
+            sentences.add(this.operands.get(i));
         }
 
-        propositions.add(this.expression.getExpression());
+        sentences.add(this.expression.getExpression());
 
-        propositionCount = operandCount + 1;
-    }
-
-    /**
-     * recursively combines sets of T and F values for each operand in expression,
-     * and then assigns them to the string truthTable and
-     * the boolean valueTable after all combinations are made in the recursive
-     * winding up.
-     * 
-     * @param n
-     * @param prefix
-     */
-    private void combineOperandValues() {
-        String[] operandValues = new String[operandCount];
-        for (int i = 0; i < operandCount; i++)
-            operandValues[i] = "T";
-
-        for (int i = 0; i < valueRowsCount; i++) {
-            for (int j = 0; j < operandCount; j++) {
-                if (operandValues[j].equals("T")) {
-                    operandValues[j] = "F";
-                    break;
-                } else {
-                    operandValues[j] = "T";
-                }
-            }
-            for (int j = 0; j < operandCount; j++) {
-                valueTable[i][j] = operandValues[j].equals("T") ? true : false;
-                truthTable[i + 1][j] = operandValues[j];
-            }
-        }
+        sentenceCount = (byte) ((int) operandCount + 1);
     }
 
     private void setTruthTable() throws InvalidExpressionException {
-        valueRowsCount = (int) Math.pow(2, operandCount);
-        valueColsCount = propositions.size();
-        valueCount = valueRowsCount * valueColsCount;
-        valueTable = new Boolean[valueRowsCount][valueColsCount];
-        truthTable = new String[valueRowsCount + 1][valueColsCount]; // +1 for column titles
+        boolRowsCount = (int) Math.pow(2, operandCount);
+        boolColsCount = sentences.size();
 
-        for (int i = 0; i < propositions.size(); i++)
-            truthTable[0][i] = propositions.get(i) + ""; // titles each column with corresponding
-                                                         // proposition/compound proposition
-        combineOperandValues();
+        TruthTableBuilder ttb = new TruthTableBuilder(operands, boolRowsCount, boolColsCount);
+        tableValues = ttb.getValueTable();
+        truthTable = ttb.getTruthTable();
+        valueCount = ttb.getBoolCount();
+        ttb.close();
+
+        truthTable[0][boolColsCount - 1] = this.expression.getExpression();
 
         HashMap<Character, Character> valueMap = new HashMap<>();
-        for (int rows = 0; rows < valueRowsCount; rows++) {
+        for (int rows = 0; rows < boolRowsCount; rows++) {
             for (int i = 0; i < operandCount; i++)
                 valueMap.put(operands.get(i).charAt(0), truthTable[rows + 1][i].charAt(0));
 
-            truthTable[rows + 1][valueColsCount - 1] = evaluateExpression(valueMap) ? "T" : "F";
-            valueTable[rows][valueColsCount - 1] = truthTable[rows + 1][valueColsCount - 1].equals("T") ? true : false;
+            truthTable[rows + 1][boolColsCount - 1] = evaluateExpression(valueMap) ? "T" : "F";
+            tableValues[rows][boolColsCount - 1] = truthTable[rows + 1][boolColsCount - 1].equals("T") ? true : false;
             valueMap.clear();
         }
     }
 
     /**
-     * incredibly inefficient but at least it works for now, will optimize later
+     * incredibly inefficient but at least it works for now, will optimize later to
+     * be recursive :^)
+     * 
      * 
      * @param valueMap
      * @return
@@ -229,7 +198,7 @@ public class Proposition {
                                         result);
                                 break;
                             }
-                            case "i": {
+                            case "i": { // TODO: Needs to be debugged, not outputting correct results
                                 result = operator.iff(leftOperand, rightOperand);
                                 expression = expression.replaceFirst(expression.substring(index - 1, index + 2),
                                         result);
@@ -316,54 +285,63 @@ public class Proposition {
     public void setExpression(String e)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         this.expression.setExpression(e);
-        setPropositions();
+        setSentences();
         setTruthTable();
     }
 
-    public ArrayList<String> getPropositions() {
-        return this.propositions;
+    public ArrayList<String> getSentences() {
+        return this.sentences;
     }
 
-    public String getProposition(int index) {
-        if (index >= 0 && index < propositions.size()) {
-            return propositions.get(index);
+    public String getSentence(int index) {
+        if (index >= 0 && index < sentences.size()) {
+            return sentences.get(index);
         } else {
             throw new IndexOutOfBoundsException("Index " + index + " is out of bounds");
         }
     }
 
-    public ArrayList<String> getPropositions(int from, int to) throws IndexOutOfBoundsException {
-        if ((from < 0) || (to > propositions.size()))
+    public ArrayList<String> getSentences(int from, int to) throws IndexOutOfBoundsException {
+        if ((from < 0) || (to > sentences.size()))
             throw new IndexOutOfBoundsException("either 'from' or 'to' is out of bounds.");
 
         ArrayList<String> subPropositions = new ArrayList<>();
-        for (; from < to; from++) {
-            subPropositions.add(this.propositions.get(from));
+        for (; from <= to; from++) {
+            subPropositions.add(this.sentences.get(from));
         }
 
         return subPropositions;
     }
 
-    public int getOperandCount() {
+    public byte getOperandCount() {
         return this.operandCount;
     }
 
-    public int getPropositionCount() {
-        return this.propositionCount;
+    public byte getSentenceCount() {
+        return this.sentenceCount;
     }
 
-    public String[][] getTruthTable() {
+    public String[][] getTruthTable() throws InvalidExpressionException {
+        if (this.tableValues == null || this.truthTable == null) {
+            setTruthTable();
+        }
         return this.truthTable;
     }
 
-    public String[] getStringTableRow(int row) {
+    public String[] getStringTableRow(int row) throws InvalidExpressionException {
+        if (this.tableValues == null || this.truthTable == null) {
+            setTruthTable();
+        }
         if (row > truthTable.length) {
             throw new IndexOutOfBoundsException();
         }
         return this.truthTable[row];
     }
 
-    public String[] getStringTableColumn(int col) {
+    public String[] getStringTableColumn(int col) throws InvalidExpressionException {
+        if (this.tableValues == null || this.truthTable == null) {
+            setTruthTable();
+        }
         if (col > truthTable[0].length) {
             throw new IndexOutOfBoundsException();
         }
@@ -375,25 +353,37 @@ public class Proposition {
         return column;
     }
 
-    public Boolean[][] getBooleanTable() {
-        return this.valueTable;
+    public Boolean[][] getBooleanTable() throws InvalidExpressionException {
+        if (this.tableValues == null || this.truthTable == null) {
+            setTruthTable();
+        }
+        return this.tableValues;
     }
 
-    public Boolean[] getBooleanTableRow(int row) {
-        return this.valueTable[row];
+    public Boolean[] getBooleanTableRow(int row) throws InvalidExpressionException {
+        if (this.tableValues == null || this.truthTable == null) {
+            setTruthTable();
+        }
+        return this.tableValues[row];
     }
 
-    public Boolean[] getBooleanTableColumn(int col) {
+    public Boolean[] getBooleanTableColumn(int col) throws InvalidExpressionException {
+        if (this.tableValues == null || this.truthTable == null) {
+            setTruthTable();
+        }
         Boolean[] column = new Boolean[valueCount];
-        int columnElements = valueCount / valueColsCount;
+        int columnElements = valueCount / boolColsCount;
 
         for (int i = 0; i < columnElements; i++)
-            column[i] = valueTable[i][col];
+            column[i] = tableValues[i][col];
 
         return column;
     }
 
-    public void printTruthTable() {
+    public void printTruthTable() throws InvalidExpressionException {
+        if (this.tableValues == null || this.truthTable == null) {
+            setTruthTable();
+        }
         System.out.print("\s\s\s\s\s");
         for (int i = 0; i < truthTable[i].length; i++) {
             System.out.print(i + "\s\s\s");
@@ -413,7 +403,10 @@ public class Proposition {
         }
     }
 
-    public void printTruthTable(int fromCol, int toCol) throws IndexOutOfBoundsException {
+    public void printTruthTable(int fromCol, int toCol) throws IndexOutOfBoundsException, InvalidExpressionException {
+        if (this.tableValues == null || this.truthTable == null) {
+            setTruthTable();
+        }
         if (fromCol > toCol)
             throw new IndexOutOfBoundsException(fromCol + " is out of bounds.");
 
@@ -437,12 +430,12 @@ public class Proposition {
 
         FileWriter csvWriter = null;
         Path path = Paths.get(".\\src\\LogicExpressions\\PropositionalLogic\\PropositionData\\ModelTableData\\");
-        String file = name + propositionCount + "-ModelTable.csv";
+        String file = name + sentenceCount + "-ModelTable.csv";
 
         if (createNew == 1) {
             int i = 1;
             while (Files.exists(path.resolve(file))) {
-                file = name + propositionCount + "-(" + i + ")" + "-ModelTable.csv";
+                file = name + sentenceCount + "-(" + i + ")" + "-ModelTable.csv";
                 i++;
             }
         }
@@ -477,7 +470,7 @@ public class Proposition {
 
         FileWriter csvWriter = null;
         Path path = Paths.get(".\\src\\LogicExpressions\\PropositionalLogic\\PropositionData\\Expressions\\");
-        String file = e + propositionCount + "Expr.csv";
+        String file = e + sentenceCount + "Expr.csv";
 
     }
 
@@ -590,7 +583,7 @@ public class Proposition {
         /** converted logical expression string for easier back-end operations */
         private String convertedExpression;
         /** Maximum number of characters accepted in converted expression String */
-        private final int MAX_CHARACTERS = 64;
+        private final short MAX_CHARACTERS = 256;
 
         /**
          * @throws InvalidExpressionException
@@ -631,7 +624,7 @@ public class Proposition {
                 throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
             e = e.replaceAll("\s", "");
             String cE = convertExpression(e); // converts expression to valid, converted format
-            checkSyntax(e, cE); // checks validity of converted expression argument
+            validateSyntax(e, cE); // checks validity of converted expression argument
             this.expression = e;
             this.convertedExpression = cE;
         }
@@ -643,12 +636,12 @@ public class Proposition {
          * @throws InvalidOperandException
          * @throws InvalidLogicOperatorException
          */
-        private void checkSyntax(String e, String cE)
+        private void validateSyntax(String e, String cE)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             int i = 0;
 
             if (e.length() > MAX_CHARACTERS)
-                throw new InvalidExpressionException("Expression is too long; only 64 characters allowed.");
+                throw new InvalidExpressionException("Expression is too long; only 256 characters allowed.");
             else if (!syntax.containsAnyOperands(cE))
                 throw new InvalidOperandException("Expression does not have at least one valid operand.");
             else if (e.charAt(0) == ')' || cE.charAt(0) == 'a' || cE.charAt(0) == 'o' || cE.charAt(0) == 'i'
@@ -760,6 +753,9 @@ public class Proposition {
                 add('X');
                 add('Y');
                 add('Z');
+                /** below are treated as true and false, not as normal operands */
+                add('T');
+                add('F');
             }
         };
 
@@ -891,6 +887,18 @@ public class Proposition {
             super();
         }
 
+        public ArrayList<Character> getOperandList() {
+            return this.OPERAND_LIST;
+        }
+
+        public Map<String, ArrayList<String>> getOperatorMaps() {
+            return this.OPERATOR_MAPS;
+        }
+
+        public ArrayList<String> getInvalidOperatorPairs() {
+            return this.INVALID_OPERATOR_PAIRS;
+        }
+
         // ~~~~~~~~OPERAND METHODS~~~~~~~~
 
         /**
@@ -899,6 +907,9 @@ public class Proposition {
          * @return
          */
         public boolean isOperand(char c) {
+            if (c == 'T' || c == 'F') {
+                return false;
+            }
             return OPERAND_LIST.contains(c);
         }
 
@@ -908,6 +919,9 @@ public class Proposition {
          * @return
          */
         public boolean isOperand(String s) {
+            if (s == "T" || s == "F") {
+                return false;
+            }
             return OPERAND_LIST.contains(s);
         }
 
@@ -918,6 +932,7 @@ public class Proposition {
          * @return
          */
         public boolean containsOperand(String s, char operand) {
+
             return s.contains(Character.toString(operand));
         }
 
@@ -935,7 +950,7 @@ public class Proposition {
          */
         public boolean containsAnyOperands(String s) {
             for (char c : OPERAND_LIST) {
-                if (s.contains(Character.toString(c))) {
+                if (s.contains(Character.toString(c)) && (c != 'T' && c != 'F')) {
                     return true;
                 }
             }
