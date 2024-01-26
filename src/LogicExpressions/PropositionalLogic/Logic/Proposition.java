@@ -306,7 +306,7 @@ public class Proposition {
             throw new IndexOutOfBoundsException("either 'from' or 'to' is out of bounds.");
 
         ArrayList<String> subPropositions = new ArrayList<>();
-        for (; from < to; from++) {
+        for (; from <= to; from++) {
             subPropositions.add(this.sentences.get(from));
         }
 
