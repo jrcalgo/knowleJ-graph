@@ -165,7 +165,8 @@ public class demo {
     Argument<Model> a = new Argument<>(determinedActivities);
     a.printTruthTable();
     a.printAllTrueKBModels();
-    System.out.println(a.checkAllTTModels("L"));
+    String query = "L|S|N|W|D|C|P";
+    System.out.println("Query " + query + " is " + a.checkAllTTModels(query));
     }
 
     public static Character exampleBoolean1(int i) {
