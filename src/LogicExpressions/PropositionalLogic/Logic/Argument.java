@@ -158,7 +158,7 @@ public class Argument<M extends Model> {
                 return "Uncertain";
             }
             valueRows++;
-        } while (valueRows < this.trueKBModels.size()-1);
+        } while (valueRows <= this.trueKBModels.size()-1);
 
         return answer;
     }
@@ -222,6 +222,8 @@ public class Argument<M extends Model> {
         for (int i = 0; i < this.knowledgeBase.length; i++) {
             knowledgeExpressions[i] = this.knowledgeBase[i].getExpression();
         }
+
+        for ()
         DeductionTree<String> dt = new DeductionTree<String>(knowledgeExpressions, query);
         return dt.search(query.getExpression());
 
