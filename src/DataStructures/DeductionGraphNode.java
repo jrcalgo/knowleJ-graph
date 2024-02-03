@@ -4,23 +4,25 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class DeductionTreeNode {
-    private String expression;
+    private String[] expression;
     private int parentExpressionIndex;
     private LinkedList<DeductionTreeNode> children;
 
     // root node constructor
-    public DeductionTreeNode(String expression) {
+    public DeductionTreeNode(String[] expression) {
         this.expression = expression;
         this.parentExpressionIndex = -1;
         this.children = null;
     }
 
-    public DeductionTreeNode(String expression, int parentExpressionIndex) {
+    // leaf node constructor
+    public DeductionTreeNode(String[] expression, int parentExpressionIndex) {
         this.expression = expression;
         this.parentExpressionIndex = parentExpressionIndex;
         this.children = null;
     }
 
+    // child node constructor
     public DeductionTreeNode(String expression, int parentExpressionIndex, DeductionTreeNode child) {
         this.expression = expression;
         this.parentExpressionIndex = parentExpressionIndex;
@@ -32,7 +34,7 @@ public class DeductionTreeNode {
     }
 
     public DeductionTreeNode(String expression, int parentExpressionStartIndex,
-            LinkedList<PropositionTreeNode> children) {
+            LinkedList<DeductionTreeNode> children) {
         this.expression = expression;
         this.parentExpressionIndex = parentExpressionStartIndex;
         this.children = children;

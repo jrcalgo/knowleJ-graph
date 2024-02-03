@@ -7,21 +7,23 @@ import src.Interfaces.Tree;
 import src.LogicExpressions.PropositionalLogic.Logic.Proposition;
 import src.LogicExpressions.PropositionalLogic.Models.Model;
 
-public class DeductionTree<T extends Comparable<T>> {
-    private DeductionTreeNode root; // initial expression / root
-    private LinkedList<LinkedList<DeductionTreeNode>> branches; // tree of expressions
+public class DeductionGraph<T extends Comparable<T>> {
+    private LinkedList<DeductionGraphNode> givenNodes; // initial expression / root
+    private LinkedList<LinkedList<DeductionGraphNode>> branches; // tree of expressions
     private int nodeCount = 0;
 
     String[] knowledgeBase;
     Proposition query;
 
-    public DeductionTree(String[] knowledgeBase, Proposition query) {
+    public DeductionGraph(String[] knowledgeBase, Proposition query) {
         this.knowledgeBase = knowledgeBase;
         this.query = query;
 
         // determine if a 
-        this.root = new DeductionTreeNode(expression);
-        this.nodeCount++;
+        for (int i = 0; i < knowledgeBase.length; i++) {
+            this.givenNodes.add(new DeductionGraphNode(knowledgeBase[i], null));
+            this.nodeCount++;
+        }
     }
 
     public void parseRootChildren() {
