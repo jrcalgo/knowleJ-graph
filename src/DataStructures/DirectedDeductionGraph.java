@@ -3,25 +3,24 @@ package src.DataStructures;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import src.Interfaces.Tree;
 import src.LogicExpressions.PropositionalLogic.Logic.Proposition;
 import src.LogicExpressions.PropositionalLogic.Models.Model;
 
-public class DeductionGraph<T extends Comparable<T>> {
+public class DirectedDeductionGraph<T extends Comparable<T>> {
     private LinkedList<DeductionGraphNode> givenNodes; // initial expression / root
     private LinkedList<LinkedList<DeductionGraphNode>> branches; // tree of expressions
     private int nodeCount = 0;
 
-    String[] knowledgeBase;
-    Proposition query;
+    private String[] knowledgeBase;
+    private Proposition query;
 
-    public DeductionGraph(String[] knowledgeBase, Proposition query) {
+    public DirectedDeductionGraph(String[] knowledgeBase, Proposition query) {
         this.knowledgeBase = knowledgeBase;
         this.query = query;
 
         // determine if a 
         for (int i = 0; i < knowledgeBase.length; i++) {
-            this.givenNodes.add(new DeductionGraphNode(knowledgeBase[i], null));
+            this.givenNodes.add(new DeductionGraphNode(knowledgeBase[i]));
             this.nodeCount++;
         }
     }
