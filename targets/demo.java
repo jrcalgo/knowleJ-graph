@@ -162,10 +162,45 @@ public class demo {
             sleeping
     };
 
-    Argument<Model> a = new Argument<>(determinedActivities);
+    DeterministicModel health = new DeterministicModel("health", new HashMap<Character, String>() {
+        {
+            put('P', "fitness");
+            put('H', "healthy eating");
+            put('S', "8 hours of sleep");
+            put('M', "stress management");
+        }
+    },
+    new HashMap<Character, Character>() {
+        {
+            put('P', 'T');
+            put('H', 'T');
+            put('S', 'T');
+            put('M', 'T');
+        }
+    }, "P&H&S&M");
+
+    DeterministicModel social = new DeterministicModel("social", new HashMap<Character, String>() {
+        {
+            put('I', "interpersonal relationships outside of family");
+            put('O', "public interactions");
+        }
+    },
+    new HashMap<Character, Character>() {
+        {
+            put('I', 'T');
+            put('O', 'T');
+        }
+    }, "I|O");
+
+    Model[] success = new Model[] {
+        health,
+        social,
+    };
+
+    Argument<Model> a = new Argument<>(success);
     a.printTruthTable();
     a.printAllTrueKBModels();
-    String query = "L|S|N|W|D|C|P";
+    String query = "P&H&S&M&I&O";
     System.out.println("Query " + query + " is " + a.checkAllTTModels(query));
     }
 
