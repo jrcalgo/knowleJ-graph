@@ -3,41 +3,31 @@ package src.DataStructures;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class DeductionTreeNode {
-    private String[] expression;
-    private int parentExpressionIndex;
-    private LinkedList<DeductionTreeNode> children;
+public class DeductionGraphNode {
+    private String expression;
+    private LinkedList<DeductionGraphNode> outNodes;
 
-    // root node constructor
-    public DeductionTreeNode(String[] expression) {
+    public DeductionGraphNode(String expression) {
         this.expression = expression;
-        this.parentExpressionIndex = -1;
-        this.children = null;
+        this.outNodes = null;
     }
-
     // leaf node constructor
-    public DeductionTreeNode(String[] expression, int parentExpressionIndex) {
+    public DeductionGraphNode(String expression, DeductionGraphNode outNode) {
         this.expression = expression;
-        this.parentExpressionIndex = parentExpressionIndex;
-        this.children = null;
+        
+        if (outNode != null) {
+            this.outNodes = new LinkedList<DeductionGraphNode>() {
+                {
+                    add(outNode);
+                }
+            };
+        }
     }
 
     // child node constructor
-    public DeductionTreeNode(String expression, int parentExpressionIndex, DeductionTreeNode child) {
+    public DeductionGraphNode(String expression, LinkedList<DeductionGraphNode> outNodes) {
         this.expression = expression;
-        this.parentExpressionIndex = parentExpressionIndex;
-        this.children = new LinkedList<DeductionTreeNode>() {
-            {
-                add(child);
-            }
-        };
-    }
-
-    public DeductionTreeNode(String expression, int parentExpressionStartIndex,
-            LinkedList<DeductionTreeNode> children) {
-        this.expression = expression;
-        this.parentExpressionIndex = parentExpressionStartIndex;
-        this.children = children;
+        this.outNodes = outNodes;
     }
 
     public String getExpression() {
@@ -48,37 +38,46 @@ public class DeductionTreeNode {
         this.expression = expression;
     }
 
-    public int getParentExpressionIndex() throws Exception {
-        if (this.parentExpressionIndex == -1)
-            throw new Exception("No parent; this node is the root.");
+    public LinkedList<DeductionGraphNode> getOutNodes() throws Exception {
+        if (this.outNodes == null)
+            throw new Exception("No out edges for this node");
 
-        return this.parentExpressionIndex;
+        return this.outNodes;
     }
 
-    public void setParentExpressionIndex(int parentExpressionIndex) {
-        this.parentExpressionIndex = parentExpressionIndex;
+    public void setOutNode(DeductionGraphNode outNode) {
+        this.outNodes = null;
+        this.outNodes = new LinkedList<DeductionGraphNode>() {
+            {
+                add(outNode);
+            }
+        };
     }
 
-    public LinkedList<DeductionTreeNode> getChildren() {
-        return this.children;
+    public void addOutNode(DeductionGraphNode outNode) {
+        if (this.outNodes == null)
+            this.outNodes = new LinkedList<DeductionGraphNode>();
+
+        this.outNodes.add(outNode);
     }
 
-    public DeductionTreeNode getChild(int index) {
-        return this.children.get(index);
-    }
-
-    public void addChild(DeductionTreeNode child) {
-        if (this.children == null)
-            this.children = new LinkedList<DeductionTreeNode>();
-
-        this.children.add(child);
-    }
-
-    public void removeChild(DeductionTreeNode child) {
-        if (this.children == null)
+    public void removeOutNode(DeductionGraphNode outNode) {
+        if (this.outNodes == null)
             return;
-
-        this.children.remove(child);
+        else
+            if (this.outNodes.contains(outNode)) 
+                this.outNodes.remove(outNode);
     }
+
+    public void removeOutNodes(LinkedList<DeductionGraphNode> outNodes) {
+        if (this.outNodes == null)
+            return;
+        else
+            if (this.outNodes.containsAll(outNodes))
+                this.outNodes.removeAll(outNodes);
+            else
+                
+    }
+
 
 }
