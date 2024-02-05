@@ -1,6 +1,5 @@
 package src.DataStructures;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class DeductionGraphNode {
@@ -76,6 +75,7 @@ public class DeductionGraphNode {
             if (this.outNodes.containsAll(outNodes))
                 this.outNodes.removeAll(outNodes);
             else
+                return;
                 
     }
 

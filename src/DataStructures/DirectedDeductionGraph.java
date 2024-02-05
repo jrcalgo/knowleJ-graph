@@ -7,8 +7,7 @@ import src.LogicExpressions.PropositionalLogic.Logic.Proposition;
 import src.LogicExpressions.PropositionalLogic.Models.Model;
 
 public class DirectedDeductionGraph<T extends Comparable<T>> {
-    private LinkedList<DeductionGraphNode> givenNodes; // initial expression / root
-    private LinkedList<LinkedList<DeductionGraphNode>> branches; // tree of expressions
+    private LinkedList<DeductionGraphNode> givenNodes; // initial expression(s) / root(s)
     private int nodeCount = 0;
 
     private String[] knowledgeBase;
