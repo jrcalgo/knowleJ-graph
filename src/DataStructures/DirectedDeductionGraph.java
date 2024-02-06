@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import src.LogicExpressions.PropositionalLogic.Logic.Proposition;
-import src.LogicExpressions.PropositionalLogic.Models.Model;
 
-public class DirectedDeductionGraph<T extends Comparable<T>> {
+public class DirectedDeductionGraph {
     private LinkedList<DeductionGraphNode> givenNodes; // initial expression(s) / root(s)
-    private int nodeCount = 0;
+    private ArrayList<DeductionGraphNode> nodes;
+    private int nodeCount = -1;
 
     private String[] knowledgeBase;
     private Proposition query;
@@ -17,62 +17,76 @@ public class DirectedDeductionGraph<T extends Comparable<T>> {
         this.knowledgeBase = knowledgeBase;
         this.query = query;
 
-        // determine if a 
+        // store knowledge base expressions as given nodes and as root nodes for subgraphs in this.nodes
         for (int i = 0; i < knowledgeBase.length; i++) {
             this.givenNodes.add(new DeductionGraphNode(knowledgeBase[i]));
+            this.nodes.add(this.givenNodes.get(i));
             this.nodeCount++;
+
+            if (i > 0) {
+                mutuallyPoint(this.nodes.get(i - 1), this.nodes.get(i));
+            }
         }
     }
 
-    public void parseRootChildren() {
-
+    private void mutuallyPoint(DeductionGraphNode outVertex, DeductionGraphNode inVertex) {
+        outVertex.addOutNode(inVertex);
+        inVertex.addOutNode(outVertex);
     }
 
+    public void add(String expression) {
+        this.nodes.add(new DeductionGraphNode(expression));
+        this.nodeCount++;
+    }
+
+    @SuppressWarnings("null")
+    public void point(DeductionGraphNode outVertex, DeductionGraphNode inVertex) {
+        if (outVertex == null || inVertex == null) {
+            throw new IllegalArgumentException("Both out and in nodes must be non-null");
+        } else if (!this.nodes.contains(outVertex) || !this.nodes.contains(inVertex)) {
+            throw new IllegalArgumentException("Both out and in nodes must be in the graph");
+        }
+        outVertex.addOutNode(inVertex);
+    }
+
+    public void delete(String expression) {
+        for (DeductionGraphNode node : this.nodes) {
+            if (node.getExpression().equals(expression)) {
+                this.nodes.remove(node);
+                this.nodeCount--;
+            }
+        }
+    }
+
+    public void delete(DeductionGraphNode vertex) {
+        if (this.nodes.contains(vertex)) {
+            this.nodes.remove(vertex);
+            this.nodeCount--;
+        }
+    }
     public boolean isEmpty() {
-        return this.root == null;
+        return this.nodeCount == -1;
     }
 
     public int size() {
         return this.nodeCount;
     }
 
-    public void insert(T element) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'insert'");
-        
+    public boolean contains(String expression) throws Exception {
+        for (DeductionGraphNode node : this.nodes) {
+            if (node.getExpression().equals(expression)) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    public boolean contains(T element) throws Exception {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'contains'");
+    public boolean contains(DeductionGraphNode vertex) {
+        return this.nodes.contains(vertex);
     }
 
-    /**
-     * implements best-first search methodology
-     */
-    public T search(T element) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'search'");
-    }
-
-    public void delete(T element) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
-    }
-
-    public String traverseInOrder() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'traverseInOrder'");
-    }
-
-    public String traversePreOrder() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'traversePreOrder'");
-    }
-
-    public String traversePostOrder() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'traversePostOrder'");
+    public boolean containsQuery(DeductionGraphNode vertex) {
+        return vertex.getExpression().equals(this.query.getExpression());
     }
 
 }
