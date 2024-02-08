@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import src.DataStructures.PropositionTree;
-import src.DataStructures.PropositionTreeNode;
+import src.DataStructures.DeductionTree;
+import src.DataStructures.DeductionTreeNode;
 import src.Exceptions.InvalidExpressionException;
 import src.Exceptions.InvalidLogicOperatorException;
 import src.Exceptions.InvalidOperandException;
@@ -158,7 +158,7 @@ public class Argument<M extends Model> {
                 return "Uncertain";
             }
             valueRows++;
-        } while (valueRows < this.trueKBModels.size()-1);
+        } while (valueRows <= this.trueKBModels.size()-1);
 
         return answer;
     }
@@ -192,18 +192,41 @@ public class Argument<M extends Model> {
 
     // }
 
-    public String deduce(String query) {
+    public ArrayList<ArrayList<String>> deduce(String query) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (query == null || query.length() == 0)
             throw new IllegalArgumentException("String query cannot be null or empty.");
         
         return deduce(new Proposition(query));
     }
 
-    public String deduce(Proposition query) {
+    public ArrayList<ArrayList<String>> deduce(Proposition query) {
         if (query == null)
             throw new IllegalArgumentException("Proposition query cannot be null or empty.");
         
-        
+        ArrayList<String> qOperands = query.getSentences(0, query.getOperandCount()-1);
+        boolean commonOperand = false;
+        for (String qOp : qOperands) {
+            for (char op : this.operands) {
+                if (qOp.charAt(0) == op) {
+                    commonOperand = true;
+                    continue;
+                }
+            }
+            if (commonOperand)
+                continue;
+        }
+        if (!commonOperand)
+            throw new IllegalArgumentException("No common operand found in query when compared with knowledge base.");
+
+        String[] knowledgeExpressions = new String[this.knowledgeBase.length];
+        for (int i = 0; i < this.knowledgeBase.length; i++) {
+            knowledgeExpressions[i] = this.knowledgeBase[i].getExpression();
+        }
+
+        for ()
+        DeductionTree<String> dt = new DeductionTree<String>(knowledgeExpressions, query);
+        return dt.search(query.getExpression());
+
     }
 
     public String[][] getAllTruthTable() {
@@ -270,68 +293,75 @@ public class Argument<M extends Model> {
         }
     }
 
-    public class InferenceLaws<M> {
-        private Model model;
-        private String mPredicate;
-        private Proposition mProposition;
-        private char[] mOperands;
-        private String e;
-        // converted expression
-        private String cE;
+    /* Used for constructing argumentative inference */
+    static class InferenceLaws {
 
-        public LogicTreeNode checkPropositionLaws(Proposition p)
-                throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
-            e = p.getExpression();
-            cE = p.getConvertedExpression();
+        public InferenceLaws() {
+            super();
         }
 
-        public LogicTreeNode checkArgumentLaws(Argument a) {
+        public String checkInferenceLaws(Proposition p)
+                throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+            String cE = p.getConvertedExpression();
 
         }
 
         /* Rules of Argument Inference */
-        private Argument[] modusPonens() {
+        private String modusPonens(String cE) {
             if
         }
 
-        private Argument[] modusTollens() {
+        private String modusTollens(String cE) {
             if
         }
 
-        private Argument[] addition() {
+        private String addition(String cE) {
             if
         }
 
-        private Argument[] simplification() {
+        private String simplification(String cE) {
             if
         }
 
-        private Argument[] conjunction() {
+        private String conjunction(String cE) {
             if
         }
 
-        private Argument[] hypotheticalSyllogism() {
+        private String hypotheticalSyllogism(String cE) {
             if
         }
 
-        private Argument[] disjunctiveSyllogism() {
+        private String disjunctiveSyllogism(String cE) {
             if
         }
 
-        private Argument[] resolution() {
+        private String resolution(String cE) {
             if
         }
     }
 
-    public class LogicalEquivalencies {
+    /**
+     * Popular logic equivalencies used for inference and argumentation; propositional logic inference
+     */
+    static class LogicalEquivalencyLaws {
+
+        public LogicalEquivalencyLaws() {
+            super();
+        }
+
+        public ArrayList<String> checkEquivalencyLaws(Proposition p) {
+            String cE = p.getConvertedExpression();
+            ArrayList<String> equivalences = new ArrayList<>();
+            
+        }
+
                 /**
-         * Laws of Propositional Logic
          * 
          * @throws InvalidLogicOperatorException
          * @throws InvalidOperandException
          * @throws InvalidExpressionException
          */
-        private Proposition idempotentLaw()
+        private String idempotentLaw(String cE)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             Proposition[] iL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
@@ -344,7 +374,7 @@ public class Argument<M extends Model> {
             return iL;
         }
 
-        private Proposition associativeLaw() throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+        private String associativeLaw(String cE) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             Proposition[] aL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
                 for (int j = 0; j < this.mOperands.length; j++) {
@@ -360,7 +390,7 @@ public class Argument<M extends Model> {
             return aL;
         }
 
-        private Proposition commutativeLaw()
+        private String commutativeLaw(String cE)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             Proposition[] cL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
@@ -373,7 +403,7 @@ public class Argument<M extends Model> {
             return cL;
         }
 
-        private Proposition distributiveLaw()
+        private String distributiveLaw(String cE)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             Proposition[] iL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
@@ -386,7 +416,7 @@ public class Argument<M extends Model> {
             return iL;
         }
 
-        private Proposition identityLaw()
+        private String identityLaw(String cE)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             Proposition[] iL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
@@ -398,7 +428,7 @@ public class Argument<M extends Model> {
             return iL;
         }
 
-        private Proposition dominationLaw()
+        private String dominationLaw(String cE)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             Proposition[] iL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
@@ -412,7 +442,7 @@ public class Argument<M extends Model> {
             return iL;
         }
 
-        private Proposition[] doubleNegationLaw()
+        private String doubleNegationLaw(String cE)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             Proposition[] dNL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
@@ -424,7 +454,7 @@ public class Argument<M extends Model> {
             return dNL;
         }
 
-        private Proposition[] complementLaw()
+        private String complementLaw(String cE)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             Proposition[] iL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
@@ -447,7 +477,7 @@ public class Argument<M extends Model> {
             return iL;
         }
 
-        private Proposition deMorgansLaw() {
+        private String deMorgansLaw(String cE) {
             Proposition[] iL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
                 if (this.cE.contains(this.mOperands[i] + "a" + this.mOperands[i])
@@ -459,7 +489,7 @@ public class Argument<M extends Model> {
             return iL;
         }
 
-        private Proposition absorptionLaw() {
+        private String absorptionLaw(String cE) {
             Proposition[] iL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
                 if (this.cE.contains(this.mOperands[i] + "a" + this.mOperands[i])
@@ -471,7 +501,7 @@ public class Argument<M extends Model> {
             return iL;
         }
 
-        private Proposition conditionalIdentity() {
+        private String conditionalIdentity(String cE) {
             Proposition[] iL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
                 if (this.cE.contains(this.mOperands[i] + "a" + this.mOperands[i])
@@ -483,9 +513,4 @@ public class Argument<M extends Model> {
             return iL;
         }
     }
-
-    public class LogicalFallacies {
-
-    }
-
 }
