@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import src.DataStructures.DeductionTree;
-import src.DataStructures.DeductionTreeNode;
+import src.DataStructures.DirectedDeductionGraph;
+import src.DataStructures.DeductionGraphNode;
+
 import src.Exceptions.InvalidExpressionException;
 import src.Exceptions.InvalidLogicOperatorException;
 import src.Exceptions.InvalidOperandException;
@@ -117,7 +118,14 @@ public class Argument<M extends Model> {
     public String checkAllTTModels(String query) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (query == null || query.length() == 0)
             throw new IllegalArgumentException("String query cannot be null or empty.");
-
+        if (query.contains(",") && !query.startsWith(",") && !query.endsWith(",")) {
+            String[] queries = query.split(",");
+            StringBuilder answer = new StringBuilder();
+            for (String q : queries) {
+                answer.append(checkAllTTModels(new Proposition(q)) + ", ");
+            }
+            return answer.toString().substring(0, answer.length()-2);
+        }
         return checkAllTTModels(new Proposition(query));
     }
 
@@ -195,7 +203,14 @@ public class Argument<M extends Model> {
     public ArrayList<ArrayList<String>> deduce(String query) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (query == null || query.length() == 0)
             throw new IllegalArgumentException("String query cannot be null or empty.");
-        
+        if (query.contains(",") && !query.startsWith(",") && !query.endsWith(",")) {
+            String[] queries = query.split(",");
+            ArrayList<ArrayList<String>> answer = new ArrayList<>();
+            for (String q : queries) {
+                answer.addAll(deduce(new Proposition(q)));
+            }
+            return answer;
+        }
         return deduce(new Proposition(query));
     }
 
@@ -222,6 +237,8 @@ public class Argument<M extends Model> {
         for (int i = 0; i < this.knowledgeBase.length; i++) {
             knowledgeExpressions[i] = this.knowledgeBase[i].getExpression();
         }
+
+        ArrayList<ArrayList<String>> deductionPaths = new ArrayList<>();
 
         for ()
         DeductionTree<String> dt = new DeductionTree<String>(knowledgeExpressions, query);
@@ -300,41 +317,83 @@ public class Argument<M extends Model> {
             super();
         }
 
-        public String checkInferenceLaws(Proposition p)
+        public ArrayList<String> checkInferenceLaws(Proposition p)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             String cE = p.getConvertedExpression();
-
+                
         }
 
         /* Rules of Argument Inference */
+
+        /**
+         * Rule: P, P->Q entails Q
+         * @param cE
+         * @return
+         */
         private String modusPonens(String cE) {
             if
         }
 
+        /**
+         * Rule: ~Q, P->Q entails ~P
+         * @param cE
+         * @return
+         */
         private String modusTollens(String cE) {
             if
         }
 
+        /**
+         * Rule: P entails P|Q
+         * @param cE
+         * @return
+         */
         private String addition(String cE) {
             if
         }
 
+        /**
+         * Rule: P&Q entails P
+         * @param cE
+         * @return
+         */
         private String simplification(String cE) {
             if
         }
 
+        /**
+         * Rule: P, Q entails P&Q
+         * @param cE
+         * @return
+         */
         private String conjunction(String cE) {
             if
         }
 
+        /**
+         * Rule: P->Q, Q->R entails P->R
+         * @param cE
+         * @return
+         */
         private String hypotheticalSyllogism(String cE) {
             if
         }
 
+        /**
+         * Rule: P|Q, ~P entails Q
+         * @param cE
+         * @return
+         */
         private String disjunctiveSyllogism(String cE) {
             if
         }
 
+        /**
+         * Rule: P|Q, ~P|R entails Q|R
+         * this one is powerful
+         * @param cE
+         * @return
+         */
         private String resolution(String cE) {
             if
         }
@@ -352,11 +411,11 @@ public class Argument<M extends Model> {
         public ArrayList<String> checkEquivalencyLaws(Proposition p) {
             String cE = p.getConvertedExpression();
             ArrayList<String> equivalences = new ArrayList<>();
-            
+
         }
 
-                /**
-         * 
+        /**
+         * Rule: [P|P => P] OR [P&P => P]
          * @throws InvalidLogicOperatorException
          * @throws InvalidOperandException
          * @throws InvalidExpressionException
@@ -374,6 +433,14 @@ public class Argument<M extends Model> {
             return iL;
         }
 
+        /**
+         * Rule: [(P|Q)|R => P|(Q|R)] OR [(P&Q)&R => P&(Q&R)]
+         * @param cE
+         * @return
+         * @throws InvalidExpressionException
+         * @throws InvalidOperandException
+         * @throws InvalidLogicOperatorException
+         */
         private String associativeLaw(String cE) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             Proposition[] aL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
@@ -390,6 +457,14 @@ public class Argument<M extends Model> {
             return aL;
         }
 
+        /**
+         * Rule: [P|Q => Q|P] OR [P&Q => Q&P]
+         * @param cE
+         * @return
+         * @throws InvalidExpressionException
+         * @throws InvalidOperandException
+         * @throws InvalidLogicOperatorException
+         */
         private String commutativeLaw(String cE)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             Proposition[] cL = new Proposition[this.mOperands.length];
@@ -403,6 +478,14 @@ public class Argument<M extends Model> {
             return cL;
         }
 
+        /**
+         * Rule: [P|(Q&R) => (P|Q)&(P|R)] OR [P&(Q|R) => (P&Q)|(P&R)]
+         * @param cE
+         * @return
+         * @throws InvalidExpressionException
+         * @throws InvalidOperandException
+         * @throws InvalidLogicOperatorException
+         */
         private String distributiveLaw(String cE)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             Proposition[] iL = new Proposition[this.mOperands.length];
@@ -416,6 +499,14 @@ public class Argument<M extends Model> {
             return iL;
         }
 
+        /**
+         * Rule: [P|F => P] OR [P&T => P]
+         * @param cE
+         * @return
+         * @throws InvalidExpressionException
+         * @throws InvalidOperandException
+         * @throws InvalidLogicOperatorException
+         */
         private String identityLaw(String cE)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             Proposition[] iL = new Proposition[this.mOperands.length];
@@ -428,6 +519,14 @@ public class Argument<M extends Model> {
             return iL;
         }
 
+        /**
+         * Rule: [P&F => F] OR [P|T => T]
+         * @param cE
+         * @return
+         * @throws InvalidExpressionException
+         * @throws InvalidOperandException
+         * @throws InvalidLogicOperatorException
+         */
         private String dominationLaw(String cE)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             Proposition[] iL = new Proposition[this.mOperands.length];
@@ -442,6 +541,14 @@ public class Argument<M extends Model> {
             return iL;
         }
 
+        /**
+         * Rule: [~~P => P]
+         * @param cE
+         * @return
+         * @throws InvalidExpressionException
+         * @throws InvalidOperandException
+         * @throws InvalidLogicOperatorException
+         */
         private String doubleNegationLaw(String cE)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             Proposition[] dNL = new Proposition[this.mOperands.length];
@@ -454,6 +561,14 @@ public class Argument<M extends Model> {
             return dNL;
         }
 
+        /**
+         * Rule: [P&~P => F, ~T => F] OR [P|~P => T, ~F => T]
+         * @param cE
+         * @return
+         * @throws InvalidExpressionException
+         * @throws InvalidOperandException
+         * @throws InvalidLogicOperatorException
+         */
         private String complementLaw(String cE)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             Proposition[] iL = new Proposition[this.mOperands.length];
@@ -477,6 +592,11 @@ public class Argument<M extends Model> {
             return iL;
         }
 
+        /**
+         * Rule: [~(P|Q) => ~P & ~Q] OR [~(P&Q) => ~P | ~Q]
+         * @param cE
+         * @return
+         */
         private String deMorgansLaw(String cE) {
             Proposition[] iL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
@@ -489,6 +609,11 @@ public class Argument<M extends Model> {
             return iL;
         }
 
+        /**
+         * Rule: [P|(P&Q) => P] OR [P&(P|Q) => P]
+         * @param cE
+         * @return
+         */
         private String absorptionLaw(String cE) {
             Proposition[] iL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
@@ -501,6 +626,11 @@ public class Argument<M extends Model> {
             return iL;
         }
 
+        /**
+         * Rule: [P->Q => ~P|Q] OR [P<>Q => (P->Q)&(Q->P)]
+         * @param cE
+         * @return
+         */
         private String conditionalIdentity(String cE) {
             Proposition[] iL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {

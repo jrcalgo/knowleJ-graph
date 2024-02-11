@@ -5,7 +5,7 @@ import java.util.Map;
 import src.LogicExpressions.PropositionalLogic.Logic.Proposition;
 
 public class StochasticModel extends Model {
-
+    public StochasticModel(String modelName, Map<Character, Double> defaultOperandTruthValues, 
     @Override
     public String getModelName() {
         // TODO Auto-generated method stub
