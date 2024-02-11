@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import src.DataStructures.DeductionTree;
-import src.DataStructures.DeductionTreeNode;
+import src.DataStructures.DirectedDeductionGraph;
+import src.DataStructures.DeductionGraphNode;
+
 import src.Exceptions.InvalidExpressionException;
 import src.Exceptions.InvalidLogicOperatorException;
 import src.Exceptions.InvalidOperandException;
@@ -117,7 +118,14 @@ public class Argument<M extends Model> {
     public String checkAllTTModels(String query) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (query == null || query.length() == 0)
             throw new IllegalArgumentException("String query cannot be null or empty.");
-
+        if (query.contains(",") && !query.startsWith(",") && !query.endsWith(",")) {
+            String[] queries = query.split(",");
+            StringBuilder answer = new StringBuilder();
+            for (String q : queries) {
+                answer.append(checkAllTTModels(new Proposition(q)) + ", ");
+            }
+            return answer.toString().substring(0, answer.length()-2);
+        }
         return checkAllTTModels(new Proposition(query));
     }
 
@@ -223,6 +231,8 @@ public class Argument<M extends Model> {
             knowledgeExpressions[i] = this.knowledgeBase[i].getExpression();
         }
 
+        ArrayList<ArrayList<String>> deductionPaths = new ArrayList<>();
+
         for ()
         DeductionTree<String> dt = new DeductionTree<String>(knowledgeExpressions, query);
         return dt.search(query.getExpression());
@@ -303,7 +313,7 @@ public class Argument<M extends Model> {
         public String checkInferenceLaws(Proposition p)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             String cE = p.getConvertedExpression();
-
+                
         }
 
         /* Rules of Argument Inference */
@@ -335,6 +345,11 @@ public class Argument<M extends Model> {
             if
         }
 
+        /**
+         * this one is very powerful
+         * @param cE
+         * @return
+         */
         private String resolution(String cE) {
             if
         }
@@ -352,7 +367,7 @@ public class Argument<M extends Model> {
         public ArrayList<String> checkEquivalencyLaws(Proposition p) {
             String cE = p.getConvertedExpression();
             ArrayList<String> equivalences = new ArrayList<>();
-            
+
         }
 
                 /**
