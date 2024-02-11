@@ -1,6 +1,5 @@
 package src.LogicExpressions.PropositionalLogic.Logic;
 
-import java.rmi.StubNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
