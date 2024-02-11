@@ -1,5 +1,6 @@
 package src.LogicExpressions.PropositionalLogic.Logic;
 
+import java.rmi.StubNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -285,7 +286,7 @@ public class Argument<M extends Model> {
         }
     }
 
-    public M[] getKnowledgeBase() {
+    public M[] getKnowledgeBaseModels() {
         return this.knowledgeBase;
     }
 
@@ -295,6 +296,14 @@ public class Argument<M extends Model> {
             expressions[i] = this.knowledgeBase[i].getExpression();
         }
         return expressions;
+    }
+
+    public Proposition[] getKnowledgeBasePropositions() {
+        Proposition[] propositions = new Proposition[this.knowledgeBase.length];
+        for (int i = 0; i < this.knowledgeBase.length; i++) {
+            propositions[i] = this.knowledgeBase[i].getProposition();
+        }
+        return propositions;
     }
 
     public ArrayList<ArrayList<String>> getAllTrueKBModels() {
@@ -313,13 +322,29 @@ public class Argument<M extends Model> {
     /* Used for constructing argumentative inference */
     static class InferenceLaws {
 
+        private final Map<String, String> inferenceLaws = new HashMap<>() {
+            {
+                put("ModusPonens", "P, P->Q entails Q");
+            }
+        };
+
         public InferenceLaws() {
             super();
         }
 
-        public ArrayList<String> checkInferenceLaws(Proposition p)
-                throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
-            String cE = p.getConvertedExpression();
+
+        public ArrayList<String> checkInferenceLaws(Argument arg) {
+            Proposition[] kbPropositions = arg.getKnowledgeBasePropositions();
+            String[] kbConversions = new String[kbPropositions.length]
+            for (int i = 0; i < kbPropositions.length; i++) {
+                kbConversions[i] = e.getConvertedExpression();
+            }
+
+            int iterations = 0;
+            ArrayList<String> applicableLaws = new ArrayList<>();
+            while (true) {
+                if ()
+            }
                 
         }
 
@@ -404,14 +429,37 @@ public class Argument<M extends Model> {
      */
     static class LogicalEquivalencyLaws {
 
+        private final Map<String, String> equivalencyLaws = new HashMap<>() {
+            {
+
+            }
+        }
+
         public LogicalEquivalencyLaws() {
             super();
         }
 
         public ArrayList<String> checkEquivalencyLaws(Proposition p) {
             String cE = p.getConvertedExpression();
-            ArrayList<String> equivalences = new ArrayList<>();
 
+            ArrayList<String> applicableLaws = new ArrayList<>();
+            // parse cE and store similar substrings (if any) into variables to then construct applicable rules. This will use key-value mapping, and then
+            // using those mapped values to evaluate applicable rules, i.e. P|Q is P, therefore (P|Q)|(P|Q) => P|Q or, alternatively, P|P => P.
+            // also check if there are any operand propositional equivalencies as well.
+
+            /* cE preprocessing,
+             * First, cycle through cE and check for similar substrings, and if found, map them to a new operand in . 
+             * 
+             */
+
+            /* For each law,
+             * First, cycle through cE and check if there are any operand equivalencies. If so, evaluate and store result in applicableLaws.
+             * Second, cycle through cE and check for similar substrings, and map them to operand if found. 
+             * Third, replace similar substrings in cE with mapped operands.
+             * Fourth, 
+             * Then evaluate and store result in applicableLaws.
+             * Third, return applicableLaws.
+             */
         }
 
         /**
