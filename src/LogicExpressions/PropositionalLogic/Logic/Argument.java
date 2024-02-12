@@ -3,6 +3,7 @@ package src.LogicExpressions.PropositionalLogic.Logic;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 import src.DataStructures.DirectedDeductionGraph;
 import src.DataStructures.DeductionGraphNode;
@@ -321,9 +322,16 @@ public class Argument<M extends Model> {
     /* Used for constructing argumentative inference */
     static class InferenceLaws {
 
-        private final Map<String, String> inferenceLaws = new HashMap<>() {
+        private static final Map<String, ArrayList<String>> lawTemplate = new HashMap<>() {
             {
-                put("ModusPonens", "P, P->Q entails Q");
+                put("ModusPonens", null);
+                put("ModusTollens", null);
+                put("Addition", null);
+                put("Simplification", null);
+                put("Conjunction", null);
+                put("HypotheticalSyllogism", null);
+                put("DisjunctiveSyllogism", null);
+                put("Resolution", null);
             }
         };
 
@@ -331,20 +339,20 @@ public class Argument<M extends Model> {
             super();
         }
 
-
-        public ArrayList<String> checkInferenceLaws(Argument arg) {
+        public Map<String, ArrayList<String>> checkInferenceLaws(Argument arg) {
             Proposition[] kbPropositions = arg.getKnowledgeBasePropositions();
             String[] kbConversions = new String[kbPropositions.length]
             for (int i = 0; i < kbPropositions.length; i++) {
                 kbConversions[i] = e.getConvertedExpression();
             }
 
-            int iterations = 0;
+            Map<String, ArrayList<String>> answerSet = lawTemplate;
             ArrayList<String> applicableLaws = new ArrayList<>();
             while (true) {
                 if ()
             }
-                
+            
+            return answerSet;
         }
 
         /* Rules of Argument Inference */
@@ -428,19 +436,30 @@ public class Argument<M extends Model> {
      */
     static class LogicalEquivalencyLaws {
 
-        private final Map<String, String> equivalencyLaws = new HashMap<>() {
+        private static final Map<String, ArrayList<String>> LawTemplate = new HashMap<>() {
             {
-
+                put("Idempotent Law", null);
+                put("Associative Law", null);
+                put("Commutative Law", null);
+                put("Distributive Law", null);
+                put("Identity Law", null);
+                put("Dominant Law", null);
+                put("Double Negation Law", null);
+                put("Complement Law", null);
+                put("DeMorgan's Law", null);
+                put("Absorption Law", null);
+                put("Conditional Identity", null);
             }
-        }
+        };
 
         public LogicalEquivalencyLaws() {
             super();
         }
 
-        public ArrayList<String> checkEquivalencyLaws(Proposition p) {
+        public Map<String, ArrayList<String>> checkEquivalencyLaws(Proposition p) {
             String cE = p.getConvertedExpression();
 
+            Map<String, ArrayList<String>> answerSet = LawTemplate;
             ArrayList<String> applicableLaws = new ArrayList<>();
             // parse cE and store similar substrings (if any) into variables to then construct applicable rules. This will use key-value mapping, and then
             // using those mapped values to evaluate applicable rules, i.e. P|Q is P, therefore (P|Q)|(P|Q) => P|Q or, alternatively, P|P => P.
@@ -459,6 +478,8 @@ public class Argument<M extends Model> {
              * Then evaluate and store result in applicableLaws.
              * Third, return applicableLaws.
              */
+
+            return answerSet;
         }
 
         /**
