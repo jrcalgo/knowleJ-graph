@@ -234,15 +234,37 @@ public class Argument<M extends Model> {
         if (!commonOperand)
             throw new IllegalArgumentException("No common operand found in query when compared with knowledge base.");
 
-        String[] knowledgeExpressions = new String[this.knowledgeBase.length];
+        Proposition[] kbPropositions = this.getKnowledgeBasePropositions();
+        String[] kbConversions = new String[this.knowledgeBase.length];
         for (int i = 0; i < this.knowledgeBase.length; i++) {
-            knowledgeExpressions[i] = this.knowledgeBase[i].getExpression();
+            kbConversions[i] = kbPropositions[i].getConvertedExpression();
         }
 
-        ArrayList<ArrayList<String>> deductionPaths = new ArrayList<>();
+        /**
+         * Given your description, here's a high-level pseudocode of how you might implement the `deduce` method:
 
-        for ()
-        DeductionTree<String> dt = new DeductionTree<String>(knowledgeExpressions, query);
+            1. Initialize the `DeductionGraph` with root nodes from the knowledge base and a detached node for the query.
+            2. Initialize a variable `depth` to 1.
+            3. Initialize a variable `mostRelevantLeaf` to null.
+            4. While a path from a root node to the query node has not been found:
+            1. For each node in the graph at the current `depth`:
+                1. Apply all applicable inference laws, considering the given roots and the current children nodes stored in the graph.
+                2. Apply all applicable equivalency laws to the node.
+                3. For each resulting sentence from the inference and equivalency laws:
+                    1. Create a new node for the sentence and add it as a child of the current node.
+                    2. If the sentence is an argumentative inference, draw a pointer from the used nodes to the new node.
+                    3. If the new node is more relevant than `mostRelevantLeaf` (according to some relevance metric), update `mostRelevantLeaf`.
+            2. If no new nodes were added in the last iteration, wait for 10 seconds and then continue. If still no new nodes are added, increment 
+            the `depth` by 1 and return to `mostRelevantLeaf` before moving onto other nodes.
+            5. If a path has been found, return the path. If not, return an indication that no path could be found.
+
+            */
+
+        ArrayList<ArrayList<String>> deductionPaths = new ArrayList<>();
+        InferenceLaws inferences = new InferenceLaws();
+        EquivalencyLaws equivalencies = new EquivalencyLaws();
+        
+        DirectedDeductionGraph dt = new DirectedDeductionGraph(knowledgeExpressions, query);
         return dt.search(query.getExpression());
 
     }
@@ -343,7 +365,7 @@ public class Argument<M extends Model> {
             Proposition[] kbPropositions = arg.getKnowledgeBasePropositions();
             String[] kbConversions = new String[kbPropositions.length]
             for (int i = 0; i < kbPropositions.length; i++) {
-                kbConversions[i] = e.getConvertedExpression();
+                kbConversions[i] = kbPropositions[i].getConvertedExpression();
             }
 
             Map<String, ArrayList<String>> answerSet = lawTemplate;
@@ -434,7 +456,7 @@ public class Argument<M extends Model> {
     /**
      * Popular logic equivalencies used for inference and argumentation; propositional logic inference
      */
-    static class LogicalEquivalencyLaws {
+    static class EquivalencyLaws {
 
         private static final Map<String, ArrayList<String>> LawTemplate = new HashMap<>() {
             {
@@ -452,7 +474,7 @@ public class Argument<M extends Model> {
             }
         };
 
-        public LogicalEquivalencyLaws() {
+        public EquivalencyLaws() {
             super();
         }
 
@@ -465,19 +487,18 @@ public class Argument<M extends Model> {
             // using those mapped values to evaluate applicable rules, i.e. P|Q is P, therefore (P|Q)|(P|Q) => P|Q or, alternatively, P|P => P.
             // also check if there are any operand propositional equivalencies as well.
 
-            /* cE preprocessing,
-             * First, cycle through cE and check for similar substrings, and if found, map them to a new operand in . 
+            /* With Propoposition p as the root/reference value and For each law,
+             * First, cycle through cE and check if there are any operand equivalencies. If so, evaluate and store result in applicableLaws.
+             * Second, cycle through cE and check for similar substrings, and map them to operand if found (relative to law operand format). 
+             * Third, new_cE = cE, and replace similar substrings in new_cE with mapped operands.
+             * Fourth, evaluate and store result in answerSet.
+             * Repeat steps until possible evaluations is exhausted.
+             * Fifth, return answerSet.
              * 
+             * ## REMEMBER: Do not store repeated evaluations in answerSet, i.e. 
              */
 
-            /* For each law,
-             * First, cycle through cE and check if there are any operand equivalencies. If so, evaluate and store result in applicableLaws.
-             * Second, cycle through cE and check for similar substrings, and map them to operand if found. 
-             * Third, replace similar substrings in cE with mapped operands.
-             * Fourth, 
-             * Then evaluate and store result in applicableLaws.
-             * Third, return applicableLaws.
-             */
+
 
             return answerSet;
         }
