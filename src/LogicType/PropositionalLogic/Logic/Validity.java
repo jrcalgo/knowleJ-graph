@@ -1,4 +1,4 @@
-package src.LogicExpressions.PropositionalLogic.Logic;
+package src.LogicType.PropositionalLogic.Logic;
 
 public class Validity {
     public boolean isTautology(char[] rowOrColumn) {

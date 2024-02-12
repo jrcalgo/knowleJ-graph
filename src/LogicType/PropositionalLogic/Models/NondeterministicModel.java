@@ -1,11 +1,11 @@
-package src.LogicExpressions.PropositionalLogic.Models;
+package src.LogicType.PropositionalLogic.Models;
 
 import java.util.Map;
 
-import src.LogicExpressions.PropositionalLogic.Logic.Proposition;
+import src.LogicType.PropositionalLogic.Logic.Proposition;
 
-public class StochasticModel extends Model {
-    public StochasticModel(String modelName, Map<Character, Double> defaultOperandTruthValues, 
+public class NondeterministicModel extends Model {
+
     @Override
     public String getModelName() {
         // TODO Auto-generated method stub

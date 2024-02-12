@@ -1,10 +1,10 @@
-package src.LogicExpressions.PropositionalLogic.Models;
+package src.LogicType.PropositionalLogic.Models;
 
 import src.Exceptions.InvalidExpressionException;
 import src.Exceptions.InvalidLogicOperatorException;
 import src.Exceptions.InvalidOperandException;
-import src.LogicExpressions.PropositionalLogic.Logic.Validity;
-import src.LogicExpressions.PropositionalLogic.Logic.Proposition;
+import src.LogicType.PropositionalLogic.Logic.Proposition;
+import src.LogicType.PropositionalLogic.Logic.Validity;
 
 import java.util.Map;
 import java.util.Stack;

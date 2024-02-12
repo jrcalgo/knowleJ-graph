@@ -1,4 +1,4 @@
-package src.LogicExpressions.PropositionalLogic.Logic;
+package src.LogicType.PropositionalLogic.Logic;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,7 +11,7 @@ import src.DataStructures.DeductionGraphNode;
 import src.Exceptions.InvalidExpressionException;
 import src.Exceptions.InvalidLogicOperatorException;
 import src.Exceptions.InvalidOperandException;
-import src.LogicExpressions.PropositionalLogic.Models.*;
+import src.LogicType.PropositionalLogic.Models.*;
 
 public class Argument<M extends Model> {
     private M[] knowledgeBase;
@@ -509,7 +509,7 @@ public class Argument<M extends Model> {
          * @throws InvalidOperandException
          * @throws InvalidExpressionException
          */
-        private String idempotentLaw(String cE)
+        private String idempotentLaw(Map<Character, String> subExpressions)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             Proposition[] iL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
@@ -530,7 +530,7 @@ public class Argument<M extends Model> {
          * @throws InvalidOperandException
          * @throws InvalidLogicOperatorException
          */
-        private String associativeLaw(String cE) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+        private String associativeLaw(Map<Character, String> subExpressions) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             Proposition[] aL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
                 for (int j = 0; j < this.mOperands.length; j++) {
@@ -554,7 +554,7 @@ public class Argument<M extends Model> {
          * @throws InvalidOperandException
          * @throws InvalidLogicOperatorException
          */
-        private String commutativeLaw(String cE)
+        private String commutativeLaw(Map<Character, String> subExpressions)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             Proposition[] cL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
@@ -575,7 +575,7 @@ public class Argument<M extends Model> {
          * @throws InvalidOperandException
          * @throws InvalidLogicOperatorException
          */
-        private String distributiveLaw(String cE)
+        private String distributiveLaw(Map<Character, String> subExpressions)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             Proposition[] iL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
@@ -596,7 +596,7 @@ public class Argument<M extends Model> {
          * @throws InvalidOperandException
          * @throws InvalidLogicOperatorException
          */
-        private String identityLaw(String cE)
+        private String identityLaw(Map<Character, String> subExpressions)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             Proposition[] iL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
@@ -616,7 +616,7 @@ public class Argument<M extends Model> {
          * @throws InvalidOperandException
          * @throws InvalidLogicOperatorException
          */
-        private String dominationLaw(String cE)
+        private String dominationLaw(Map<Character, String> subExpressions)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             Proposition[] iL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
@@ -638,7 +638,7 @@ public class Argument<M extends Model> {
          * @throws InvalidOperandException
          * @throws InvalidLogicOperatorException
          */
-        private String doubleNegationLaw(String cE)
+        private String doubleNegationLaw(Map<Character, String> subExpressions)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             Proposition[] dNL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
@@ -658,7 +658,7 @@ public class Argument<M extends Model> {
          * @throws InvalidOperandException
          * @throws InvalidLogicOperatorException
          */
-        private String complementLaw(String cE)
+        private String complementLaw(Map<Character, String> subExpressions)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             Proposition[] iL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
@@ -686,7 +686,7 @@ public class Argument<M extends Model> {
          * @param cE
          * @return
          */
-        private String deMorgansLaw(String cE) {
+        private String deMorgansLaw(Map<Character, String> subExpressions) {
             Proposition[] iL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
                 if (this.cE.contains(this.mOperands[i] + "a" + this.mOperands[i])
@@ -703,7 +703,7 @@ public class Argument<M extends Model> {
          * @param cE
          * @return
          */
-        private String absorptionLaw(String cE) {
+        private String absorptionLaw(Map<Character, String> subExpressions) {
             Proposition[] iL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
                 if (this.cE.contains(this.mOperands[i] + "a" + this.mOperands[i])
@@ -720,7 +720,7 @@ public class Argument<M extends Model> {
          * @param cE
          * @return
          */
-        private String conditionalIdentity(String cE) {
+        private String conditionalIdentity(Map<Character, String> subExpressions) {
             Proposition[] iL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
                 if (this.cE.contains(this.mOperands[i] + "a" + this.mOperands[i])

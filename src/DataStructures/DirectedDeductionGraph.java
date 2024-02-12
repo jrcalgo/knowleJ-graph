@@ -3,7 +3,7 @@ package src.DataStructures;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import src.LogicExpressions.PropositionalLogic.Logic.Proposition;
+import src.LogicType.PropositionalLogic.Logic.Proposition;
 
 public class DirectedDeductionGraph {
     private LinkedList<DeductionGraphNode> givenNodes; // initial expression(s) / root(s)

@@ -1,4 +1,4 @@
-package src.LogicExpressions.PropositionalLogic.Logic;
+package src.LogicType.PropositionalLogic.Logic;
 
 import java.io.FileWriter;
 import java.nio.file.Files;

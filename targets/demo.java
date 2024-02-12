@@ -8,9 +8,9 @@ import java.io.IOException;
 import src.Exceptions.InvalidExpressionException;
 import src.Exceptions.InvalidLogicOperatorException;
 import src.Exceptions.InvalidOperandException;
-import src.LogicExpressions.PropositionalLogic.Logic.*;
-import src.LogicExpressions.PropositionalLogic.Models.DeterministicModel;
-import src.LogicExpressions.PropositionalLogic.Models.Model;
+import src.LogicType.PropositionalLogic.Logic.*;
+import src.LogicType.PropositionalLogic.Models.DeterministicModel;
+import src.LogicType.PropositionalLogic.Models.Model;
 
 public class demo {
 

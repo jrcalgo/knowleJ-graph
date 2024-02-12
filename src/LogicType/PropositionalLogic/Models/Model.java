@@ -1,8 +1,8 @@
-package src.LogicExpressions.PropositionalLogic.Models;
+package src.LogicType.PropositionalLogic.Models;
 
 import java.util.Map;
 
-import src.LogicExpressions.PropositionalLogic.Logic.Proposition;
+import src.LogicType.PropositionalLogic.Logic.Proposition;
 
 public abstract class Model {
     public abstract String getModelName();
