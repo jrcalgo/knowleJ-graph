@@ -83,5 +83,6 @@ public class TruthTableBuilder {
         this.boolCount = 0;
         this.valueTable = null;
         this.truthTable = null;
+        System.gc();
     }
 }
