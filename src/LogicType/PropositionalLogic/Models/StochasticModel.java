@@ -2,7 +2,7 @@ package src.LogicType.PropositionalLogic.Models;
 
 import java.util.Map;
 
-import src.LogicExpressions.PropositionalLogic.Logic.Proposition;
+import src.LogicType.PropositionalLogic.Logic.Proposition;
 
 public class StochasticModel extends Model {
     public StochasticModel(String modelName, Map<Character, Double> defaultOperandTruthValues, 
