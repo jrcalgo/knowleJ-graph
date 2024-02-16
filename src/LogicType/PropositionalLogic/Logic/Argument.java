@@ -201,6 +201,12 @@ public class Argument<M extends Model> {
 
     // }
 
+    private ArrayList<String> iterativeDeepeningSearch() {
+        ArrayList<String> optimalPaths = new ArrayList<>();
+
+        return optimalPaths;
+    }
+
     public ArrayList<ArrayList<String>> deduce(String query) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (query == null || query.length() == 0)
             throw new IllegalArgumentException("String query cannot be null or empty.");
@@ -215,7 +221,7 @@ public class Argument<M extends Model> {
         return deduce(new Proposition(query));
     }
 
-    public ArrayList<ArrayList<String>> deduce(Proposition query) {
+    public <G> G deduce(Proposition query) {
         if (query == null)
             throw new IllegalArgumentException("Proposition query cannot be null or empty.");
         
@@ -241,8 +247,7 @@ public class Argument<M extends Model> {
         }
 
         /**
-         * Given your description, here's a high-level pseudocode of how you might implement the `deduce` method:
-
+         * 
             1. Initialize the `DeductionGraph` with root nodes from the knowledge base and a detached node for the query.
             2. Initialize a variable `depth` to 1.
             3. Initialize a variable `mostRelevantLeaf` to null.
@@ -260,13 +265,28 @@ public class Argument<M extends Model> {
 
             */
 
+        while(true) {
+
+
+        }
+
         ArrayList<ArrayList<String>> deductionPaths = new ArrayList<>();
         InferenceLaws inferences = new InferenceLaws();
         EquivalencyLaws equivalencies = new EquivalencyLaws();
         
         DirectedDeductionGraph dt = new DirectedDeductionGraph(knowledgeExpressions, query);
-        return dt.search(query.getExpression());
+        return dt;
 
+    }
+
+    private <G> G deductionReturnType(G type) {
+        if (type == null)
+            throw new IllegalArgumentException("Type cannot be null.");
+        else if (!(type instanceof DirectedDeductionGraph) || !(type instanceof ArrayList<ArrayList<String>>))
+            throw new IllegalArgumentException("Type must be a DirectedDeductionGraph or an ArrayList<ArrayList<String>>.");
+
+        G returnType = type;
+        return returnType;
     }
 
     public String[][] getAllTruthTable() {
@@ -344,15 +364,15 @@ public class Argument<M extends Model> {
     /* Used for constructing argumentative inference */
     static class InferenceLaws {
 
-        private static final Map<String, ArrayList<String>> lawTemplate = new HashMap<>() {
+        private static final Map<String, ArrayList<String>> answerTemplate = new HashMap<>() {
             {
-                put("ModusPonens", null);
-                put("ModusTollens", null);
+                put("Modus Ponens", null);
+                put("Modus Tollens", null);
                 put("Addition", null);
                 put("Simplification", null);
                 put("Conjunction", null);
-                put("HypotheticalSyllogism", null);
-                put("DisjunctiveSyllogism", null);
+                put("Hypothetical Syllogism", null);
+                put("Disjunctive Syllogism", null);
                 put("Resolution", null);
             }
         };
@@ -368,7 +388,7 @@ public class Argument<M extends Model> {
                 kbConversions[i] = kbPropositions[i].getConvertedExpression();
             }
 
-            Map<String, ArrayList<String>> answerSet = lawTemplate;
+            Map<String, ArrayList<String>> answerSet = answerTemplate;
             ArrayList<String> applicableLaws = new ArrayList<>();
             while (true) {
                 if ()
@@ -458,7 +478,7 @@ public class Argument<M extends Model> {
      */
     static class EquivalencyLaws {
 
-        private static final Map<String, ArrayList<String>> LawTemplate = new HashMap<>() {
+        private static final Map<String, ArrayList<String>> answerTemplate = new HashMap<>() {
             {
                 put("Idempotent Law", null);
                 put("Associative Law", null);
@@ -481,8 +501,8 @@ public class Argument<M extends Model> {
         public Map<String, ArrayList<String>> checkEquivalencyLaws(Proposition p) {
             String cE = p.getConvertedExpression();
 
-            Map<String, ArrayList<String>> answerSet = LawTemplate;
-            ArrayList<String> applicableLaws = new ArrayList<>();
+            Map<String, ArrayList<String>> answerSet = answerTemplate;
+            Map<Character, String> subExpressions = new HashMap<>();
             // parse cE and store similar substrings (if any) into variables to then construct applicable rules. This will use key-value mapping, and then
             // using those mapped values to evaluate applicable rules, i.e. P|Q is P, therefore (P|Q)|(P|Q) => P|Q or, alternatively, P|P => P.
             // also check if there are any operand propositional equivalencies as well.
@@ -511,7 +531,16 @@ public class Argument<M extends Model> {
          */
         private String idempotentLaw(Map<Character, String> subExpressions)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
-            Proposition[] iL = new Proposition[this.mOperands.length];
+            String law;
+            for (Character operand : subExpressions.keySet()) {
+                if (subExpressions.get(operand) == null) {
+                    continue;
+                } else {
+
+                }
+            }
+
+
             for (int i = 0; i < this.mOperands.length; i++) {
                 if (this.cE.contains(this.mOperands[i] + "a" + this.mOperands[i])
                         || this.cE.contains(this.mOperands[i] + "o" + this.mOperands[i])) {
@@ -598,6 +627,9 @@ public class Argument<M extends Model> {
          */
         private String identityLaw(Map<Character, String> subExpressions)
                 throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+            for (Chara)
+
+
             Proposition[] iL = new Proposition[this.mOperands.length];
             for (int i = 0; i < this.mOperands.length; i++) {
                 if (this.cE.contains(this.mOperands[i] + "oF") || (this.cE.contains(this.mOperands[i] + "aT"))) {
@@ -669,7 +701,7 @@ public class Argument<M extends Model> {
                 }
                 continue;
             }
-
+s
             for (int i = 0; i < this.cE.length(); i++) {
                 if (this.cE.charAt(i) == 'n' && this.cE.charAt(i + 1) == 'F') {
                     iL[i] = new Proposition("F");
