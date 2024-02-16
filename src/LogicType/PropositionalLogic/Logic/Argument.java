@@ -201,9 +201,26 @@ public class Argument<M extends Model> {
 
     // }
 
-    private ArrayList<String> iterativeDeepeningSearch() {
+    private ArrayList<String> iterativeDeepeningSearch(DirectedDeductionGraph graph) {
         ArrayList<String> optimalPaths = new ArrayList<>();
+        /**
+         * 
+            1. Initialize the `DeductionGraph` with root nodes from the knowledge base and a detached node for the query.
+            2. Initialize a variable `depth` to 1.
+            3. Initialize a variable `mostRelevantLeaf` to null.
+            4. While a path from a root node to the query node has not been found:
+            1. For each node in the graph at the current `depth`:
+                1. Apply all applicable inference laws, considering the given roots and the current children nodes stored in the graph.
+                2. Apply all applicable equivalency laws to the node.
+                3. For each resulting sentence from the inference and equivalency laws:
+                    1. Create a new node for the sentence and add it as a child of the current node.
+                    2. If the sentence is an argumentative inference, draw a pointer from the used nodes to the new node.
+                    3. If the new node is more relevant than `mostRelevantLeaf` (according to some relevance metric), update `mostRelevantLeaf`.
+            2. If no new nodes were added in the last iteration, wait for 10 seconds and then continue. If still no new nodes are added, increment 
+            the `depth` by 1 and return to `mostRelevantLeaf` before moving onto other nodes.
+            5. If a path has been found, return the path. If not, return an indication that no path could be found.
 
+            */
         return optimalPaths;
     }
 
@@ -246,30 +263,6 @@ public class Argument<M extends Model> {
             kbConversions[i] = kbPropositions[i].getConvertedExpression();
         }
 
-        /**
-         * 
-            1. Initialize the `DeductionGraph` with root nodes from the knowledge base and a detached node for the query.
-            2. Initialize a variable `depth` to 1.
-            3. Initialize a variable `mostRelevantLeaf` to null.
-            4. While a path from a root node to the query node has not been found:
-            1. For each node in the graph at the current `depth`:
-                1. Apply all applicable inference laws, considering the given roots and the current children nodes stored in the graph.
-                2. Apply all applicable equivalency laws to the node.
-                3. For each resulting sentence from the inference and equivalency laws:
-                    1. Create a new node for the sentence and add it as a child of the current node.
-                    2. If the sentence is an argumentative inference, draw a pointer from the used nodes to the new node.
-                    3. If the new node is more relevant than `mostRelevantLeaf` (according to some relevance metric), update `mostRelevantLeaf`.
-            2. If no new nodes were added in the last iteration, wait for 10 seconds and then continue. If still no new nodes are added, increment 
-            the `depth` by 1 and return to `mostRelevantLeaf` before moving onto other nodes.
-            5. If a path has been found, return the path. If not, return an indication that no path could be found.
-
-            */
-
-        while(true) {
-
-
-        }
-
         ArrayList<ArrayList<String>> deductionPaths = new ArrayList<>();
         InferenceLaws inferences = new InferenceLaws();
         EquivalencyLaws equivalencies = new EquivalencyLaws();
@@ -288,6 +281,8 @@ public class Argument<M extends Model> {
         G returnType = type;
         return returnType;
     }
+
+    public void 
 
     public String[][] getAllTruthTable() {
         return this.allTruthTable;
