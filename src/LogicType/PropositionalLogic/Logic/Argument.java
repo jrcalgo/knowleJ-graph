@@ -201,7 +201,7 @@ public class Argument<M extends Model> {
 
     // }
 
-    private ArrayList<String> iterativeDeepeningSearch(DirectedDeductionGraph graph) {
+    private <G> G iterativeDeepeningSearch(DirectedDeductionGraph graph, G returnType) {
         ArrayList<String> optimalPaths = new ArrayList<>();
         /**
          * 
@@ -221,10 +221,10 @@ public class Argument<M extends Model> {
             5. If a path has been found, return the path. If not, return an indication that no path could be found.
 
             */
-        return optimalPaths;
+        return deductionReturnType(null);
     }
 
-    public ArrayList<ArrayList<String>> deduce(String query) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+    public <G> G deduce(String query) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (query == null || query.length() == 0)
             throw new IllegalArgumentException("String query cannot be null or empty.");
         if (query.contains(",") && !query.startsWith(",") && !query.endsWith(",")) {
@@ -267,16 +267,34 @@ public class Argument<M extends Model> {
         InferenceLaws inferences = new InferenceLaws();
         EquivalencyLaws equivalencies = new EquivalencyLaws();
         
-        DirectedDeductionGraph dt = new DirectedDeductionGraph(knowledgeExpressions, query);
-        return dt;
+        DirectedDeductionGraph dt = new DirectedDeductionGraph(this.getKnowledgeBaseExpressions(), query);
+
+        return iterativeDeepeningSearch(dt);
 
     }
 
     private <G> G deductionReturnType(G type) {
         if (type == null)
             throw new IllegalArgumentException("Type cannot be null.");
-        else if (!(type instanceof DirectedDeductionGraph) || !(type instanceof ArrayList<ArrayList<String>>))
+        else if (!(type instanceof DirectedDeductionGraph) || !(type instanceof ArrayList))
             throw new IllegalArgumentException("Type must be a DirectedDeductionGraph or an ArrayList<ArrayList<String>>.");
+        else if (type instanceof ArrayList) {
+            ArrayList<?> list = (ArrayList<?>) type;
+            if (!list.isEmpty()) {
+                Object item = list.get(0);
+                if (item instanceof ArrayList) {
+                    ArrayList<?> innerList = (ArrayList<?>) item;
+                    if (!innerList.isEmpty()) {
+                        Object innerItem = innerList.get(0);
+                        if (!(innerItem instanceof String)) {
+                            throw new IllegalArgumentException("Type must be a DirectedDeductionGraph or an ArrayList<ArrayList<String>>.");
+                        }
+                    }
+                } else {
+                    throw new IllegalArgumentException("Type must be a DirectedDeductionGraph or an ArrayList<ArrayList<String>>.");
+                }
+            }
+        }
 
         G returnType = type;
         return returnType;
