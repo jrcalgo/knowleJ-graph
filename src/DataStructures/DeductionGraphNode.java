@@ -54,10 +54,10 @@ public class DeductionGraphNode {
     }
 
     public void addOutNode(DeductionGraphNode outNode) {
-        if (this.outNodes == null)
+        boolean outNodeContains = this.outNodes.contains(outNode);
+        if (this.outNodes == null && outNodeContains == false)
             this.outNodes = new LinkedList<DeductionGraphNode>();
-        
-        if (!this.outNodes.contains(outNode))
+        else if (outNodeContains == false)
             this.outNodes.add(outNode);
         else
             return;
