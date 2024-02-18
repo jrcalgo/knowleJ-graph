@@ -202,7 +202,18 @@ public class Argument<M extends Model> {
     // }
 
     private <G> G iterativeDeepeningSearch(DirectedDeductionGraph graph, G returnType) {
-        ArrayList<String> optimalPaths = new ArrayList<>();
+        InferenceLaws inferences = new InferenceLaws();
+        EquivalencyLaws equivalencies = new EquivalencyLaws();
+
+        Argument knowledgeHistory = new Argument(this.knowledgeBase);
+        ArrayList<DeductionGraphNode> leafs = graph.getLeafNodes();
+        ArrayList<ArrayList<String>> optimalPaths = new ArrayList<>();
+        int depth = 2;
+        DeductionGraphNode mostRelevantLeaf = null;
+        while (true) {
+            Map<String, ArrayList<String>> inferencesMap = inferences.checkInferenceLaws(knowledgeHistory);
+            Map<String, ArrayList<String>> equivalenciesMap = equivalencies.checkEquivalencyLaws()
+        }
         /**
          * 
             1. Initialize the `DeductionGraph` with root nodes from the knowledge base and a detached node for the query.
@@ -221,7 +232,7 @@ public class Argument<M extends Model> {
             5. If a path has been found, return the path. If not, return an indication that no path could be found.
 
             */
-        return deductionReturnType(null);
+        return deductionReturnType(returnType);
     }
 
     public <G> G deduce(String query) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
@@ -269,7 +280,7 @@ public class Argument<M extends Model> {
         
         DirectedDeductionGraph dt = new DirectedDeductionGraph(this.getKnowledgeBaseExpressions(), query);
 
-        return iterativeDeepeningSearch(dt);
+        return iterativeDeepeningSearch(dt, );
 
     }
 
@@ -288,6 +299,8 @@ public class Argument<M extends Model> {
                         Object innerItem = innerList.get(0);
                         if (!(innerItem instanceof String)) {
                             throw new IllegalArgumentException("Type must be a DirectedDeductionGraph or an ArrayList<ArrayList<String>>.");
+                        } else {
+                            System.gc();
                         }
                     }
                 } else {
