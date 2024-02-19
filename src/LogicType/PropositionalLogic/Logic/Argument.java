@@ -436,7 +436,7 @@ public class Argument<M extends Model> {
         /**
          * Rule: [P], [P->Q] entails {Q}
          * @param cE
-         * @return
+         * @return Rule string
          */
         private String modusPonens(String cE) {
             if
@@ -445,7 +445,7 @@ public class Argument<M extends Model> {
         /**
          * Rule: [~Q], [P->Q] entails {~P}
          * @param cE
-         * @return
+         * @return Rule string
          */
         private String modusTollens(String cE) {
             if
@@ -454,7 +454,7 @@ public class Argument<M extends Model> {
         /**
          * Rule: [P] entails {P|Q}
          * @param cE
-         * @return
+         * @return Rule string
          */
         private String addition(String cE) {
             if
@@ -463,7 +463,7 @@ public class Argument<M extends Model> {
         /**
          * Rule: [P&Q] entails {P}
          * @param cE
-         * @return
+         * @return Rule string
          */
         private String simplification(String cE) {
             if
@@ -472,7 +472,7 @@ public class Argument<M extends Model> {
         /**
          * Rule: [P], [Q] entails {P&Q}
          * @param cE
-         * @return
+         * @return Rule string
          */
         private String conjunction(String cE) {
             if
@@ -481,7 +481,7 @@ public class Argument<M extends Model> {
         /**
          * Rule: [P->Q], [Q->R] entails {P->R}
          * @param cE
-         * @return
+         * @return Rule string
          */
         private String hypotheticalSyllogism(String cE) {
             if
@@ -490,7 +490,7 @@ public class Argument<M extends Model> {
         /**
          * Rule: [P|Q], [~P] entails {Q}
          * @param cE
-         * @return
+         * @return Rule string
          */
         private String disjunctiveSyllogism(String cE) {
             if
@@ -500,7 +500,7 @@ public class Argument<M extends Model> {
          * Rule: [P|Q], [~P|R] entails {Q|R}
          * this one is powerful
          * @param cE
-         * @return
+         * @return Rule string
          */
         private String resolution(String cE) {
             if
