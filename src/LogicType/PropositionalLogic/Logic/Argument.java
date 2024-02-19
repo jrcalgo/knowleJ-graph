@@ -206,11 +206,14 @@ public class Argument<M extends Model> {
         EquivalencyLaws equivalencies = new EquivalencyLaws();
 
         Argument knowledgeHistory = new Argument(this.knowledgeBase);
-        ArrayList<DeductionGraphNode> leafs = graph.getLeafNodes();
+        ArrayList<DeductionGraphNode> leafs = graph.getNodes();
         ArrayList<ArrayList<String>> optimalPaths = new ArrayList<>();
-        int depth = 2;
+        int depth = 0;
         DeductionGraphNode mostRelevantLeaf = null;
         while (true) {
+            for (DeductionGraphNode leaf : leafs) {
+
+            }
             Map<String, ArrayList<String>> inferencesMap = inferences.checkInferenceLaws(knowledgeHistory);
             Map<String, ArrayList<String>> equivalenciesMap = equivalencies.checkEquivalencyLaws()
         }
@@ -407,6 +410,11 @@ public class Argument<M extends Model> {
             super();
         }
 
+        /**
+         * 
+         * @param arg an Argument object containing given knowledge base and each successive deduction; knowledge history
+         * @return Maps inference law to list of strings, with each string containing [applied premises] and resulting {conclusion}.
+         */
         public Map<String, ArrayList<String>> checkInferenceLaws(Argument arg) {
             Proposition[] kbPropositions = arg.getKnowledgeBasePropositions();
             String[] kbConversions = new String[kbPropositions.length]
@@ -426,7 +434,7 @@ public class Argument<M extends Model> {
         /* Rules of Argument Inference */
 
         /**
-         * Rule: P, P->Q entails Q
+         * Rule: [P], [P->Q] entails {Q}
          * @param cE
          * @return
          */
@@ -435,7 +443,7 @@ public class Argument<M extends Model> {
         }
 
         /**
-         * Rule: ~Q, P->Q entails ~P
+         * Rule: [~Q], [P->Q] entails {~P}
          * @param cE
          * @return
          */
@@ -444,7 +452,7 @@ public class Argument<M extends Model> {
         }
 
         /**
-         * Rule: P entails P|Q
+         * Rule: [P] entails {P|Q}
          * @param cE
          * @return
          */
@@ -453,7 +461,7 @@ public class Argument<M extends Model> {
         }
 
         /**
-         * Rule: P&Q entails P
+         * Rule: [P&Q] entails {P}
          * @param cE
          * @return
          */
@@ -462,7 +470,7 @@ public class Argument<M extends Model> {
         }
 
         /**
-         * Rule: P, Q entails P&Q
+         * Rule: [P], [Q] entails {P&Q}
          * @param cE
          * @return
          */
@@ -471,7 +479,7 @@ public class Argument<M extends Model> {
         }
 
         /**
-         * Rule: P->Q, Q->R entails P->R
+         * Rule: [P->Q], [Q->R] entails {P->R}
          * @param cE
          * @return
          */
@@ -480,7 +488,7 @@ public class Argument<M extends Model> {
         }
 
         /**
-         * Rule: P|Q, ~P entails Q
+         * Rule: [P|Q], [~P] entails {Q}
          * @param cE
          * @return
          */
@@ -489,7 +497,7 @@ public class Argument<M extends Model> {
         }
 
         /**
-         * Rule: P|Q, ~P|R entails Q|R
+         * Rule: [P|Q], [~P|R] entails {Q|R}
          * this one is powerful
          * @param cE
          * @return
@@ -524,8 +532,13 @@ public class Argument<M extends Model> {
             super();
         }
 
+        /**
+         * 
+         * @param p A single propositional expression
+         * @return Maps equivalency to list strings, with each string containing [applied expression] and resulting {conversion}.
+         */
         public Map<String, ArrayList<String>> checkEquivalencyLaws(Proposition p) {
-            String cE = p.getConvertedExpression();
+            String cE = p.getConvertedExpression(); // easier to work with
 
             Map<String, ArrayList<String>> answerSet = answerTemplate;
             Map<Character, String> subExpressions = new HashMap<>();
@@ -550,7 +563,7 @@ public class Argument<M extends Model> {
         }
 
         /**
-         * Rule: [P|P => P] OR [P&P => P]
+         * Rule: [P|P] => {P} OR [P&P] => {P}
          * @throws InvalidLogicOperatorException
          * @throws InvalidOperandException
          * @throws InvalidExpressionException
@@ -578,7 +591,7 @@ public class Argument<M extends Model> {
         }
 
         /**
-         * Rule: [(P|Q)|R => P|(Q|R)] OR [(P&Q)&R => P&(Q&R)]
+         * Rule: [(P|Q)|R] => {P|(Q|R)} OR [(P&Q)&R] => {P&(Q&R)}
          * @param cE
          * @return
          * @throws InvalidExpressionException
@@ -602,7 +615,7 @@ public class Argument<M extends Model> {
         }
 
         /**
-         * Rule: [P|Q => Q|P] OR [P&Q => Q&P]
+         * Rule: [P|Q] => {Q|P} OR [P&Q] => {Q&P}
          * @param cE
          * @return
          * @throws InvalidExpressionException
@@ -623,7 +636,7 @@ public class Argument<M extends Model> {
         }
 
         /**
-         * Rule: [P|(Q&R) => (P|Q)&(P|R)] OR [P&(Q|R) => (P&Q)|(P&R)]
+         * Rule: [P|(Q&R)] => {(P|Q)&(P|R)} OR [P&(Q|R)] => {(P&Q)|(P&R)}
          * @param cE
          * @return
          * @throws InvalidExpressionException
@@ -644,7 +657,7 @@ public class Argument<M extends Model> {
         }
 
         /**
-         * Rule: [P|F => P] OR [P&T => P]
+         * Rule: [P|F] => {P} OR [P&T] => {P}
          * @param cE
          * @return
          * @throws InvalidExpressionException
@@ -667,7 +680,7 @@ public class Argument<M extends Model> {
         }
 
         /**
-         * Rule: [P&F => F] OR [P|T => T]
+         * Rule: [P&F] => {F} OR [P|T] => {T}
          * @param cE
          * @return
          * @throws InvalidExpressionException
@@ -689,7 +702,7 @@ public class Argument<M extends Model> {
         }
 
         /**
-         * Rule: [~~P => P]
+         * Rule: [~~P] => {P}
          * @param cE
          * @return
          * @throws InvalidExpressionException
@@ -709,7 +722,7 @@ public class Argument<M extends Model> {
         }
 
         /**
-         * Rule: [P&~P => F, ~T => F] OR [P|~P => T, ~F => T]
+         * Rule: [P&~P] => {F}, [~T] => {F} OR [P|~P] => {T}, [~F] => {T}
          * @param cE
          * @return
          * @throws InvalidExpressionException
@@ -740,7 +753,7 @@ s
         }
 
         /**
-         * Rule: [~(P|Q) => ~P & ~Q] OR [~(P&Q) => ~P | ~Q]
+         * Rule: [~(P|Q)] => {~P&~Q} OR [~(P&Q)] => {~P|~Q}
          * @param cE
          * @return
          */
@@ -757,7 +770,7 @@ s
         }
 
         /**
-         * Rule: [P|(P&Q) => P] OR [P&(P|Q) => P]
+         * Rule: [P|(P&Q)] => {P} OR [P&(P|Q)] => {P}
          * @param cE
          * @return
          */
@@ -774,7 +787,7 @@ s
         }
 
         /**
-         * Rule: [P->Q => ~P|Q] OR [P<>Q => (P->Q)&(Q->P)]
+         * Rule: [P->Q] => {~P|Q} OR [P<>Q] => {(P->Q)&(Q->P)}
          * @param cE
          * @return
          */
