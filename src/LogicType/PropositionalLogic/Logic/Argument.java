@@ -211,28 +211,29 @@ public class Argument<M extends Model> {
         int depth = 0;
         DeductionGraphNode mostRelevantLeaf = null;
         while (true) {
-            Map<String, ArrayList<String>> inferencesMap = new HashMap<>();
-            Map<String, ArrayList<String>> equivalenciesMap = new HashMap<>();
+            Map<String, ArrayList<String>> inferenceMap = new HashMap<>();
+            Map<String, ArrayList<String>> equivalencyMap = new HashMap<>();
             for (DeductionGraphNode leaf : leafs) {
-                inferencesMap = inferences.checkInferenceLaws(knowledgeHistory);
-                equivalenciesMap = equivalencies.checkEquivalencyLaws(new Proposition(leaf.getExpression()));
+                inferenceMap = inferences.checkInferenceLaws(knowledgeHistory);
+                equivalencyMap = equivalencies.checkEquivalencyLaws(new Proposition(leaf.getExpression()));
 
-                for (String law : inferencesMap.keySet()) {
-                    if (inferencesMap.get(law) == null) {
+                for (String law : inferenceMap.keySet()) {
+                    if (inferenceMap.get(law) == null) {
                         break;
                     } else {
-                        String[] premises = inferencesMap.get(law).get(0).substring;
-                        String conclusion = inferencesMap.get(law).get(0).substring()
+                        String[] premises = inferenceMap.get(law).get(0).substring;
+                        String conclusion = inferenceMap.get(law).get(0).substring()
                     }
                 }
-                for (String law : equivalenciesMap.keySet()) {
-                    if (equivalenciesMap.get(law) == null) {
+                for (String law : equivalencyMap.keySet()) {
+                    if (equivalencyMap.get(law) == null) {
                         break;
                     } else {
 
                     }
                 }
             }
+            System.gc();
         }
         /**
          * 
@@ -250,7 +251,6 @@ public class Argument<M extends Model> {
             2. If no new nodes were added in the last iteration, wait for 10 seconds and then continue. If still no new nodes are added, increment 
             the `depth` by 1 and return to `mostRelevantLeaf` before moving onto other nodes.
             5. If a path has been found, return the path. If not, return an indication that no path could be found.
-
             */
         return deductionReturnType(returnType);
     }
