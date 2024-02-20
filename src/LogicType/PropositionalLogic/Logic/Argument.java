@@ -201,7 +201,7 @@ public class Argument<M extends Model> {
 
     // }
 
-    private <G> G iterativeDeepeningSearch(DirectedDeductionGraph graph, G returnType) {
+    private <G> G iterativeDeepeningSearch(DirectedDeductionGraph graph, G returnType) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         InferenceLaws inferences = new InferenceLaws();
         EquivalencyLaws equivalencies = new EquivalencyLaws();
 
@@ -211,11 +211,28 @@ public class Argument<M extends Model> {
         int depth = 0;
         DeductionGraphNode mostRelevantLeaf = null;
         while (true) {
+            Map<String, ArrayList<String>> inferencesMap = new HashMap<>();
+            Map<String, ArrayList<String>> equivalenciesMap = new HashMap<>();
             for (DeductionGraphNode leaf : leafs) {
+                inferencesMap = inferences.checkInferenceLaws(knowledgeHistory);
+                equivalenciesMap = equivalencies.checkEquivalencyLaws(new Proposition(leaf.getExpression()));
 
+                for (String law : inferencesMap.keySet()) {
+                    if (inferencesMap.get(law) == null) {
+                        break;
+                    } else {
+                        String[] premises = inferencesMap.get(law).get(0).substring;
+                        String conclusion = inferencesMap.get(law).get(0).substring()
+                    }
+                }
+                for (String law : equivalenciesMap.keySet()) {
+                    if (equivalenciesMap.get(law) == null) {
+                        break;
+                    } else {
+
+                    }
+                }
             }
-            Map<String, ArrayList<String>> inferencesMap = inferences.checkInferenceLaws(knowledgeHistory);
-            Map<String, ArrayList<String>> equivalenciesMap = equivalencies.checkEquivalencyLaws()
         }
         /**
          * 
@@ -316,7 +333,23 @@ public class Argument<M extends Model> {
         return returnType;
     }
 
-    public void 
+    public void setKnowledgeBase(M[] knowledgeBase) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+        validateKnowledgeBase(knowledgeBase);
+        setTruthTable();
+    }
+
+    public void addKnowledgeModel(M model) {
+        Object[] newKB = new Object[this.knowledgeBase.length+1];
+        for (int i = 0; i < this.knowledgeBase.length+1; i++) {
+
+        }
+
+        this.knowledgeBase = newKB;
+    }
+
+    public int getKnowledgeBaseSize() {
+        return this.knowledgeBase.length;
+    }
 
     public String[][] getAllTruthTable() {
         return this.allTruthTable;
