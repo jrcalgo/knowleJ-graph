@@ -341,11 +341,9 @@ public class Argument<M extends Model> {
 
     public void addKnowledgeModel(M model) {
         Object[] newKB = new Object[this.knowledgeBase.length+1];
-        for (int i = 0; i < this.knowledgeBase.length+1; i++) {
-
-        }
-
-        this.knowledgeBase = newKB;
+        newKB = getKnowledgeBaseModels();
+        newKB[this.knowledgeBase.length+1] = model;
+        this.knowledgeBase = (M[]) newKB;
     }
 
     public int getKnowledgeBaseSize() {
