@@ -159,7 +159,7 @@ public class Argument<M extends Model> {
             }
             queryValues.add(query.evaluateExpression(valueMap));
             if (queryValues.get(valueRows-1))
-                answer = "True";
+                answer = "True"; 
             else
                 answer = "False";
             
@@ -229,7 +229,8 @@ public class Argument<M extends Model> {
                     if (equivalencyMap.get(law) == null) {
                         break;
                     } else {
-
+                        String[] premises = equivalencyMap.get(law)
+                        String conversion = equivalencyMap.get(law)
                     }
                 }
             }
@@ -456,9 +457,26 @@ public class Argument<M extends Model> {
             }
 
             Map<String, ArrayList<String>> answerSet = answerTemplate;
-            ArrayList<String> applicableLaws = new ArrayList<>();
-            while (true) {
-                if ()
+            Map<Character, String> subExpressions = new HashMap<>();
+            for (String law : answerSet.keySet()) {
+                switch(law) {
+                    case "Modus Ponens":
+
+                    case "Modus Tollens":
+
+                    case "Addition":
+
+                    case "Simplification":
+
+                    case "Conjunction":
+
+                    case "Hypothetical Syllogism":
+
+                    case "Disjunctive Syllogism":
+
+                    case "Resolution":
+                }
+                subExpressions.clear();
             }
             
             return answerSet;
@@ -589,7 +607,32 @@ public class Argument<M extends Model> {
              * 
              * ## REMEMBER: Do not store repeated evaluations in answerSet, i.e. 
              */
+            for (String law : answerSet.keySet()) {
+                switch(law) {
+                    case "Idempotent Law":
 
+                    case "Associative Law":
+
+                    case "Commutative Law":
+
+                    case "Distributive Law":
+
+                    case "Identity Law":
+
+                    case "Dominant Law":
+
+                    case "Double Negation Law":
+
+                    case "Complement Law":
+
+                    case "DeMorgan's Law":
+
+                    case "Absorption Law":
+
+                    case "Conditional Identity":
+                }
+                subExpressions.clear();
+            }
 
 
             return answerSet;
