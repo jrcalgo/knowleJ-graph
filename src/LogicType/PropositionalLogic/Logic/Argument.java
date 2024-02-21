@@ -458,25 +458,36 @@ public class Argument<M extends Model> {
 
             Map<String, ArrayList<String>> answerSet = answerTemplate;
             Map<Character, String> subExpressions = new HashMap<>();
+            ArrayList<String> returnedLawExpressions = new ArrayList<>();
             for (String law : answerSet.keySet()) {
                 switch(law) {
-                    case "Modus Ponens":
+                    case "Modus Ponens": {
 
-                    case "Modus Tollens":
+                    }
+                    case "Modus Tollens": {
 
-                    case "Addition":
+                    }
+                    case "Addition": {
 
-                    case "Simplification":
+                    }
+                    case "Simplification": {
 
-                    case "Conjunction":
+                    }
+                    case "Conjunction": {
 
-                    case "Hypothetical Syllogism":
+                    }
+                    case "Hypothetical Syllogism": {
 
-                    case "Disjunctive Syllogism":
+                    }
+                    case "Disjunctive Syllogism": {
 
-                    case "Resolution":
+                    }
+                    case "Resolution": {
+
+                    }
                 }
                 subExpressions.clear();
+                returnedLawExpressions.clear();
             }
             
             return answerSet;
@@ -607,33 +618,46 @@ public class Argument<M extends Model> {
              * 
              * ## REMEMBER: Do not store repeated evaluations in answerSet, i.e. 
              */
+            ArrayList<String> returnedLawExpressions = new ArrayList<>();
             for (String law : answerSet.keySet()) {
                 switch(law) {
-                    case "Idempotent Law":
+                    case "Idempotent Law": {
 
-                    case "Associative Law":
+                    }
+                    case "Associative Law": {
 
-                    case "Commutative Law":
+                    }
+                    case "Commutative Law": {
 
-                    case "Distributive Law":
+                    }
+                    case "Distributive Law": {
 
-                    case "Identity Law":
+                    }
+                    case "Identity Law": {
 
-                    case "Dominant Law":
+                    }
+                    case "Dominant Law": {
 
-                    case "Double Negation Law":
+                    }
+                    case "Double Negation Law": {
 
-                    case "Complement Law":
+                    }
+                    case "Complement Law": {
 
-                    case "DeMorgan's Law":
+                    }
+                    case "DeMorgan's Law": {
 
-                    case "Absorption Law":
+                    }
+                    case "Absorption Law": {
 
-                    case "Conditional Identity":
+                    }
+                    case "Conditional Identity": {
+
+                    }
                 }
                 subExpressions.clear();
+                returnedLawExpressions.clear();
             }
-
 
             return answerSet;
         }
