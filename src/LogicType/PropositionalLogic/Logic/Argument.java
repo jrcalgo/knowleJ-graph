@@ -457,10 +457,19 @@ public class Argument<M extends Model> {
             Map<String, ArrayList<String>> answerSet = answerTemplate;
             Map<Character, String> subExpressions = new HashMap<>();
             ArrayList<String> returnedLawExpressions = new ArrayList<>();
+            boolean foundLaw = false;
             for (String law : answerSet.keySet()) {
                 switch(law) {
                     case "Modus Ponens": {
+                        for (String conversion : kbConversions) {
+                            if (conversion.contains("m")) {
+                               foundLaw = true;
+                               break;
+                            }
+                        }
+                        if (foundLaw) {
 
+                        }
                     }
                     case "Modus Tollens": {
 
@@ -486,6 +495,7 @@ public class Argument<M extends Model> {
                 }
                 subExpressions.clear();
                 returnedLawExpressions.clear();
+                foundLaw = false;
             }
             
             return answerSet;
@@ -658,6 +668,24 @@ public class Argument<M extends Model> {
             }
 
             return answerSet;
+        }
+
+        private String findMatchingSubstring(String cE, String operator) {
+            String[] cESubstrings = cE.split(operator);
+
+            if (cESubstrings.length < 2) {
+                return null;
+            }
+
+            for (int i = 0; i < cESubstrings.length; i++) {
+                for (int  j = cESubstrings.length; j != i; j--) {
+                    if (cESubstrings[i].equals(cESubstrings[j])) {
+                        return cESubstrings[i];
+                    }
+                }
+            }
+
+            return null;
         }
 
         /**
