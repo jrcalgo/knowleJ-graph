@@ -459,40 +459,6 @@ public class Argument<M extends Model> {
             ArrayList<String> returnedLawExpressions = new ArrayList<>();
             boolean foundLaw = false;
             for (String law : answerSet.keySet()) {
-                switch(law) {
-                    case "Modus Ponens": {
-                        for (String conversion : kbConversions) {
-                            if (conversion.contains("m")) {
-                               foundLaw = true;
-                               break;
-                            }
-                        }
-                        if (foundLaw) {
-
-                        }
-                    }
-                    case "Modus Tollens": {
-
-                    }
-                    case "Addition": {
-
-                    }
-                    case "Simplification": {
-
-                    }
-                    case "Conjunction": {
-
-                    }
-                    case "Hypothetical Syllogism": {
-
-                    }
-                    case "Disjunctive Syllogism": {
-
-                    }
-                    case "Resolution": {
-
-                    }
-                }
                 subExpressions.clear();
                 returnedLawExpressions.clear();
                 foundLaw = false;
@@ -500,6 +466,63 @@ public class Argument<M extends Model> {
             
             return answerSet;
         }
+
+        private ArrayList<String[]> subexpressionAbstraction(String law, String cE) {
+            switch(law) {
+                case "Modus Ponens": {
+                    for (String conversion : kbConversions) {
+                        if (conversion.contains("m")) {
+                           foundLaw = true;
+                           break;
+                        }
+                    }
+                    if (foundLaw) {
+
+                    }
+                }
+                case "Modus Tollens": {
+
+                }
+                case "Addition": {
+
+                }
+                case "Simplification": {
+
+                }
+                case "Conjunction": {
+
+                }
+                case "Hypothetical Syllogism": {
+
+                }
+                case "Disjunctive Syllogism": {
+
+                }
+                case "Resolution": {
+
+                }
+            }
+            return null;
+        }
+
+        private String findMatchingSubstring(String cE, String operator) {
+            String[] cESubstrings = cE.split(operator);
+
+            if (cESubstrings.length < 2) {
+                return null;
+            }
+
+            for (int i = 0; i < cESubstrings.length; i++) {
+                for (int  j = cESubstrings.length; j != i; j--) {
+                    if (cESubstrings[i].equals(cESubstrings[j])) {
+                        return cESubstrings[i];
+                    }
+                }
+            }
+
+            return null;
+        }
+
 
         /* Rules of Argument Inference */
 
@@ -626,48 +649,54 @@ public class Argument<M extends Model> {
              * 
              * ## REMEMBER: Do not store repeated evaluations in answerSet, i.e. 
              */
+            String[] abstractions;
             ArrayList<String> returnedLawExpressions = new ArrayList<>();
             for (String law : answerSet.keySet()) {
-                switch(law) {
-                    case "Idempotent Law": {
-
-                    }
-                    case "Associative Law": {
-
-                    }
-                    case "Commutative Law": {
-
-                    }
-                    case "Distributive Law": {
-
-                    }
-                    case "Identity Law": {
-
-                    }
-                    case "Dominant Law": {
-
-                    }
-                    case "Double Negation Law": {
-
-                    }
-                    case "Complement Law": {
-
-                    }
-                    case "DeMorgan's Law": {
-
-                    }
-                    case "Absorption Law": {
-
-                    }
-                    case "Conditional Identity": {
-
-                    }
-                }
+                abstractions = subexpressionAbstraction(law, cE);
                 subExpressions.clear();
                 returnedLawExpressions.clear();
             }
 
             return answerSet;
+        }
+
+        private ArrayList<String[]> subexpressionAbstraction(String law, String cE) {
+            switch(law) {
+                case "Idempotent Law": {
+                    
+                }
+                case "Associative Law": {
+
+                }
+                case "Commutative Law": {
+
+                }
+                case "Distributive Law": {
+
+                }
+                case "Identity Law": {
+
+                }
+                case "Dominant Law": {
+
+                }
+                case "Double Negation Law": {
+
+                }
+                case "Complement Law": {
+
+                }
+                case "DeMorgan's Law": {
+
+                }
+                case "Absorption Law": {
+
+                }
+                case "Conditional Identity": {
+
+                }
+            }
+            return null;
         }
 
         private String findMatchingSubstring(String cE, String operator) {
