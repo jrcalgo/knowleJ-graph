@@ -467,7 +467,7 @@ public class Argument<M extends Model> {
             return answerSet;
         }
 
-        private ArrayList<String[]> subexpressionAbstraction(String law, String cE) {
+        private ArrayList<Map<Character, String>> subexpressionAbstraction(String law, String cE) {
             switch(law) {
                 case "Modus Ponens": {
                     for (String conversion : kbConversions) {
@@ -523,7 +523,6 @@ public class Argument<M extends Model> {
             return null;
         }
 
-
         /* Rules of Argument Inference */
 
         /**
@@ -568,7 +567,7 @@ public class Argument<M extends Model> {
          * @return Rule string
          */
         private String conjunction(Argument a) {
-            if
+            if (a.)
         }
 
         /**
@@ -631,10 +630,6 @@ public class Argument<M extends Model> {
          * @return Maps equivalency to list strings, with each string containing [applied expression] and resulting {conversion}.
          */
         public Map<String, ArrayList<String>> checkEquivalencyLaws(Proposition p) {
-            String cE = p.getConvertedExpression(); // easier to work with
-
-            Map<String, ArrayList<String>> answerSet = answerTemplate;
-            Map<Character, String> subExpressions = new HashMap<>();
             // parse cE and store similar substrings (if any) into variables to then construct applicable rules. This will use key-value mapping, and then
             // using those mapped values to evaluate applicable rules, i.e. P|Q is P, therefore (P|Q)|(P|Q) => P|Q or, alternatively, P|P => P.
             // also check if there are any operand propositional equivalencies as well.
@@ -649,54 +644,70 @@ public class Argument<M extends Model> {
              * 
              * ## REMEMBER: Do not store repeated evaluations in answerSet, i.e. 
              */
-            String[] abstractions;
+            String cE = p.getConvertedExpression(); // easier to work with
+            Map<String, ArrayList<String>> answerSet = answerTemplate;
+            ArrayList<Map<Character, String>> abstractions = new ArrayList<>();
             ArrayList<String> returnedLawExpressions = new ArrayList<>();
             for (String law : answerSet.keySet()) {
                 abstractions = subexpressionAbstraction(law, cE);
-                subExpressions.clear();
                 returnedLawExpressions.clear();
             }
 
             return answerSet;
         }
 
-        private ArrayList<String[]> subexpressionAbstraction(String law, String cE) {
+        private ArrayList<Map<Character, String>> subexpressionAbstraction(String law, String cE) {
+            ArrayList<Map<Character, String>> abstractions = new ArrayList<>();
             switch(law) {
                 case "Idempotent Law": {
                     
+                    break;
                 }
                 case "Associative Law": {
-
+                    
+                    break;
                 }
                 case "Commutative Law": {
-
+                    
+                    break;
                 }
                 case "Distributive Law": {
-
+                    
+                    break;
                 }
                 case "Identity Law": {
-
+                    
+                    break;
                 }
                 case "Dominant Law": {
-
+                    
+                    break;
                 }
                 case "Double Negation Law": {
-
+                    
+                    break;
                 }
                 case "Complement Law": {
-
+                    
+                    break;
                 }
                 case "DeMorgan's Law": {
-
+                    
+                    break;
                 }
                 case "Absorption Law": {
-
+                    
+                    break;
                 }
                 case "Conditional Identity": {
-
+                    
+                    break;
+                }
+                default: {
+                    return null;
                 }
             }
-            return null;
+            return abstractions;
         }
 
         private String findMatchingSubstring(String cE, String operator) {
@@ -713,241 +724,284 @@ public class Argument<M extends Model> {
                     }
                 }
             }
-
             return null;
         }
 
+        private Character[] findConversionOperands(String cE) {
+            ArrayList<Character> operands = new ArrayList<>();
+            for (int i = 0; i < cE.length(); i++) {
+                if (Character.isUpperCase(cE.charAt(i))) {
+                    operands.add(cE.charAt(i));
+                }
+            }
+
+            return operands.toArray(new Character[operands.size()]);
+        }
+
         /**
-         * Rule: [P|P] => {P} OR [P&P] => {P}
+         * Rule: [P|P] == {P} OR [P&P] == {P}
          * @throws InvalidLogicOperatorException
          * @throws InvalidOperandException
          * @throws InvalidExpressionException
          */
-        private String idempotentLaw(Proposition p)
-                throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
-            String law;
-
-            for (int i = 0; i < this.mOperands.length; i++) {
-                if (this.cE.contains(this.mOperands[i] + "a" + this.mOperands[i])
-                        || this.cE.contains(this.mOperands[i] + "o" + this.mOperands[i])) {
-                    iL[i] = new Proposition(this.mOperands[i] + "");
-                } else
-                    continue;
-            }
-            return iL;
+        private String idempotentLaw(String cE) {
+            String law = null;
+            if (cE.contains("PaP") || cE.contains("PoP"))
+                law = "P";
+            
+            return law;
         }
 
         /**
-         * Rule: [(P|Q)|R] => {P|(Q|R)} OR [(P&Q)&R] => {P&(Q&R)}
+         * Rule: [(P|Q)|R] == {P|(Q|R)} OR [(P&Q)&R] == {P&(Q&R)}
          * @param cE
          * @return
          * @throws InvalidExpressionException
          * @throws InvalidOperandException
          * @throws InvalidLogicOperatorException
          */
-        private String associativeLaw(Proposition p) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
-            Proposition[] aL = new Proposition[this.mOperands.length];
-            for (int i = 0; i < this.mOperands.length; i++) {
-                for (int j = 0; j < this.mOperands.length; j++) {
-                    for (int k = 0; k < this.mOperands.length; k++) {
-                        if (this.cE.contains(this.mOperands))
+        private String associativeLaw(String cE) {
+            String law = null;
+            if (cE.contains("(PoQ)oR"))
+                law = "Po(QoR)";
+            else if (cE.contains("(PaQ)aR"))
+                law = "Pa(QaR)";
+
+            if (cE.contains("Po(QoR)"))
+                law = "(PoQ)oR";
+            else if (cE.contains("Pa(QaR)"))
+                law = "(PaQ)aR";
+            
+            return law;
+        }
+
+        /**
+         * Rule: [P|Q] == {Q|P} OR [P&Q] == {Q&P}
+         * @param cE
+         * @return
+         * @throws InvalidExpressionException
+         * @throws InvalidOperandException
+         * @throws InvalidLogicOperatorException
+         */
+        private String commutativeLaw(String cE) {
+            String law = null;
+            if (cE.contains("PoQ") || cE.contains("QoP"))
+                law = cE.contains("PoQ") ? "QoP" : "PoQ";
+            else if (cE.contains("PaQ") || cE.contains("QaP"))
+                law = cE.contains("PaQ") ? "QaP" : "PaQ";
+
+            return law;
+        }
+
+        /**
+         * Rule: [P|(Q&R)] == {(P|Q)&(P|R)} OR [P&(Q|R)] == {(P&Q)|(P&R)}
+         * @param cE
+         * @return
+         * @throws InvalidExpressionException
+         * @throws InvalidOperandException
+         * @throws InvalidLogicOperatorException
+         */
+        private String distributiveLaw(String cE) {
+            String law = null;
+            if (cE.contains("Po(QaR)"))
+                law = "(PoQ)a(PoR)";
+            else if (cE.contains("Pa(QoR)"))
+                law = "(PaQ)o(PaR)";
+            
+            if (cE.contains("(PoQ)a(PoR)"))
+                law = "Po(QaR)";
+            else if (cE.contains("(PaQ)o(PaR)"))
+                law = "Pa(QoR)";
+
+            return law;
+        }
+
+        /**
+         * Rule: [P|F] == {P} OR [P&T] == {P}
+         * @param cE
+         * @return
+         * @throws InvalidExpressionException
+         * @throws InvalidOperandException
+         * @throws InvalidLogicOperatorException
+         */
+        private String identityLaw(String cE) {
+            String law = null;
+            if (cE.contains("PoF") || cE.contains("PaT"))
+                law = "P";
+                
+            return law;
+        }
+
+        /**
+         * Rule: [P&F] == {F} OR [P|T] == {T}
+         * @param cE
+         * @return
+         * @throws InvalidExpressionException
+         * @throws InvalidOperandException
+         * @throws InvalidLogicOperatorException
+         */
+        private String dominationLaw(String cE) {
+            String law = null;
+            if (cE.contains("PaF"))
+                law = "F";
+            else if (cE.contains("PoT"))
+                law = "T";
+            
+            return law;
+        }
+
+        /**
+         * Rule: [~~P] == {P}
+         * @param cE
+         * @return
+         * @throws InvalidExpressionException
+         * @throws InvalidOperandException
+         * @throws InvalidLogicOperatorException
+         */
+        private String doubleNegationLaw(String cE) {
+            String law = null;
+            if (cE.contains("nnP"))
+                law = "P";
+
+            return law;
+        }
+
+        /**
+         * Rule: [P&~P] == {F}, [~T] == {F} OR [P|~P] == {T}, [~F] == {T}
+         * @param cE
+         * @return
+         * @throws InvalidExpressionException
+         * @throws InvalidOperandException
+         * @throws InvalidLogicOperatorException
+         */
+        private String complementLaw(Proposition p) {
+            String law = null;
+            if (p.getExpression().contains("PanP") || p.getExpression().contains("nPaP"))
+                law = "F";
+            else if (p.getExpression().contains("nT"))
+                law = "F";
+            else if (p.getExpression().contains("PonP") || p.getExpression().contains("nPoP"))
+                law = "T";
+            else if (p.getExpression().contains("nF"))
+                law = "T";
+
+            return law;
+        }
+
+        /**
+         * Rule: [~(P|Q)] == {~P&~Q} OR [~(P&Q)] == {~P|~Q}
+         * @param cE
+         * @return
+         */
+        private String deMorgansLaw(String cE) {
+            String law = null;
+            if (cE.contains("n(PoQ)"))
+                law = "nPanQ";
+            else if (cE.contains("n(PaQ)"))
+                law = "nPonQ";
+
+            if (cE.contains("nPanQ"))
+                law = "n(PoQ)";
+            else if (cE.contains("nPonQ"))
+                law = "n(PaQ)";
+
+            return law;
+        }
+
+        /**
+         * Rule: [P|(P&Q)] == {P} OR [P&(P|Q)] == {P}
+         * @param cE
+         * @return
+         */
+        private String absorptionLaw(String cE) {
+            String law = null;
+            if (cE.contains("Po(PaQ)") || cE.contains("Pa(PoQ)"))
+                law = "P";
+            
+            return law;
+        }
+
+        /**
+         * Rule: [P->Q] == {~P|Q} OR [P<>Q] == {(P->Q)&(Q->P)}
+         * @param cE
+         * @return
+         */
+        private String conditionalIdentity(String cE) {
+            String law = null;
+            if (cE.contains("PmQ"))
+                law = "nPoQ";
+            else if (cE.contains("PiQ"))
+                law = "(PmQ)a(QmP)";
+
+            if (cE.contains("nPoQ"))
+                law = "PmQ";
+            else if (cE.contains("(PmQ)a(QmP)"))
+                law = "PiQ";
+            
+            return law;
+        }
+
+        private String[] singleOperandEquivalencies(String law, String cE) {
+            String[] equivalencies = null;
+            switch(law) {
+                case "Idempotent Law": {
+                    if (cE == "P") {
+                        equivalencies = new String[2];
+                        equivalencies[0] = "PoP";
+                        equivalencies[1] = "PaP";
                     }
-                }
-                if (this.cE.contains(this.mOperands[i] + "a" + this.mOperands[i]) || this.cE.contains(this.mOperands[i] + "o" + this.mOperands[i])) {
-                    aL[i] = new Proposition(this.mOperands[i] + "");
-                } else
-                    continue;
-            }
-            return aL;
-        }
-
-        /**
-         * Rule: [P|Q] => {Q|P} OR [P&Q] => {Q&P}
-         * @param cE
-         * @return
-         * @throws InvalidExpressionException
-         * @throws InvalidOperandException
-         * @throws InvalidLogicOperatorException
-         */
-        private String commutativeLaw(Proposition p)
-                throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
-            Proposition[] cL = new Proposition[this.mOperands.length];
-            for (int i = 0; i < this.mOperands.length; i++) {
-                if (this.cE.contains(this.mOperands[i] + "a" + this.mOperands[i])
-                        || this.cE.contains(this.mOperands[i] + "o" + this.mOperands[i])) {
-                    cL[i] = new Proposition(this.mOperands[i] + "");
-                } else
-                    continue;
-            }
-            return cL;
-        }
-
-        /**
-         * Rule: [P|(Q&R)] => {(P|Q)&(P|R)} OR [P&(Q|R)] => {(P&Q)|(P&R)}
-         * @param cE
-         * @return
-         * @throws InvalidExpressionException
-         * @throws InvalidOperandException
-         * @throws InvalidLogicOperatorException
-         */
-        private String distributiveLaw(Proposition p)
-                throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
-            Proposition[] iL = new Proposition[this.mOperands.length];
-            for (int i = 0; i < this.mOperands.length; i++) {
-                if (this.cE.contains(this.mOperands[i] + "a" + this.mOperands[i])
-                        || this.cE.contains(this.mOperands[i] + "o" + this.mOperands[i])) {
-                    iL[i] = new Proposition(this.mOperands[i] + "");
-                } else
-                    continue;
-            }
-            return iL;
-        }
-
-        /**
-         * Rule: [P|F] => {P} OR [P&T] => {P}
-         * @param cE
-         * @return
-         * @throws InvalidExpressionException
-         * @throws InvalidOperandException
-         * @throws InvalidLogicOperatorException
-         */
-        private String identityLaw(Proposition p)
-                throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
-            for (Chara)
-
-
-            Proposition[] iL = new Proposition[this.mOperands.length];
-            for (int i = 0; i < this.mOperands.length; i++) {
-                if (this.cE.contains(this.mOperands[i] + "oF") || (this.cE.contains(this.mOperands[i] + "aT"))) {
-                    iL[i] = new Proposition(this.mOperands[i] + "");
-                } else
-                    continue;
-            }
-            return iL;
-        }
-
-        /**
-         * Rule: [P&F] => {F} OR [P|T] => {T}
-         * @param cE
-         * @return
-         * @throws InvalidExpressionException
-         * @throws InvalidOperandException
-         * @throws InvalidLogicOperatorException
-         */
-        private String dominationLaw(Proposition p)
-                throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
-            Proposition[] iL = new Proposition[this.mOperands.length];
-            for (int i = 0; i < this.mOperands.length; i++) {
-                if (this.cE.contains(this.mOperands[i] + "aF")) {
-                    iL[i] = new Proposition("F");
-                } else if (this.cE.contains(this.mOperands[i] + "oT")) {
-                    iL[i] = new Proposition("T");
-                }
-                continue;
-            }
-            return iL;
-        }
-
-        /**
-         * Rule: [~~P] => {P}
-         * @param cE
-         * @return
-         * @throws InvalidExpressionException
-         * @throws InvalidOperandException
-         * @throws InvalidLogicOperatorException
-         */
-        private String doubleNegationLaw(Proposition p)
-                throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
-            Proposition[] dNL = new Proposition[this.mOperands.length];
-            for (int i = 0; i < this.mOperands.length; i++) {
-                if (this.cE.contains("nn" + this.mOperands[i])) {
-                    dNL[i] = new Proposition(this.mOperands[i] + "");
-                } else
-                    continue;
-            }
-            return dNL;
-        }
-
-        /**
-         * Rule: [P&~P] => {F}, [~T] => {F} OR [P|~P] => {T}, [~F] => {T}
-         * @param cE
-         * @return
-         * @throws InvalidExpressionException
-         * @throws InvalidOperandException
-         * @throws InvalidLogicOperatorException
-         */
-        private String complementLaw(Proposition p)
-                throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
-            Proposition[] iL = new Proposition[this.mOperands.length];
-            for (int i = 0; i < this.mOperands.length; i++) {
-                if (this.cE.contains(this.mOperands[i] + "an" + this.mOperands[i])) {
-                    iL[i] = new Proposition("F");
-                } else if (this.cE.contains(this.mOperands[i] + "on" + this.mOperands[i])) {
-                    iL[i] = new Proposition("T");
-                }
-                continue;
-            }
-s
-            for (int i = 0; i < this.cE.length(); i++) {
-                if (this.cE.charAt(i) == 'n' && this.cE.charAt(i + 1) == 'F') {
-                    iL[i] = new Proposition("F");
-                } else if (this.cE.charAt(i) == 'n' && this.cE.charAt(i + 1) == 'T') {
-                    iL[i] = new Proposition("T");
-                } else
                     break;
+                }
+                case "Identity Law": {
+                    if (cE == "P") {
+                        equivalencies = new String[2];
+                        equivalencies[0] = "PoF";
+                        equivalencies[1] = "PaT";
+                    }
+                    break;
+                }
+                case "Domination Law": {
+                    if (cE == "F") {
+                        equivalencies = new String[1];
+                        equivalencies[0] = "PaF";
+                    } else if (cE == "T") {
+                        equivalencies = new String[1];
+                        equivalencies[0] = "PoT";
+                    }
+                    break;
+                }
+                case "Double Negation Law": {
+                    if (cE == "P") {
+                        equivalencies = new String[1];
+                        equivalencies[0] = "nnP";
+                    }
+                    break;
+                }
+                case "Complement Law": {
+                    if (cE == "F") {
+                        equivalencies = new String[2];
+                        equivalencies[0] = "PanP";
+                        equivalencies[1] = "nT";
+                    } else if (cE == "T") {
+                        equivalencies = new String[2];
+                        equivalencies[0] = "PonP";
+                        equivalencies[1] = "nF";
+                    }
+                    break;
+                }
+                case "Absorption Law": {
+                    if (cE == "P") {
+                        equivalencies = new String[2];
+                        equivalencies[0] = "Po(PaQ)";
+                        equivalencies[1] = "Pa(PoQ)";
+                    }
+                    break;
+                }
+                default: {
+                    return null;
+                }
             }
-            return iL;
-        }
-
-        /**
-         * Rule: [~(P|Q)] => {~P&~Q} OR [~(P&Q)] => {~P|~Q}
-         * @param cE
-         * @return
-         */
-        private String deMorgansLaw(Proposition p) {
-            Proposition[] iL = new Proposition[this.mOperands.length];
-            for (int i = 0; i < this.mOperands.length; i++) {
-                if (this.cE.contains(this.mOperands[i] + "a" + this.mOperands[i])
-                        || this.cE.contains(this.mOperands[i] + "o" + this.mOperands[i])) {
-                    iL[i] = new Proposition(this.mOperands[i] + "");
-                } else
-                    continue;
-            }
-            return iL;
-        }
-
-        /**
-         * Rule: [P|(P&Q)] => {P} OR [P&(P|Q)] => {P}
-         * @param cE
-         * @return
-         */
-        private String absorptionLaw(Proposition p) {
-            Proposition[] iL = new Proposition[this.mOperands.length];
-            for (int i = 0; i < this.mOperands.length; i++) {
-                if (this.cE.contains(this.mOperands[i] + "a" + this.mOperands[i])
-                        || this.cE.contains(this.mOperands[i] + "o" + this.mOperands[i])) {
-                    iL[i] = new Proposition(this.mOperands[i] + "");
-                } else
-                    continue;
-            }
-            return iL;
-        }
-
-        /**
-         * Rule: [P->Q] => {~P|Q} OR [P<>Q] => {(P->Q)&(Q->P)}
-         * @param cE
-         * @return
-         */
-        private String conditionalIdentity(Proposition p) {
-            Proposition[] iL = new Proposition[this.mOperands.length];
-            for (int i = 0; i < this.mOperands.length; i++) {
-                if (this.cE.contains(this.mOperands[i] + "a" + this.mOperands[i])
-                        || this.cE.contains(this.mOperands[i] + "o" + this.mOperands[i])) {
-                    iL[i] = new Proposition(this.mOperands[i] + "");
-                } else
-                    continue;
-            }
-            return iL;
+            return equivalencies;
         }
     }
 }
