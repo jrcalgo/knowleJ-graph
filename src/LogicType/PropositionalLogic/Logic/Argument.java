@@ -26,7 +26,8 @@ public class Argument<M extends Model> {
     // private String[][] currentTruthTable;
     // private Boolean[][] currentTruthValues;
 
-    public Argument(M[] knowledgeBase) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+    public Argument(M[] knowledgeBase)
+            throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         validateKnowledgeBase(knowledgeBase);
         setTruthTable();
     }
@@ -52,7 +53,8 @@ public class Argument<M extends Model> {
         this.knowledgeBase = kb;
     }
 
-    private void setTruthTable() throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+    private void setTruthTable()
+            throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         int boolRowsCount = (int) Math.pow(2, this.operandCount);
         int boolColsCount = this.operandCount + this.knowledgeBase.length + 1;
 
@@ -64,8 +66,8 @@ public class Argument<M extends Model> {
 
         for (int i = operandCount, j = 0; j < this.knowledgeBase.length; i++, j++)
             this.allTruthTable[0][i] = this.knowledgeBase[j].getExpression();
-        
-        this.allTruthTable[0][boolColsCount-1] = "KB";
+
+        this.allTruthTable[0][boolColsCount - 1] = "KB";
 
         this.trueKBModels = new ArrayList<>();
         ArrayList<String> titleRow = new ArrayList<>();
@@ -84,21 +86,22 @@ public class Argument<M extends Model> {
 
             for (int i = 0; i < this.knowledgeBase.length; i++) {
                 Proposition p = new Proposition(this.knowledgeBase[i].getExpression());
-                this.allTruthValues[rows][operandCount+i] = p.evaluateExpression(valueMap);
-                this.allTruthTable[rows+1][operandCount+i] = this.allTruthValues[rows][operandCount+i] ? "T" : "F";
+                this.allTruthValues[rows][operandCount + i] = p.evaluateExpression(valueMap);
+                this.allTruthTable[rows + 1][operandCount + i] = this.allTruthValues[rows][operandCount + i] ? "T"
+                        : "F";
             }
             valueMap.clear();
-            
+
             // setting KB table values, including KB evaluation(s)
             int i = 0;
-            while (operandCount+i < allTruthValues[rows].length-1) {
-                modelEvaluations[i] = this.allTruthValues[rows][operandCount+i];
+            while (operandCount + i < allTruthValues[rows].length - 1) {
+                modelEvaluations[i] = this.allTruthValues[rows][operandCount + i];
                 i++;
             }
-            this.allTruthValues[rows][boolColsCount-1] = evaluateKnowledgeBase(modelEvaluations);
-            this.allTruthTable[rows+1][boolColsCount-1] = this.allTruthValues[rows][boolColsCount-1] ? "T" : "F";
+            this.allTruthValues[rows][boolColsCount - 1] = evaluateKnowledgeBase(modelEvaluations);
+            this.allTruthTable[rows + 1][boolColsCount - 1] = this.allTruthValues[rows][boolColsCount - 1] ? "T" : "F";
 
-            if (allTruthValues[rows][boolColsCount-1]) {
+            if (allTruthValues[rows][boolColsCount - 1]) {
                 trueKBModelPlaceholder = new ArrayList<>();
                 for (int j = 0; j < boolColsCount; j++)
                     trueKBModelPlaceholder.add(this.allTruthValues[rows][j] ? "T" : "F");
@@ -110,13 +113,14 @@ public class Argument<M extends Model> {
 
     private boolean evaluateKnowledgeBase(boolean[] modelEvaluations) {
         boolean rowAnswer = true;
-        for (int i = 0; i < modelEvaluations.length; i++) 
+        for (int i = 0; i < modelEvaluations.length; i++)
             rowAnswer = rowAnswer && modelEvaluations[i];
-        
+
         return rowAnswer;
     }
 
-    public String checkAllTTModels(String query) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+    public String checkAllTTModels(String query)
+            throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (query == null || query.length() == 0)
             throw new IllegalArgumentException("String query cannot be null or empty.");
         if (query.contains(",") && !query.startsWith(",") && !query.endsWith(",")) {
@@ -125,7 +129,7 @@ public class Argument<M extends Model> {
             for (String q : queries) {
                 answer.append(checkAllTTModels(new Proposition(q)) + ", ");
             }
-            return answer.toString().substring(0, answer.length()-2);
+            return answer.toString().substring(0, answer.length() - 2);
         }
         return checkAllTTModels(new Proposition(query));
     }
@@ -134,7 +138,7 @@ public class Argument<M extends Model> {
         if (query == null)
             throw new IllegalArgumentException("Proposition query cannot be null or empty.");
 
-        ArrayList<String> qOperands = query.getSentences(0, query.getOperandCount()-1);
+        ArrayList<String> qOperands = query.getSentences(0, query.getOperandCount() - 1);
         boolean commonOperand = false;
         for (String qOp : qOperands) {
             for (char op : this.operands) {
@@ -148,7 +152,7 @@ public class Argument<M extends Model> {
         }
         if (!commonOperand)
             throw new IllegalArgumentException("No common operand found in query when compared with knowledge base.");
-        
+
         String answer = null;
         ArrayList<Boolean> queryValues = new ArrayList<>();
         HashMap<Character, Character> valueMap = new HashMap<>();
@@ -158,46 +162,47 @@ public class Argument<M extends Model> {
                 valueMap.put(this.operands[i], this.trueKBModels.get(valueRows).get(i).charAt(0));
             }
             queryValues.add(query.evaluateExpression(valueMap));
-            if (queryValues.get(valueRows-1))
-                answer = "True"; 
+            if (queryValues.get(valueRows - 1))
+                answer = "True";
             else
                 answer = "False";
-            
-            if (valueRows > 1 && queryValues.get(valueRows-1) != queryValues.get(valueRows-2)) {
+
+            if (valueRows > 1 && queryValues.get(valueRows - 1) != queryValues.get(valueRows - 2)) {
                 return "Uncertain";
             }
             valueRows++;
-        } while (valueRows <= this.trueKBModels.size()-1);
+        } while (valueRows <= this.trueKBModels.size() - 1);
 
         return answer;
     }
 
-
     // public String checkCurrentTTModels(String query) {
-    //     if (query == null)
-    //         throw new IllegalArgumentException("String query cannot be null or empty.");
+    // if (query == null)
+    // throw new IllegalArgumentException("String query cannot be null or empty.");
 
-    //     return checkCurrentTTModels(new Proposition(query));
+    // return checkCurrentTTModels(new Proposition(query));
     // }
 
     // public String checkCurrentTTModels(Proposition query) {
-    //     if (query == null)
-    //         throw new IllegalArgumentException("Proposition query cannot be null");
-        
-    //     ArrayList<String> qOperands = query.getSentences(0, query.getOperandCount()-1);
-    //     boolean commonOperand = false;
-    //     for (String qOp : qOperands) {
-    //         for (char op : this.operands) {
-    //             if (qOp.charAt(0) == op) {
-    //                 commonOperand = true;
-    //                 continue;
-    //             }
-    //         }
-    //         if (commonOperand)
-    //             continue;
-    //     }
-    //     if (!commonOperand)
-    //         throw new IllegalArgumentException("No common operand found in query when compared with knowledge base.");
+    // if (query == null)
+    // throw new IllegalArgumentException("Proposition query cannot be null");
+
+    // ArrayList<String> qOperands = query.getSentences(0,
+    // query.getOperandCount()-1);
+    // boolean commonOperand = false;
+    // for (String qOp : qOperands) {
+    // for (char op : this.operands) {
+    // if (qOp.charAt(0) == op) {
+    // commonOperand = true;
+    // continue;
+    // }
+    // }
+    // if (commonOperand)
+    // continue;
+    // }
+    // if (!commonOperand)
+    // throw new IllegalArgumentException("No common operand found in query when
+    // compared with knowledge base.");
 
     // }
 
@@ -256,7 +261,8 @@ public class Argument<M extends Model> {
         return deductionReturnType(returnType);
     }
 
-    public <G> G deduce(String query) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+    public <G> G deduce(String query)
+            throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (query == null || query.length() == 0)
             throw new IllegalArgumentException("String query cannot be null or empty.");
         if (query.contains(",") && !query.startsWith(",") && !query.endsWith(",")) {
@@ -309,7 +315,8 @@ public class Argument<M extends Model> {
         if (type == null)
             throw new IllegalArgumentException("Type cannot be null.");
         else if (!(type instanceof DirectedDeductionGraph) || !(type instanceof ArrayList))
-            throw new IllegalArgumentException("Type must be a DirectedDeductionGraph or an ArrayList<ArrayList<String>>.");
+            throw new IllegalArgumentException(
+                    "Type must be a DirectedDeductionGraph or an ArrayList<ArrayList<String>>.");
         else if (type instanceof ArrayList) {
             ArrayList<?> list = (ArrayList<?>) type;
             if (!list.isEmpty()) {
@@ -319,13 +326,15 @@ public class Argument<M extends Model> {
                     if (!innerList.isEmpty()) {
                         Object innerItem = innerList.get(0);
                         if (!(innerItem instanceof String)) {
-                            throw new IllegalArgumentException("Type must be a DirectedDeductionGraph or an ArrayList<ArrayList<String>>.");
+                            throw new IllegalArgumentException(
+                                    "Type must be a DirectedDeductionGraph or an ArrayList<ArrayList<String>>.");
                         } else {
                             System.gc();
                         }
                     }
                 } else {
-                    throw new IllegalArgumentException("Type must be a DirectedDeductionGraph or an ArrayList<ArrayList<String>>.");
+                    throw new IllegalArgumentException(
+                            "Type must be a DirectedDeductionGraph or an ArrayList<ArrayList<String>>.");
                 }
             }
         }
@@ -334,15 +343,16 @@ public class Argument<M extends Model> {
         return returnType;
     }
 
-    public void setKnowledgeBase(M[] knowledgeBase) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+    public void setKnowledgeBase(M[] knowledgeBase)
+            throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         validateKnowledgeBase(knowledgeBase);
         setTruthTable();
     }
 
     public void addKnowledgeModel(M model) {
-        Object[] newKB = new Object[this.knowledgeBase.length+1];
+        Object[] newKB = new Object[this.knowledgeBase.length + 1];
         newKB = getKnowledgeBaseModels();
-        newKB[this.knowledgeBase.length+1] = model;
+        newKB[this.knowledgeBase.length + 1] = model;
         this.knowledgeBase = (M[]) newKB;
     }
 
@@ -468,12 +478,12 @@ public class Argument<M extends Model> {
         }
 
         private ArrayList<Map<Character, String>> subexpressionAbstraction(String law, String cE) {
-            switch(law) {
+            switch (law) {
                 case "Modus Ponens": {
                     for (String conversion : kbConversions) {
                         if (conversion.contains("m")) {
-                           foundLaw = true;
-                           break;
+                            foundLaw = true;
+                            break;
                         }
                     }
                     if (foundLaw) {
@@ -513,7 +523,7 @@ public class Argument<M extends Model> {
             }
 
             for (int i = 0; i < cESubstrings.length; i++) {
-                for (int  j = cESubstrings.length; j != i; j--) {
+                for (int j = cESubstrings.length; j != i; j--) {
                     if (cESubstrings[i].equals(cESubstrings[j])) {
                         return cESubstrings[i];
                     }
@@ -600,7 +610,8 @@ public class Argument<M extends Model> {
     }
 
     /**
-     * Popular logic equivalencies used for inference and argumentation; propositional logic inference
+     * Popular logic equivalencies used for inference and argumentation;
+     * propositional logic inference
      */
     static class EquivalencyLaws {
 
@@ -627,22 +638,29 @@ public class Argument<M extends Model> {
         /**
          * 
          * @param p A single propositional expression
-         * @return Maps equivalency to list strings, with each string containing [applied expression] and resulting {conversion}.
+         * @return Maps equivalency to list strings, with each string containing
+         *         [applied expression] and resulting {conversion}.
          */
         public Map<String, ArrayList<String>> checkEquivalencyLaws(Proposition p) {
-            // parse cE and store similar substrings (if any) into variables to then construct applicable rules. This will use key-value mapping, and then
-            // using those mapped values to evaluate applicable rules, i.e. P|Q is P, therefore (P|Q)|(P|Q) => P|Q or, alternatively, P|P => P.
+            // parse cE and store similar substrings (if any) into variables to then
+            // construct applicable rules. This will use key-value mapping, and then
+            // using those mapped values to evaluate applicable rules, i.e. P|Q is P,
+            // therefore (P|Q)|(P|Q) => P|Q or, alternatively, P|P => P.
             // also check if there are any operand propositional equivalencies as well.
 
-            /* With Propoposition p as the root/reference value and For each law,
-             * First, cycle through cE and check if there are any operand equivalencies. If so, evaluate and store result in applicableLaws.
-             * Second, cycle through cE and check for similar substrings, and map them to operand if found (relative to law operand format). 
-             * Third, new_cE = cE, and replace similar substrings in new_cE with mapped operands.
+            /*
+             * With Propoposition p as the root/reference value and For each law,
+             * First, cycle through cE and check if there are any operand equivalencies. If
+             * so, evaluate and store result in applicableLaws.
+             * Second, cycle through cE and check for similar substrings, and map them to
+             * operand if found (relative to law operand format).
+             * Third, new_cE = cE, and replace similar substrings in new_cE with mapped
+             * operands.
              * Fourth, evaluate and store result in answerSet.
              * Repeat steps until possible evaluations is exhausted.
              * Fifth, return answerSet.
              * 
-             * ## REMEMBER: Do not store repeated evaluations in answerSet, i.e. 
+             * ## REMEMBER: Do not store repeated evaluations in answerSet, i.e.
              */
             String cE = p.getConvertedExpression(); // easier to work with
             Map<String, ArrayList<String>> answerSet = answerTemplate;
@@ -658,49 +676,49 @@ public class Argument<M extends Model> {
 
         private ArrayList<Map<Character, String>> subexpressionAbstraction(String law, String cE) {
             ArrayList<Map<Character, String>> abstractions = new ArrayList<>();
-            switch(law) {
+            switch (law) {
                 case "Idempotent Law": {
-                    
+
                     break;
                 }
                 case "Associative Law": {
-                    
+
                     break;
                 }
                 case "Commutative Law": {
-                    
+
                     break;
                 }
                 case "Distributive Law": {
-                    
+
                     break;
                 }
                 case "Identity Law": {
-                    
+
                     break;
                 }
                 case "Dominant Law": {
-                    
+
                     break;
                 }
                 case "Double Negation Law": {
-                    
+
                     break;
                 }
                 case "Complement Law": {
-                    
+
                     break;
                 }
                 case "DeMorgan's Law": {
-                    
+
                     break;
                 }
                 case "Absorption Law": {
-                    
+
                     break;
                 }
                 case "Conditional Identity": {
-                    
+
                     break;
                 }
                 default: {
@@ -718,7 +736,7 @@ public class Argument<M extends Model> {
             }
 
             for (int i = 0; i < cESubstrings.length; i++) {
-                for (int  j = cESubstrings.length; j != i; j--) {
+                for (int j = cESubstrings.length; j != i; j--) {
                     if (cESubstrings[i].equals(cESubstrings[j])) {
                         return cESubstrings[i];
                     }
@@ -727,11 +745,11 @@ public class Argument<M extends Model> {
             return null;
         }
 
-        private Character[] findConversionOperands(String cE) {
+        private Character[] findOperands(String e) {
             ArrayList<Character> operands = new ArrayList<>();
-            for (int i = 0; i < cE.length(); i++) {
-                if (Character.isUpperCase(cE.charAt(i))) {
-                    operands.add(cE.charAt(i));
+            for (int i = 0; i < e.length(); i++) {
+                if (Character.isUpperCase(e.charAt(i))) {
+                    operands.add(e.charAt(i));
                 }
             }
 
@@ -740,25 +758,21 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P|P] == {P} OR [P&P] == {P}
-         * @throws InvalidLogicOperatorException
-         * @throws InvalidOperandException
-         * @throws InvalidExpressionException
+         * 
          */
         private String idempotentLaw(String cE) {
             String law = null;
             if (cE.contains("PaP") || cE.contains("PoP"))
                 law = "P";
-            
+
             return law;
         }
 
         /**
          * Rule: [(P|Q)|R] == {P|(Q|R)} OR [(P&Q)&R] == {P&(Q&R)}
+         * 
          * @param cE
          * @return
-         * @throws InvalidExpressionException
-         * @throws InvalidOperandException
-         * @throws InvalidLogicOperatorException
          */
         private String associativeLaw(String cE) {
             String law = null;
@@ -771,17 +785,15 @@ public class Argument<M extends Model> {
                 law = "(PoQ)oR";
             else if (cE.contains("Pa(QaR)"))
                 law = "(PaQ)aR";
-            
+
             return law;
         }
 
         /**
          * Rule: [P|Q] == {Q|P} OR [P&Q] == {Q&P}
+         * 
          * @param cE
          * @return
-         * @throws InvalidExpressionException
-         * @throws InvalidOperandException
-         * @throws InvalidLogicOperatorException
          */
         private String commutativeLaw(String cE) {
             String law = null;
@@ -795,11 +807,9 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P|(Q&R)] == {(P|Q)&(P|R)} OR [P&(Q|R)] == {(P&Q)|(P&R)}
+         * 
          * @param cE
          * @return
-         * @throws InvalidExpressionException
-         * @throws InvalidOperandException
-         * @throws InvalidLogicOperatorException
          */
         private String distributiveLaw(String cE) {
             String law = null;
@@ -807,7 +817,7 @@ public class Argument<M extends Model> {
                 law = "(PoQ)a(PoR)";
             else if (cE.contains("Pa(QoR)"))
                 law = "(PaQ)o(PaR)";
-            
+
             if (cE.contains("(PoQ)a(PoR)"))
                 law = "Po(QaR)";
             else if (cE.contains("(PaQ)o(PaR)"))
@@ -818,27 +828,23 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P|F] == {P} OR [P&T] == {P}
+         * 
          * @param cE
          * @return
-         * @throws InvalidExpressionException
-         * @throws InvalidOperandException
-         * @throws InvalidLogicOperatorException
          */
         private String identityLaw(String cE) {
             String law = null;
             if (cE.contains("PoF") || cE.contains("PaT"))
                 law = "P";
-                
+
             return law;
         }
 
         /**
          * Rule: [P&F] == {F} OR [P|T] == {T}
+         * 
          * @param cE
          * @return
-         * @throws InvalidExpressionException
-         * @throws InvalidOperandException
-         * @throws InvalidLogicOperatorException
          */
         private String dominationLaw(String cE) {
             String law = null;
@@ -846,17 +852,15 @@ public class Argument<M extends Model> {
                 law = "F";
             else if (cE.contains("PoT"))
                 law = "T";
-            
+
             return law;
         }
 
         /**
          * Rule: [~~P] == {P}
+         * 
          * @param cE
          * @return
-         * @throws InvalidExpressionException
-         * @throws InvalidOperandException
-         * @throws InvalidLogicOperatorException
          */
         private String doubleNegationLaw(String cE) {
             String law = null;
@@ -868,11 +872,9 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P&~P] == {F}, [~T] == {F} OR [P|~P] == {T}, [~F] == {T}
+         * 
          * @param cE
          * @return
-         * @throws InvalidExpressionException
-         * @throws InvalidOperandException
-         * @throws InvalidLogicOperatorException
          */
         private String complementLaw(Proposition p) {
             String law = null;
@@ -890,6 +892,7 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [~(P|Q)] == {~P&~Q} OR [~(P&Q)] == {~P|~Q}
+         * 
          * @param cE
          * @return
          */
@@ -910,6 +913,7 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P|(P&Q)] == {P} OR [P&(P|Q)] == {P}
+         * 
          * @param cE
          * @return
          */
@@ -917,12 +921,13 @@ public class Argument<M extends Model> {
             String law = null;
             if (cE.contains("Po(PaQ)") || cE.contains("Pa(PoQ)"))
                 law = "P";
-            
+
             return law;
         }
 
         /**
          * Rule: [P->Q] == {~P|Q} OR [P<>Q] == {(P->Q)&(Q->P)}
+         * 
          * @param cE
          * @return
          */
@@ -937,13 +942,13 @@ public class Argument<M extends Model> {
                 law = "PmQ";
             else if (cE.contains("(PmQ)a(QmP)"))
                 law = "PiQ";
-            
+
             return law;
         }
 
         private String[] singleOperandEquivalencies(String law, String cE) {
             String[] equivalencies = null;
-            switch(law) {
+            switch (law) {
                 case "Idempotent Law": {
                     if (cE == "P") {
                         equivalencies = new String[2];
