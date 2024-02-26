@@ -540,7 +540,7 @@ public class Argument<M extends Model> {
          * @param cE
          * @return Rule string
          */
-        private String modusPonens(Argument a) {
+        private String modusPonens(Argument<Model> a) {
             if
         }
 
@@ -549,7 +549,7 @@ public class Argument<M extends Model> {
          * @param cE
          * @return Rule string
          */
-        private String modusTollens(Argument a) {
+        private String modusTollens(Argument<Model> a) {
             if
         }
 
@@ -558,7 +558,7 @@ public class Argument<M extends Model> {
          * @param cE
          * @return Rule string
          */
-        private String addition(Argument a) {
+        private String addition(Argument<Model> a) {
             if
         }
 
@@ -567,7 +567,7 @@ public class Argument<M extends Model> {
          * @param cE
          * @return Rule string
          */
-        private String simplification(Argument a) {
+        private String simplification(Argument<Model> a) {
             if
         }
 
@@ -576,7 +576,7 @@ public class Argument<M extends Model> {
          * @param cE
          * @return Rule string
          */
-        private String conjunction(Argument a) {
+        private String conjunction(Argument<Model> a {
             if (a.)
         }
 
@@ -585,7 +585,7 @@ public class Argument<M extends Model> {
          * @param cE
          * @return Rule string
          */
-        private String hypotheticalSyllogism(Argument a) {
+        private String hypotheticalSyllogism(Argument<Model> a) {
             if
         }
 
@@ -594,7 +594,7 @@ public class Argument<M extends Model> {
          * @param cE
          * @return Rule string
          */
-        private String disjunctiveSyllogism(Argument a) {
+        private String disjunctiveSyllogism(Argument<Model> a) {
             if
         }
 
@@ -604,7 +604,7 @@ public class Argument<M extends Model> {
          * @param cE
          * @return Rule string
          */
-        private String resolution(Argument a) {
+        private String resolution(Argument<Model> a) {
             if
         }
     }
