@@ -206,11 +206,62 @@ public class Argument<M extends Model> {
 
     // }
 
+    public <G> G deduce(String query)
+            throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+        if (query == null || query.length() == 0)
+            throw new IllegalArgumentException("String query cannot be null or empty.");
+        if (query.contains(",") && !query.startsWith(",") && !query.endsWith(",")) {
+            String[] queries = query.split(",");
+            ArrayList<ArrayList<String>> answer = new ArrayList<>();
+            for (String q : queries) {
+                answer.addAll(deduce(new Proposition(q)));
+            }
+            return answer;
+        }
+        return deduce(new Proposition(query));
+    }
+
+    public <G> G deduce(Proposition query) {
+        if (query == null)
+            throw new IllegalArgumentException("Proposition query cannot be null or empty.");
+        
+        ArrayList<String> qOperands = query.getSentences(0, query.getOperandCount()-1);
+        boolean commonOperand = false;
+        for (String qOp : qOperands) {
+            for (char op : this.operands) {
+                if (qOp.charAt(0) == op) {
+                    commonOperand = true;
+                    continue;
+                }
+            }
+            if (commonOperand)
+                continue;
+        }
+        if (!commonOperand)
+            throw new IllegalArgumentException("No common operand found in query when compared with knowledge base.");
+
+        Proposition[] kbPropositions = this.getKnowledgeBasePropositions();
+        String[] kbConversions = new String[this.knowledgeBase.length];
+        for (int i = 0; i < this.knowledgeBase.length; i++) {
+            kbConversions[i] = kbPropositions[i].getConvertedExpression();
+        }
+
+        ArrayList<ArrayList<String>> deductionPaths = new ArrayList<>();
+        InferenceLaws inferences = new InferenceLaws();
+        EquivalencyLaws equivalencies = new EquivalencyLaws();
+        
+        DirectedDeductionGraph dt = new DirectedDeductionGraph(this.getKnowledgeBaseExpressions(), query);
+
+        return iterativeDeepeningSearch(dt, );
+
+    }
+
+    
     private <G> G iterativeDeepeningSearch(DirectedDeductionGraph graph, G returnType) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         InferenceLaws inferences = new InferenceLaws();
         EquivalencyLaws equivalencies = new EquivalencyLaws();
 
-        Argument knowledgeHistory = new Argument(this.knowledgeBase);
+        Argument<Model> knowledgeHistory = new Argument<>(this.knowledgeBase); // serves as knowledge history container
         ArrayList<DeductionGraphNode> leafs = graph.getNodes();
         ArrayList<ArrayList<String>> optimalPaths = new ArrayList<>();
         int depth = 0;
@@ -261,55 +312,6 @@ public class Argument<M extends Model> {
         return deductionReturnType(returnType);
     }
 
-    public <G> G deduce(String query)
-            throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
-        if (query == null || query.length() == 0)
-            throw new IllegalArgumentException("String query cannot be null or empty.");
-        if (query.contains(",") && !query.startsWith(",") && !query.endsWith(",")) {
-            String[] queries = query.split(",");
-            ArrayList<ArrayList<String>> answer = new ArrayList<>();
-            for (String q : queries) {
-                answer.addAll(deduce(new Proposition(q)));
-            }
-            return answer;
-        }
-        return deduce(new Proposition(query));
-    }
-
-    public <G> G deduce(Proposition query) {
-        if (query == null)
-            throw new IllegalArgumentException("Proposition query cannot be null or empty.");
-        
-        ArrayList<String> qOperands = query.getSentences(0, query.getOperandCount()-1);
-        boolean commonOperand = false;
-        for (String qOp : qOperands) {
-            for (char op : this.operands) {
-                if (qOp.charAt(0) == op) {
-                    commonOperand = true;
-                    continue;
-                }
-            }
-            if (commonOperand)
-                continue;
-        }
-        if (!commonOperand)
-            throw new IllegalArgumentException("No common operand found in query when compared with knowledge base.");
-
-        Proposition[] kbPropositions = this.getKnowledgeBasePropositions();
-        String[] kbConversions = new String[this.knowledgeBase.length];
-        for (int i = 0; i < this.knowledgeBase.length; i++) {
-            kbConversions[i] = kbPropositions[i].getConvertedExpression();
-        }
-
-        ArrayList<ArrayList<String>> deductionPaths = new ArrayList<>();
-        InferenceLaws inferences = new InferenceLaws();
-        EquivalencyLaws equivalencies = new EquivalencyLaws();
-        
-        DirectedDeductionGraph dt = new DirectedDeductionGraph(this.getKnowledgeBaseExpressions(), query);
-
-        return iterativeDeepeningSearch(dt, );
-
-    }
 
     private <G> G deductionReturnType(G type) {
         if (type == null)
@@ -523,10 +525,11 @@ public class Argument<M extends Model> {
             }
 
             for (int i = 0; i < cESubstrings.length; i++) {
-                for (int j = cESubstrings.length; j != i; j--) {
-                    if (cESubstrings[i].equals(cESubstrings[j])) {
+                for (int j = cESubstrings.length; j > 0; j--) {
+                    if (j == i)
+                        break;
+                    if (cESubstrings[i].equals(cESubstrings[j]))
                         return cESubstrings[i];
-                    }
                 }
             }
 
@@ -537,13 +540,14 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P], [P->Q] entails {Q}
+         * 
          * @param cE
          * @return Rule string
          */
         private String modusPonens(String[] premises) {
             String conclusion = null;
-            if ((premises[0].contains("PmQ") && premises[1].contains("QmR")) || 
-                (premises[0].contains("QmR") && premises[1].contains("PmQ"))) {
+            if ((premises[0].contains("PmQ") && premises[1].contains("QmR")) ||
+                    (premises[0].contains("QmR") && premises[1].contains("PmQ"))) {
                 conclusion = "PmR";
             }
 
@@ -552,13 +556,14 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [~Q], [P->Q] entails {~P}
+         * 
          * @param cE
          * @return Rule string
          */
         private String modusTollens(String[] premises) {
             String conclusion = null;
-            if ((premises[0].contains("nQ") && premises[1].contains("PmQ")) || 
-                (premises[0].contains("PmQ") && premises[1].contains("nQ"))) {
+            if ((premises[0].contains("nQ") && premises[1].contains("PmQ")) ||
+                    (premises[0].contains("PmQ") && premises[1].contains("nQ"))) {
                 conclusion = "nP";
             }
 
@@ -567,6 +572,7 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P] entails {P|Q}
+         * 
          * @param cE
          * @return Rule string
          */
@@ -581,6 +587,7 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P&Q] entails {P}
+         * 
          * @param cE
          * @return Rule string
          */
@@ -595,13 +602,14 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P], [Q] entails {P&Q}
+         * 
          * @param cE
          * @return Rule string
          */
         private String conjunction(String[] premises) {
             String conclusion = null;
-            if ((premises[0].contains("P") && premises[1].contains("Q")) || 
-                (premises[0].contains("Q") && premises[1].contains("P"))) {
+            if ((premises[0].contains("P") && premises[1].contains("Q")) ||
+                    (premises[0].contains("Q") && premises[1].contains("P"))) {
                 conclusion = "PaQ";
             }
 
@@ -610,13 +618,14 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P->Q], [Q->R] entails {P->R}
+         * 
          * @param cE
          * @return Rule string
          */
         private String hypotheticalSyllogism(String[] premises) {
             String conclusion = null;
-            if ((premises[0].contains("PmQ") && premises[1].contains("QmR")) || 
-                (premises[0].contains("QmR") && premises[1].contains("PmQ"))) {
+            if ((premises[0].contains("PmQ") && premises[1].contains("QmR")) ||
+                    (premises[0].contains("QmR") && premises[1].contains("PmQ"))) {
                 conclusion = "PmR";
             }
 
@@ -625,13 +634,14 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P|Q], [~P] entails {Q}
+         * 
          * @param cE
          * @return Rule string
          */
         private String disjunctiveSyllogism(String[] premises) {
             String conclusion = null;
-            if ((premises[0].contains("PoQ") && premises[1].contains("nP")) || 
-                (premises[0].contains("nP") && premises[1].contains("PoQ"))) {
+            if ((premises[0].contains("PoQ") && premises[1].contains("nP")) ||
+                    (premises[0].contains("nP") && premises[1].contains("PoQ"))) {
                 conclusion = "Q";
             }
 
@@ -641,13 +651,14 @@ public class Argument<M extends Model> {
         /**
          * Rule: [P|Q], [~P|R] entails {Q|R}
          * this one is powerful
+         * 
          * @param cE
          * @return Rule string
          */
         private String resolution(String[] premises) {
             String conclusion = null;
-            if ((premises[0].contains("PoQ") && premises[1].contains("nPoR")) || 
-                (premises[0].contains("nPoR") && premises[1].contains("PoQ"))) {
+            if ((premises[0].contains("PoQ") && premises[1].contains("nPoR")) ||
+                    (premises[0].contains("nPoR") && premises[1].contains("PoQ"))) {
                 conclusion = "QoR";
             }
 
