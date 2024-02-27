@@ -721,8 +721,8 @@ public class Argument<M extends Model> {
              */
             String cE = p.getConvertedExpression(); // easier to work with
             Map<String, ArrayList<String>> answerSet = answerTemplate;
-            ArrayList<Map<Character, String>> abstractions = new ArrayList<>();
-            ArrayList<String> returnedLawExpressions = new ArrayList<>();
+            ArrayList<Map<Character, String>> abstractions;
+            ArrayList<String> returnedLawExpressions;
             for (String law : answerSet.keySet()) {
                 abstractions = subexpressionAbstraction(law, cE);
                 returnedLawExpressions.clear();
@@ -732,50 +732,100 @@ public class Argument<M extends Model> {
         }
 
         private ArrayList<Map<Character, String>> subexpressionAbstraction(String law, String cE) {
-            ArrayList<Map<Character, String>> abstractions = new ArrayList<>();
+            Character[] lawOperators;
+            ArrayList<Map<Character, String>> abstractions = null;
+            Character[] expressionOperands;
             switch (law) {
                 case "Idempotent Law": {
-
+                    lawOperators = new Character[2];
+                    lawOperators[0] = 'o';
+                    lawOperators[1] = 'a';
+                    abstractions = new ArrayList<>();
+                    expressionOperands = findOperands(cE);
                     break;
                 }
                 case "Associative Law": {
-
+                    lawOperators = new Character[2];
+                    lawOperators[0] = 'o';
+                    lawOperators[1] = 'a';
+                    abstractions = new ArrayList<>();
+                    expressionOperands = findOperands(cE);
                     break;
                 }
                 case "Commutative Law": {
-
+                    lawOperators = new Character[2];
+                    lawOperators[0] = 'o';
+                    lawOperators[1] = 'a';
+                    abstractions = new ArrayList<>();
+                    expressionOperands = findOperands(cE);
                     break;
                 }
                 case "Distributive Law": {
-
+                    lawOperators = new Character[2];
+                    lawOperators[0] = 'o';
+                    lawOperators[1] = 'a';
+                    abstractions = new ArrayList<>();
+                    expressionOperands = findOperands(cE);
                     break;
                 }
                 case "Identity Law": {
-
+                    lawOperators = new Character[2];
+                    lawOperators[0] = 'o';
+                    lawOperators[1] = 'a';
+                    abstractions = new ArrayList<>();
+                    expressionOperands = findOperands(cE);
                     break;
                 }
                 case "Dominant Law": {
-
+                    lawOperators = new Character[2];
+                    lawOperators[0] = 'o';
+                    lawOperators[1] = 'a';
+                    abstractions = new ArrayList<>();
+                    expressionOperands = findOperands(cE);
                     break;
                 }
                 case "Double Negation Law": {
-
+                    lawOperators = new Character[1];
+                    lawOperators[0] = 'n';
+                    abstractions = new ArrayList<>();
+                    expressionOperands = findOperands(cE);
                     break;
                 }
                 case "Complement Law": {
-
+                    lawOperators = new Character[3];
+                    lawOperators[0] = 'o';
+                    lawOperators[1] = 'a';
+                    lawOperators[2] = 'n';
+                    abstractions = new ArrayList<>();
+                    expressionOperands = findOperands(cE);
                     break;
                 }
                 case "DeMorgan's Law": {
-
+                    lawOperators = new Character[3];
+                    lawOperators[0] = 'o';
+                    lawOperators[1] = 'a';
+                    lawOperators[2] = 'n';
+                    abstractions = new ArrayList<>();
+                    expressionOperands = findOperands(cE);
                     break;
                 }
                 case "Absorption Law": {
-
+                    lawOperators = new Character[2];
+                    lawOperators[0] = 'o';
+                    lawOperators[1] = 'a';
+                    abstractions = new ArrayList<>();
+                    expressionOperands = findOperands(cE);
                     break;
                 }
                 case "Conditional Identity": {
-
+                    lawOperators = new Character[5];
+                    lawOperators[0] = 'o';
+                    lawOperators[1] = 'a';
+                    lawOperators[2] = 'n';
+                    lawOperators[3] = 'm';
+                    lawOperators[4] = 'i';
+                    abstractions = new ArrayList<>();
+                    expressionOperands = findOperands(cE);
                     break;
                 }
                 default: {
@@ -785,7 +835,7 @@ public class Argument<M extends Model> {
             return abstractions;
         }
 
-        private String findMatchingSubstring(String cE, String operator) {
+        private static String findMatchingSubstring(String cE, String operator) {
             String[] cESubstrings = cE.split(operator);
 
             if (cESubstrings.length < 2) {
@@ -802,7 +852,7 @@ public class Argument<M extends Model> {
             return null;
         }
 
-        private Character[] findOperands(String e) {
+        private static Character[] findOperands(String e) {
             ArrayList<Character> operands = new ArrayList<>();
             for (int i = 0; i < e.length(); i++) {
                 if (Character.isUpperCase(e.charAt(i))) {
