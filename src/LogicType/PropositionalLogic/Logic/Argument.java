@@ -256,7 +256,6 @@ public class Argument<M extends Model> {
 
     }
 
-    
     private <G> G iterativeDeepeningSearch(DirectedDeductionGraph graph, G returnType) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         InferenceLaws inferences = new InferenceLaws();
         EquivalencyLaws equivalencies = new EquivalencyLaws();
@@ -311,7 +310,6 @@ public class Argument<M extends Model> {
             */
         return deductionReturnType(returnType);
     }
-
 
     private <G> G deductionReturnType(G type) {
         if (type == null)
@@ -733,62 +731,164 @@ public class Argument<M extends Model> {
 
         private ArrayList<Map<Character, String>> subexpressionAbstraction(String law, String cE) {
             Character[] lawOperators;
-            ArrayList<Map<Character, String>> abstractions = null;
+            Character[] lawOperands;
             Character[] expressionOperands;
+            ArrayList<Map<Character, String>> abstractions = null;
             switch (law) {
                 case "Idempotent Law": {
                     lawOperators = new Character[2];
                     lawOperators[0] = 'o';
                     lawOperators[1] = 'a';
-                    abstractions = new ArrayList<>();
+                    lawOperands = new Character[1];
+                    lawOperands[0] = 'P';
                     expressionOperands = findOperands(cE);
+
+                    if (cE.contains("o")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
+                    if (cE.contains("a")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[1]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
                     break;
                 }
                 case "Associative Law": {
                     lawOperators = new Character[2];
                     lawOperators[0] = 'o';
                     lawOperators[1] = 'a';
-                    abstractions = new ArrayList<>();
+                    lawOperands = new Character[3];
+                    lawOperands[0] = 'P';
+                    lawOperands[1] = 'Q';
+                    lawOperands[2] = 'R';
                     expressionOperands = findOperands(cE);
+
+                    if (cE.contains("o")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
+                    if (cE.contains("a")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[1]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
                     break;
                 }
                 case "Commutative Law": {
                     lawOperators = new Character[2];
                     lawOperators[0] = 'o';
                     lawOperators[1] = 'a';
-                    abstractions = new ArrayList<>();
+                    lawOperands = new Character[2];
+                    lawOperands[0] = 'P';
+                    lawOperands[1] = 'Q';
                     expressionOperands = findOperands(cE);
+
+                    if (cE.contains("o")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
+                    if (cE.contains("a")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[1]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
                     break;
                 }
                 case "Distributive Law": {
                     lawOperators = new Character[2];
                     lawOperators[0] = 'o';
                     lawOperators[1] = 'a';
-                    abstractions = new ArrayList<>();
+                    lawOperands = new Character[3];
+                    lawOperands[0] = 'P';
+                    lawOperands[1] = 'Q';
+                    lawOperands[2] = 'R';
                     expressionOperands = findOperands(cE);
+
+                    if (cE.contains("o")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
+                    if (cE.contains("a")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[1]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
                     break;
                 }
                 case "Identity Law": {
                     lawOperators = new Character[2];
                     lawOperators[0] = 'o';
                     lawOperators[1] = 'a';
-                    abstractions = new ArrayList<>();
+                    lawOperands = new Character[3];
+                    lawOperands[0] = 'P';
+                    lawOperands[1] = 'T';
+                    lawOperands[2] = 'F';
                     expressionOperands = findOperands(cE);
+
+                    if (cE.contains("o")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
+                    if (cE.contains("a")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[1]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
                     break;
                 }
                 case "Dominant Law": {
                     lawOperators = new Character[2];
                     lawOperators[0] = 'o';
                     lawOperators[1] = 'a';
-                    abstractions = new ArrayList<>();
+                    lawOperands = new Character[3];
+                    lawOperands[0] = 'P';
+                    lawOperands[1] = 'T';
+                    lawOperands[2] = 'F';
                     expressionOperands = findOperands(cE);
+
+                    if (cE.contains("o")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
+                    if (cE.contains("a")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[1]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
                     break;
                 }
                 case "Double Negation Law": {
                     lawOperators = new Character[1];
                     lawOperators[0] = 'n';
-                    abstractions = new ArrayList<>();
+                    lawOperands = new Character[1];
+                    lawOperands[0] = 'P';
                     expressionOperands = findOperands(cE);
+
+                    if (cE.contains("n")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
                     break;
                 }
                 case "Complement Law": {
@@ -796,8 +896,30 @@ public class Argument<M extends Model> {
                     lawOperators[0] = 'o';
                     lawOperators[1] = 'a';
                     lawOperators[2] = 'n';
-                    abstractions = new ArrayList<>();
+                    lawOperands = new Character[3];
+                    lawOperands[0] = 'P';
+                    lawOperands[1] = 'T';
+                    lawOperands[2] = 'F';
                     expressionOperands = findOperands(cE);
+
+                    if (cE.contains("o")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
+                    if (cE.contains("a")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[1]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
+                    if (cE.contains("n")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[2]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
                     break;
                 }
                 case "DeMorgan's Law": {
@@ -805,16 +927,52 @@ public class Argument<M extends Model> {
                     lawOperators[0] = 'o';
                     lawOperators[1] = 'a';
                     lawOperators[2] = 'n';
-                    abstractions = new ArrayList<>();
+                    lawOperands = new Character[2];
+                    lawOperands[0] = 'P';
+                    lawOperands[1] = 'Q';
                     expressionOperands = findOperands(cE);
+
+                    if (cE.contains("o")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
+                    if (cE.contains("a")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[1]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
+                    if (cE.contains("n")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[2]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
                     break;
                 }
                 case "Absorption Law": {
                     lawOperators = new Character[2];
                     lawOperators[0] = 'o';
                     lawOperators[1] = 'a';
-                    abstractions = new ArrayList<>();
+                    lawOperands = new Character[2];
+                    lawOperands[0] = 'P';
+                    lawOperands[1] = 'Q';
                     expressionOperands = findOperands(cE);
+
+                    if (cE.contains("o")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
+                    if (cE.contains("a")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[1]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
                     break;
                 }
                 case "Conditional Identity": {
@@ -824,8 +982,41 @@ public class Argument<M extends Model> {
                     lawOperators[2] = 'n';
                     lawOperators[3] = 'm';
                     lawOperators[4] = 'i';
-                    abstractions = new ArrayList<>();
+                    lawOperands = new Character[2];
+                    lawOperands[0] = 'P';
+                    lawOperands[1] = 'Q';
                     expressionOperands = findOperands(cE);
+
+                    if (cE.contains("o")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
+                    if (cE.contains("a")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[1]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
+                    if (cE.contains("n")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[2]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
+                    if (cE.contains("m")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[3]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
+                    if (cE.contains("i")) {
+                        String matchingSubstring = findMatchingSubstring(cE, lawOperators[4]);
+                        if (matchingSubstring != null) {
+
+                        }
+                    }
                     break;
                 }
                 default: {
@@ -835,18 +1026,19 @@ public class Argument<M extends Model> {
             return abstractions;
         }
 
-        private static String findMatchingSubstring(String cE, String operator) {
-            String[] cESubstrings = cE.split(operator);
+        private static String findMatchingSubstring(String cE, Character operator) {
+            String[] cESubstrings = cE.split(operator.toString());
 
             if (cESubstrings.length < 2) {
                 return null;
             }
 
             for (int i = 0; i < cESubstrings.length; i++) {
-                for (int j = cESubstrings.length; j != i; j--) {
-                    if (cESubstrings[i].equals(cESubstrings[j])) {
+                for (int j = cESubstrings.length; j > 0; j--) {
+                    if (j == i)
+                        break;
+                    if (cESubstrings[i].equals(cESubstrings[j]))
                         return cESubstrings[i];
-                    }
                 }
             }
             return null;
