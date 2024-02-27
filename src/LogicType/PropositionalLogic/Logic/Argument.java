@@ -540,8 +540,14 @@ public class Argument<M extends Model> {
          * @param cE
          * @return Rule string
          */
-        private String modusPonens(Argument<Model> a) {
-            if
+        private String modusPonens(String[] premises) {
+            String conclusion = null;
+            if ((premises[0].contains("PmQ") && premises[1].contains("QmR")) || 
+                (premises[0].contains("QmR") && premises[1].contains("PmQ"))) {
+                conclusion = "PmR";
+            }
+
+            return conclusion;
         }
 
         /**
@@ -549,8 +555,14 @@ public class Argument<M extends Model> {
          * @param cE
          * @return Rule string
          */
-        private String modusTollens(Argument<Model> a) {
-            if
+        private String modusTollens(String[] premises) {
+            String conclusion = null;
+            if ((premises[0].contains("nQ") && premises[1].contains("PmQ")) || 
+                (premises[0].contains("PmQ") && premises[1].contains("nQ"))) {
+                conclusion = "nP";
+            }
+
+            return conclusion;
         }
 
         /**
@@ -558,8 +570,13 @@ public class Argument<M extends Model> {
          * @param cE
          * @return Rule string
          */
-        private String addition(Argument<Model> a) {
-            if
+        private String addition(String premise) {
+            String conclusion = null;
+            if (premise.contains("P")) {
+                conclusion = "PoQ";
+            }
+
+            return conclusion;
         }
 
         /**
@@ -567,8 +584,13 @@ public class Argument<M extends Model> {
          * @param cE
          * @return Rule string
          */
-        private String simplification(Argument<Model> a) {
-            if
+        private String simplification(String[] premises) {
+            String conclusion = null;
+            if (premises[0].contains("PaQ")) {
+                conclusion = "P";
+            }
+
+            return conclusion;
         }
 
         /**
@@ -576,8 +598,14 @@ public class Argument<M extends Model> {
          * @param cE
          * @return Rule string
          */
-        private String conjunction(Argument<Model> a {
-            if (a.)
+        private String conjunction(String[] premises) {
+            String conclusion = null;
+            if ((premises[0].contains("P") && premises[1].contains("Q")) || 
+                (premises[0].contains("Q") && premises[1].contains("P"))) {
+                conclusion = "PaQ";
+            }
+
+            return conclusion;
         }
 
         /**
@@ -585,8 +613,14 @@ public class Argument<M extends Model> {
          * @param cE
          * @return Rule string
          */
-        private String hypotheticalSyllogism(Argument<Model> a) {
-            if
+        private String hypotheticalSyllogism(String[] premises) {
+            String conclusion = null;
+            if ((premises[0].contains("PmQ") && premises[1].contains("QmR")) || 
+                (premises[0].contains("QmR") && premises[1].contains("PmQ"))) {
+                conclusion = "PmR";
+            }
+
+            return conclusion;
         }
 
         /**
@@ -594,8 +628,14 @@ public class Argument<M extends Model> {
          * @param cE
          * @return Rule string
          */
-        private String disjunctiveSyllogism(Argument<Model> a) {
-            if
+        private String disjunctiveSyllogism(String[] premises) {
+            String conclusion = null;
+            if ((premises[0].contains("PoQ") && premises[1].contains("nP")) || 
+                (premises[0].contains("nP") && premises[1].contains("PoQ"))) {
+                conclusion = "Q";
+            }
+
+            return conclusion;
         }
 
         /**
@@ -604,8 +644,14 @@ public class Argument<M extends Model> {
          * @param cE
          * @return Rule string
          */
-        private String resolution(Argument<Model> a) {
-            if
+        private String resolution(String[] premises) {
+            String conclusion = null;
+            if ((premises[0].contains("PoQ") && premises[1].contains("nPoR")) || 
+                (premises[0].contains("nPoR") && premises[1].contains("PoQ"))) {
+                conclusion = "QoR";
+            }
+
+            return conclusion;
         }
     }
 
@@ -876,7 +922,7 @@ public class Argument<M extends Model> {
          * @param cE
          * @return
          */
-        private String complementLaw(Proposition p) {
+        private String complementLaw(String cE) {
             String law = null;
             if (p.getExpression().contains("PanP") || p.getExpression().contains("nPaP"))
                 law = "F";
