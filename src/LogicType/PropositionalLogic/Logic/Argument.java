@@ -477,7 +477,11 @@ public class Argument<M extends Model> {
             return answerSet;
         }
 
-        private ArrayList<Map<Character, String>> subexpressionAbstraction(String law, String cE) {
+        private ArrayList<Map<Character, String>> subexpressionAbstraction(String law, String[] cE) {
+            Character[] lawOperators;
+            Character[] lawOperands;
+            Character[][] premiseOperands;
+            ArrayList<Map<Character, String>> abstractions = null;
             switch (law) {
                 case "Modus Ponens": {
                     for (String conversion : kbConversions) {
@@ -511,8 +515,11 @@ public class Argument<M extends Model> {
                 case "Resolution": {
 
                 }
+                default: {
+                    return null;
+                }
             }
-            return null;
+            return abstractions;
         }
 
         private String findMatchingSubstring(String cE, String operator) {
@@ -723,25 +730,62 @@ public class Argument<M extends Model> {
             ArrayList<String> returnedLawExpressions;
             for (String law : answerSet.keySet()) {
                 abstractions = subexpressionAbstraction(law, cE);
-                returnedLawExpressions.clear();
+                if (abstractions != null) {
+                    for (Map<Character, String> abstraction : abstractions) {
+                        StringBuilder abstracted_cE = new StringBuilder();
+                        switch(law) {
+                            case "Idempotent Law": {
+    
+                            }
+                            case "Associative Law": {
+                                
+                            }
+                            case "Commutative Law": {
+                                
+                            } 
+                            case "Distributive Law": {
+                                
+                            }
+                            case "Identity Law": {
+                                
+                            }
+                            case "Domination Law": {
+                                
+                            }
+                            case "Double Negation Law": {
+                                
+                            }
+                            case "Complement Law": {
+                                
+                            }
+                            case "DeMorgan's Law": {
+                                
+                            }
+                            case "Absorption Law": {
+                                
+                            }
+                            case "Conditional Identity": {
+                                
+                            }
+                        }
+                    }
+                } else
+                    break;
             }
 
             return answerSet;
         }
 
         private ArrayList<Map<Character, String>> subexpressionAbstraction(String law, String cE) {
-            Character[] lawOperators;
-            Character[] lawOperands;
-            Character[] expressionOperands;
             ArrayList<Map<Character, String>> abstractions = null;
             switch (law) {
                 case "Idempotent Law": {
-                    lawOperators = new Character[2];
+                    Character[] lawOperators = new Character[2];
                     lawOperators[0] = 'o';
                     lawOperators[1] = 'a';
-                    lawOperands = new Character[1];
+                    Character[] lawOperands = new Character[1];
                     lawOperands[0] = 'P';
-                    expressionOperands = findOperands(cE);
+                    Character[] expressionOperands = findOperands(cE);
 
                     if (cE.contains("o")) {
                         String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
@@ -758,14 +802,14 @@ public class Argument<M extends Model> {
                     break;
                 }
                 case "Associative Law": {
-                    lawOperators = new Character[2];
+                    Character[] lawOperators = new Character[2];
                     lawOperators[0] = 'o';
                     lawOperators[1] = 'a';
-                    lawOperands = new Character[3];
+                    Character[] lawOperands = new Character[3];
                     lawOperands[0] = 'P';
                     lawOperands[1] = 'Q';
                     lawOperands[2] = 'R';
-                    expressionOperands = findOperands(cE);
+                    Character[] expressionOperands = findOperands(cE);
 
                     if (cE.contains("o")) {
                         String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
@@ -782,13 +826,13 @@ public class Argument<M extends Model> {
                     break;
                 }
                 case "Commutative Law": {
-                    lawOperators = new Character[2];
+                    Character[] lawOperators = new Character[2];
                     lawOperators[0] = 'o';
                     lawOperators[1] = 'a';
-                    lawOperands = new Character[2];
+                    Character[] lawOperands = new Character[2];
                     lawOperands[0] = 'P';
                     lawOperands[1] = 'Q';
-                    expressionOperands = findOperands(cE);
+                    Character[] expressionOperands = findOperands(cE);
 
                     if (cE.contains("o")) {
                         String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
@@ -805,14 +849,14 @@ public class Argument<M extends Model> {
                     break;
                 }
                 case "Distributive Law": {
-                    lawOperators = new Character[2];
+                    Character[] lawOperators = new Character[2];
                     lawOperators[0] = 'o';
                     lawOperators[1] = 'a';
-                    lawOperands = new Character[3];
+                    Character[] lawOperands = new Character[3];
                     lawOperands[0] = 'P';
                     lawOperands[1] = 'Q';
                     lawOperands[2] = 'R';
-                    expressionOperands = findOperands(cE);
+                    Character[] expressionOperands = findOperands(cE);
 
                     if (cE.contains("o")) {
                         String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
@@ -829,14 +873,14 @@ public class Argument<M extends Model> {
                     break;
                 }
                 case "Identity Law": {
-                    lawOperators = new Character[2];
+                    Character[] lawOperators = new Character[2];
                     lawOperators[0] = 'o';
                     lawOperators[1] = 'a';
-                    lawOperands = new Character[3];
+                    Character[] lawOperands = new Character[3];
                     lawOperands[0] = 'P';
                     lawOperands[1] = 'T';
                     lawOperands[2] = 'F';
-                    expressionOperands = findOperands(cE);
+                    Character[] expressionOperands = findOperands(cE);
 
                     if (cE.contains("o")) {
                         String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
@@ -853,14 +897,14 @@ public class Argument<M extends Model> {
                     break;
                 }
                 case "Dominant Law": {
-                    lawOperators = new Character[2];
+                    Character[] lawOperators = new Character[2];
                     lawOperators[0] = 'o';
                     lawOperators[1] = 'a';
-                    lawOperands = new Character[3];
+                    Character[] lawOperands = new Character[3];
                     lawOperands[0] = 'P';
                     lawOperands[1] = 'T';
                     lawOperands[2] = 'F';
-                    expressionOperands = findOperands(cE);
+                    Character[] expressionOperands = findOperands(cE);
 
                     if (cE.contains("o")) {
                         String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
@@ -877,11 +921,11 @@ public class Argument<M extends Model> {
                     break;
                 }
                 case "Double Negation Law": {
-                    lawOperators = new Character[1];
+                    Character[] lawOperators = new Character[1];
                     lawOperators[0] = 'n';
-                    lawOperands = new Character[1];
+                    Character[] lawOperands = new Character[1];
                     lawOperands[0] = 'P';
-                    expressionOperands = findOperands(cE);
+                    Character[] expressionOperands = findOperands(cE);
 
                     if (cE.contains("n")) {
                         String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
@@ -892,15 +936,15 @@ public class Argument<M extends Model> {
                     break;
                 }
                 case "Complement Law": {
-                    lawOperators = new Character[3];
+                    Character[] lawOperators = new Character[3];
                     lawOperators[0] = 'o';
                     lawOperators[1] = 'a';
                     lawOperators[2] = 'n';
-                    lawOperands = new Character[3];
+                    Character[] lawOperands = new Character[3];
                     lawOperands[0] = 'P';
                     lawOperands[1] = 'T';
                     lawOperands[2] = 'F';
-                    expressionOperands = findOperands(cE);
+                    Character[] expressionOperands = findOperands(cE);
 
                     if (cE.contains("o")) {
                         String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
@@ -923,14 +967,14 @@ public class Argument<M extends Model> {
                     break;
                 }
                 case "DeMorgan's Law": {
-                    lawOperators = new Character[3];
+                    Character[] lawOperators = new Character[3];
                     lawOperators[0] = 'o';
                     lawOperators[1] = 'a';
                     lawOperators[2] = 'n';
-                    lawOperands = new Character[2];
+                    Character[] lawOperands = new Character[2];
                     lawOperands[0] = 'P';
                     lawOperands[1] = 'Q';
-                    expressionOperands = findOperands(cE);
+                    Character[] expressionOperands = findOperands(cE);
 
                     if (cE.contains("o")) {
                         String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
@@ -953,13 +997,13 @@ public class Argument<M extends Model> {
                     break;
                 }
                 case "Absorption Law": {
-                    lawOperators = new Character[2];
+                    Character[] lawOperators = new Character[2];
                     lawOperators[0] = 'o';
                     lawOperators[1] = 'a';
-                    lawOperands = new Character[2];
+                    Character[] lawOperands = new Character[2];
                     lawOperands[0] = 'P';
                     lawOperands[1] = 'Q';
-                    expressionOperands = findOperands(cE);
+                    Character[] expressionOperands = findOperands(cE);
 
                     if (cE.contains("o")) {
                         String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
@@ -976,16 +1020,16 @@ public class Argument<M extends Model> {
                     break;
                 }
                 case "Conditional Identity": {
-                    lawOperators = new Character[5];
+                    Character[] lawOperators = new Character[5];
                     lawOperators[0] = 'o';
                     lawOperators[1] = 'a';
                     lawOperators[2] = 'n';
                     lawOperators[3] = 'm';
                     lawOperators[4] = 'i';
-                    lawOperands = new Character[2];
+                    Character[] lawOperands = new Character[2];
                     lawOperands[0] = 'P';
                     lawOperands[1] = 'Q';
-                    expressionOperands = findOperands(cE);
+                    Character[] expressionOperands = findOperands(cE);
 
                     if (cE.contains("o")) {
                         String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
@@ -1177,13 +1221,13 @@ public class Argument<M extends Model> {
          */
         private String complementLaw(String cE) {
             String law = null;
-            if (p.getExpression().contains("PanP") || p.getExpression().contains("nPaP"))
+            if (cE.contains("PanP") || cE.contains("nPaP"))
                 law = "F";
-            else if (p.getExpression().contains("nT"))
+            else if (cE.contains("nT"))
                 law = "F";
-            else if (p.getExpression().contains("PonP") || p.getExpression().contains("nPoP"))
+            else if (cE.contains("PonP") || cE.contains("nPoP"))
                 law = "T";
-            else if (p.getExpression().contains("nF"))
+            else if (cE.contains("nF"))
                 law = "T";
 
             return law;
