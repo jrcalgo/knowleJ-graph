@@ -739,51 +739,51 @@ public class Argument<M extends Model> {
                         String new_cE = new String();
                         switch (law) {
                             case "Idempotent Law": {
-                                new_cE = idempotentLaw(abstracted_cE).replace("P", abstraction.get('P').toString());
+                                new_cE = idempotentLaw(abstracted_cE).replace("P", abstraction.get('P'));
                             }
                             case "Associative Law": {
-                                new_cE = associativeLaw(abstracted_cE).replace("P", abstraction.get('P').toString())
-                                        .replace("Q", abstraction.get('Q').toString())
-                                        .replace("R", abstraction.get('R').toString());
+                                new_cE = associativeLaw(abstracted_cE).replace("P", abstraction.get('P'))
+                                        .replace("Q", abstraction.get('Q'))
+                                        .replace("R", abstraction.get('R'));
                             }
                             case "Commutative Law": {
-                                new_cE = commutativeLaw(abstracted_cE).replace("P", abstraction.get('P').toString())
-                                        .replace("Q", abstraction.get('Q').toString());
+                                new_cE = commutativeLaw(abstracted_cE).replace("P", abstraction.get('P'))
+                                        .replace("Q", abstraction.get('Q'));
                             }
                             case "Distributive Law": {
-                                new_cE = distributiveLaw(abstracted_cE).replace("P", abstraction.get('P').toString())
-                                        .replace("Q", abstraction.get('Q').toString())
-                                        .replace("R", abstraction.get('R').toString());
+                                new_cE = distributiveLaw(abstracted_cE).replace("P", abstraction.get('P'))
+                                        .replace("Q", abstraction.get('Q'))
+                                        .replace("R", abstraction.get('R'));
                             }
                             case "Identity Law": {
-                                new_cE = identityLaw(abstracted_cE).replace("P", abstraction.get('P').toString())
-                                        .replace("T", abstraction.get('T').toString())
-                                        .replace("F", abstraction.get('F').toString());
+                                new_cE = identityLaw(abstracted_cE).replace("P", abstraction.get('P'))
+                                        .replace("T", abstraction.get('T'))
+                                        .replace("F", abstraction.get('F'));
                             }
                             case "Domination Law": {
-                                new_cE = dominationLaw(abstracted_cE).replace("P", abstraction.get('P').toString())
-                                        .replace("T", abstraction.get('T').toString())
-                                        .replace("F", abstraction.get('F').toString());
+                                new_cE = dominationLaw(abstracted_cE).replace("P", abstraction.get('P'))
+                                        .replace("T", abstraction.get('T'))
+                                        .replace("F", abstraction.get('F'));
                             }
                             case "Double Negation Law": {
-                                new_cE = doubleNegationLaw(abstracted_cE).replace("P", abstraction.get('P').toString());
+                                new_cE = doubleNegationLaw(abstracted_cE).replace("P", abstraction.get('P'));
                             }
                             case "Complement Law": {
-                                new_cE = complementLaw(abstracted_cE).replace("P", abstraction.get('P').toString())
-                                        .replace("T", abstraction.get('T').toString())
-                                        .replace("F", abstraction.get('F').toString());
+                                new_cE = complementLaw(abstracted_cE).replace("P", abstraction.get('P'))
+                                        .replace("T", abstraction.get('T'))
+                                        .replace("F", abstraction.get('F'));
                             }
                             case "DeMorgan's Law": {
-                                new_cE = deMorgansLaw(abstracted_cE).replace("P", abstraction.get('P').toString())
-                                        .replace("Q", abstraction.get('Q').toString());
+                                new_cE = deMorgansLaw(abstracted_cE).replace("P", abstraction.get('P'))
+                                        .replace("Q", abstraction.get('Q'));
                             }
                             case "Absorption Law": {
-                                new_cE = absorptionLaw(abstracted_cE).replace("P", abstraction.get('P').toString())
-                                        .replace("Q", abstraction.get('Q').toString());
+                                new_cE = absorptionLaw(abstracted_cE).replace("P", abstraction.get('P'))
+                                        .replace("Q", abstraction.get('Q'));
                             }
                             case "Conditional Identity": {
-                                new_cE = conditionalIdentity(abstracted_cE).replace("P", abstraction.get('P').toString())
-                                        .replace("Q", abstraction.get('Q').toString());
+                                new_cE = conditionalIdentity(abstracted_cE).replace("P", abstraction.get('P'))
+                                        .replace("Q", abstraction.get('Q'));
                             }
                         }
                         law_cE_collection.add(new_cE);
