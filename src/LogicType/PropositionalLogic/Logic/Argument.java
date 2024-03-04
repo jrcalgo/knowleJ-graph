@@ -250,9 +250,9 @@ public class Argument<M extends Model> {
         InferenceLaws inferences = new InferenceLaws();
         EquivalencyLaws equivalencies = new EquivalencyLaws();
         
-        DirectedDeductionGraph dt = new DirectedDeductionGraph(this.getKnowledgeBaseExpressions(), query);
+        DirectedDeductionGraph dg = new DirectedDeductionGraph(this.getKnowledgeBaseExpressions(), query);
 
-        return iterativeDeepeningSearch(dt, );
+        return iterativeDeepeningSearch(dg);
 
     }
 
@@ -262,9 +262,8 @@ public class Argument<M extends Model> {
 
         Argument<Model> knowledgeHistory = new Argument<>(this.knowledgeBase); // serves as knowledge history container
         ArrayList<DeductionGraphNode> leafs = graph.getNodes();
-        ArrayList<ArrayList<String>> optimalPaths = new ArrayList<>();
-        int depth = 0;
-        DeductionGraphNode mostRelevantLeaf = null;
+        ArrayList<ArrayList<String>> optimalPaths;
+        int depth = 2;
         while (true) {
             Map<String, ArrayList<String>> inferenceMap = new HashMap<>();
             Map<String, ArrayList<String>> equivalencyMap = new HashMap<>();
@@ -272,14 +271,6 @@ public class Argument<M extends Model> {
                 inferenceMap = inferences.checkInferenceLaws(knowledgeHistory);
                 equivalencyMap = equivalencies.checkEquivalencyLaws(new Proposition(leaf.getExpression()));
 
-                for (String law : inferenceMap.keySet()) {
-                    if (inferenceMap.get(law) == null) {
-                        break;
-                    } else {
-                        String[] premises = inferenceMap.get(law).get(0).substring;
-                        String conclusion = inferenceMap.get(law).get(0).substring()
-                    }
-                }
                 for (String law : equivalencyMap.keySet()) {
                     if (equivalencyMap.get(law) == null) {
                         break;
@@ -289,6 +280,10 @@ public class Argument<M extends Model> {
                     }
                 }
             }
+            for (DeductionGraphNode node : graph.getNodes()) {
+                if (knowledgeHistory)
+            }
+            leafs = graph.getLeafNodes();
             System.gc();
         }
         /**
@@ -731,10 +726,11 @@ public class Argument<M extends Model> {
                 answerAbstractions.put(key, null);
             // This will have to be refactored; for each law check for each abstraction is flawed logically
             for (String law : answerSet.keySet()) {
+                answerAbstractions.put(law, null);
                 if (cE.length() == 1) {
 
                 } else {
-                    
+
                     abstractions.get(law).add(subexpressionAbstraction(law, cE));
                     if (abstractions != null) {
                         for (Map<Character, String> abstraction : abstractions) {
