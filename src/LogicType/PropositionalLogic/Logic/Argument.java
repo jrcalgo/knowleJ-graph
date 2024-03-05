@@ -226,7 +226,7 @@ public class Argument<M extends Model> {
         return bidirectionalIterativeDeepeningSearch(dg, false);
     }
 
-    public <G> G deduce(String query)
+    public <G> G deduce(String query, G returnType)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (query == null || query.length() == 0)
             throw new IllegalArgumentException("String query cannot be null or empty.");
@@ -241,7 +241,7 @@ public class Argument<M extends Model> {
         return deduce(new Proposition(query));
     }
 
-    public <G> G deduce(Proposition query) {
+    public <G> G deduce(Proposition query, G returnType) {
         if (query == null)
             throw new IllegalArgumentException("Proposition query cannot be null or empty.");
         
@@ -1085,7 +1085,7 @@ public class Argument<M extends Model> {
          */
         private String idempotentLaw(String cE) {
             String law = null;
-            if (cE.contains("PaP") || cE.contains("PoP"))
+            if (cE.equals("PaP") || cE.equals("PoP"))
                 law = "P";
 
             return law;
@@ -1099,14 +1099,14 @@ public class Argument<M extends Model> {
          */
         private String associativeLaw(String cE) {
             String law = null;
-            if (cE.contains("(PoQ)oR"))
+            if (cE.equals("(PoQ)oR"))
                 law = "Po(QoR)";
-            else if (cE.contains("(PaQ)aR"))
+            else if (cE.equals("(PaQ)aR"))
                 law = "Pa(QaR)";
 
-            if (cE.contains("Po(QoR)"))
+            if (cE.equals("Po(QoR)"))
                 law = "(PoQ)oR";
-            else if (cE.contains("Pa(QaR)"))
+            else if (cE.equals("Pa(QaR)"))
                 law = "(PaQ)aR";
 
             return law;
@@ -1121,9 +1121,9 @@ public class Argument<M extends Model> {
         private String commutativeLaw(String cE) {
             String law = null;
             if (cE == "PoQ" || cE == "QoP")
-                law = cE.contains("PoQ") ? "QoP" : "PoQ";
+                law = cE.equals("PoQ") ? "QoP" : "PoQ";
             else if (cE == "PaQ" || cE == "QaP")
-                law = cE.contains("PaQ") ? "QaP" : "PaQ";
+                law = cE.equals("PaQ") ? "QaP" : "PaQ";
 
             return law;
         }
@@ -1157,7 +1157,7 @@ public class Argument<M extends Model> {
          */
         private String identityLaw(String cE) {
             String law = null;
-            if (cE.contains("PoF") || cE.contains("PaT"))
+            if (cE.equals("PoF") || cE.equals("PaT"))
                 law = "P";
 
             return law;
@@ -1171,9 +1171,9 @@ public class Argument<M extends Model> {
          */
         private String dominationLaw(String cE) {
             String law = null;
-            if (cE.contains("PaF"))
+            if (cE.equals("PaF"))
                 law = "F";
-            else if (cE.contains("PoT"))
+            else if (cE.equals("PoT"))
                 law = "T";
 
             return law;
@@ -1187,7 +1187,7 @@ public class Argument<M extends Model> {
          */
         private String doubleNegationLaw(String cE) {
             String law = null;
-            if (cE.contains("nnP"))
+            if (cE.equals("nnP"))
                 law = "P";
 
             return law;
@@ -1201,13 +1201,13 @@ public class Argument<M extends Model> {
          */
         private String complementLaw(String cE) {
             String law = null;
-            if (cE.contains("PanP") || cE.contains("nPaP"))
+            if (cE.equals("PanP") || cE.equals("nPaP"))
                 law = "F";
-            else if (cE.contains("nT"))
+            else if (cE.equals("nT"))
                 law = "F";
-            else if (cE.contains("PonP") || cE.contains("nPoP"))
+            else if (cE.equals("PonP") || cE.equals("nPoP"))
                 law = "T";
-            else if (cE.contains("nF"))
+            else if (cE.equals("nF"))
                 law = "T";
 
             return law;
@@ -1221,14 +1221,14 @@ public class Argument<M extends Model> {
          */
         private String deMorgansLaw(String cE) {
             String law = null;
-            if (cE.contains("n(PoQ)"))
+            if (cE.equals("n(PoQ)"))
                 law = "nPanQ";
-            else if (cE.contains("n(PaQ)"))
+            else if (cE.equals("n(PaQ)"))
                 law = "nPonQ";
 
-            if (cE.contains("nPanQ"))
+            if (cE.equals("nPanQ"))
                 law = "n(PoQ)";
-            else if (cE.contains("nPonQ"))
+            else if (cE.equals("nPonQ"))
                 law = "n(PaQ)";
 
             return law;
@@ -1242,7 +1242,7 @@ public class Argument<M extends Model> {
          */
         private String absorptionLaw(String cE) {
             String law = null;
-            if (cE.contains("Po(PaQ)") || cE.contains("Pa(PoQ)"))
+            if (cE.equals("Po(PaQ)") || cE.equals("Pa(PoQ)"))
                 law = "P";
 
             return law;
@@ -1256,14 +1256,14 @@ public class Argument<M extends Model> {
          */
         private String conditionalIdentity(String cE) {
             String law = null;
-            if (cE.contains("PmQ"))
+            if (cE.equals("PmQ"))
                 law = "nPoQ";
-            else if (cE.contains("PiQ"))
+            else if (cE.equals("PiQ"))
                 law = "(PmQ)a(QmP)";
 
-            if (cE.contains("nPoQ"))
+            if (cE.equals("nPoQ"))
                 law = "PmQ";
-            else if (cE.contains("(PmQ)a(QmP)"))
+            else if (cE.equals("(PmQ)a(QmP)"))
                 law = "PiQ";
 
             return law;
