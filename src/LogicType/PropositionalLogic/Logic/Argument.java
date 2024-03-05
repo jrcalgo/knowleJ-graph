@@ -220,7 +220,7 @@ public class Argument<M extends Model> {
                 break;
         }
         if (!foundQuery)
-            throw new IllegalArgumentException("No common operand found in query when compared with knowledge base.");
+            throw new IllegalArgumentException("Query not found within current knowledge base.");
 
         DirectedDeductionGraph dg = new DirectedDeductionGraph(kbExpressions, new Proposition(kbQuery));
         return bidirectionalIterativeDeepeningSearch(dg, false);
@@ -566,10 +566,10 @@ public class Argument<M extends Model> {
          */
         private String modusPonens(String[] premises) {
             String conclusion = null;
-            if ((premises[0].contains("PmQ") && premises[1].contains("QmR")) ||
-                    (premises[0].contains("QmR") && premises[1].contains("PmQ"))) {
-                conclusion = "PmR";
-            }
+            if ((premises[0].equals("P") && premises[1].equals("PmQ")) || (premises[0].equals("PmQ") && premises[1].equals("P"))) 
+                conclusion = "Q";
+            else if ((premises[0].equals("Q") && premises[1].equals("QmP")) || (premises[0].equals("QmP") && premises[1].equals("Q")))
+                conclusion = "P";
 
             return conclusion;
         }
@@ -582,9 +582,12 @@ public class Argument<M extends Model> {
          */
         private String modusTollens(String[] premises) {
             String conclusion = null;
-            if ((premises[0].contains("nQ") && premises[1].contains("PmQ")) ||
-                    (premises[0].contains("PmQ") && premises[1].contains("nQ"))) {
+            if ((premises[0].equals("nQ") && premises[1].equals("PmQ")) ||
+                    (premises[0].equals("PmQ") && premises[1].equals("nQ"))) {
                 conclusion = "nP";
+            } else if ((premises[0].equals("nP") && premises[1].equals("QmP")) ||
+                    (premises[0].equals("QmP") && premises[1].equals("nP"))) {
+                conclusion = "nQ";
             }
 
             return conclusion;
@@ -598,9 +601,9 @@ public class Argument<M extends Model> {
          */
         private String addition(String premise) {
             String conclusion = null;
-            if (premise == "P") 
+            if (premise.equals("P")) 
                 conclusion = "PoQ";
-            else if (premise == "Q")
+            else if (premise.equals("Q"))
                 conclusion = "QoP";
 
             return conclusion;
@@ -614,9 +617,9 @@ public class Argument<M extends Model> {
          */
         private String simplification(String[] premises) {
             String conclusion = null;
-            if (premises[0] == "PaQ")
+            if (premises[0].equals("PaQ"))
                 conclusion = "P";
-            else if (premises[0] == "QaP") 
+            else if (premises[0].equals("QaP")) 
                 conclusion = "Q";
 
             return conclusion;
@@ -630,9 +633,9 @@ public class Argument<M extends Model> {
          */
         private String conjunction(String[] premises) {
             String conclusion = null;
-            if (premises[0] == "P" && premises[1] == "Q")
+            if (premises[0].equals("P") && premises[1].equals("Q"))
                 conclusion = "PaQ";
-            else if (premises[0] == "Q" && premises[1] == "P")
+            else if (premises[0].equals("Q") && premises[1].equals("P"))
                 conclusion = "QaP";
 
             return conclusion;
@@ -646,11 +649,11 @@ public class Argument<M extends Model> {
          */
         private String hypotheticalSyllogism(String[] premises) {
             String conclusion = null;
-            if ((premises[0] == "PmQ" && premises[1] == "QmR") || (premises[0] == "QmR" && premises[1] == "PmQ"))
+            if ((premises[0].equals("PmQ") && premises[1].equals("QmR")) || (premises[0].equals("QmR") && premises[1].equals("PmQ")))
                 conclusion = "PmR";
-            else if ((premises[0] == "QmR" && premises[1] == "RmP") || (premises[0] == "RmP" && premises[1] == "QmR"))
+            else if ((premises[0].equals("QmR") && premises[1].equals("RmP")) || (premises[0].equals("RmP") && premises[1].equals("QmR")))
                 conclusion = "QmP";
-            else if ((premises[0] == "RmP" && premises[1] == "PmQ") || (premises[0] == "PmQ" && premises[1] == "RmP"))
+            else if ((premises[0].equals("RmP") && premises[1].equals("PmQ")) || (premises[0].equals("PmQ") && premises[1].equals("RmP")))
                 conclusion = "RmQ";
 
             return conclusion;
@@ -664,11 +667,11 @@ public class Argument<M extends Model> {
          */
         private String disjunctiveSyllogism(String[] premises) {
             String conclusion = null;
-            if ((premises[0] == "PoQ" && premises[1] == "nP") ||
-                    (premises[0] == "nP" && premises[1] == "PoQ")) {
+            if ((premises[0].equals("PoQ") && premises[1].equals("nP")) ||
+                    (premises[0].equals("nP") && premises[1].equals("PoQ"))) {
                 conclusion = "Q";
-            } else if ((premises[0] == "QoP" && premises[1] == "nQ") ||
-                    (premises[0] == "nQ" && premises[1] == "QoP")) {
+            } else if ((premises[0].equals("QoP") && premises[1].equals("nQ")) ||
+                    (premises[0].equals("nQ") && premises[1].equals("QoP"))) {
                 conclusion = "P";
             }
 
@@ -684,10 +687,15 @@ public class Argument<M extends Model> {
          */
         private String resolution(String[] premises) {
             String conclusion = null;
-            if ((premises[0].contains("PoQ") && premises[1].contains("nPoR")) ||
-                    (premises[0].contains("nPoR") && premises[1].contains("PoQ"))) {
+            if ((premises[0].equals("PoQ") && premises[1].equals("nPoR")) ||
+                    (premises[0].equals("nPoR") && premises[1].equals("PoQ")))
                 conclusion = "QoR";
-            }
+            else if ((premises[0].equals("QoP") && premises[1].equals("nQoR")) ||
+                    (premises[0].equals("nQoR") && premises[1].equals("QoP")))
+                conclusion = "RoP";
+            else if ((premises[0].equals("PoQ") && premises[1].equals("nRoP")) ||
+                    (premises[0].equals("nRoP") && premises[1].equals("PoQ")))
+                conclusion = "QoR";
 
             return conclusion;
         }
@@ -1120,9 +1128,9 @@ public class Argument<M extends Model> {
          */
         private String commutativeLaw(String cE) {
             String law = null;
-            if (cE == "PoQ" || cE == "QoP")
+            if (cE.equals("PoQ") || cE.equals("QoP"))
                 law = cE.equals("PoQ") ? "QoP" : "PoQ";
-            else if (cE == "PaQ" || cE == "QaP")
+            else if (cE.equals("PaQ") || cE.equals("QaP"))
                 law = cE.equals("PaQ") ? "QaP" : "PaQ";
 
             return law;
@@ -1136,14 +1144,14 @@ public class Argument<M extends Model> {
          */
         private String distributiveLaw(String cE) {
             String law = null;
-            if (cE == "Po(QaR)")
+            if (cE.equals("Po(QaR)"))
                 law = "(PoQ)a(PoR)";
-            else if (cE == "Pa(QoR)")
+            else if (cE.equals("Pa(QoR)"))
                 law = "(PaQ)o(PaR)";
 
-            if (cE == "(PoQ)a(PoR)")
+            if (cE.equals("(PoQ)a(PoR)"))
                 law = "Po(QaR)";
-            else if (cE == "(PaQ)o(PaR)")
+            else if (cE.equals("(PaQ)o(PaR)"))
                 law = "Pa(QoR)";
 
             return law;
@@ -1273,7 +1281,7 @@ public class Argument<M extends Model> {
             String[] equivalencies = null;
             switch (law) {
                 case "Idempotent Law": {
-                    if (cE == "P") {
+                    if (cE.equals("P")) {
                         equivalencies = new String[2];
                         equivalencies[0] = "PoP";
                         equivalencies[1] = "PaP";
@@ -1281,7 +1289,7 @@ public class Argument<M extends Model> {
                     break;
                 }
                 case "Identity Law": {
-                    if (cE == "P") {
+                    if (cE.equals("P")) {
                         equivalencies = new String[2];
                         equivalencies[0] = "PoF";
                         equivalencies[1] = "PaT";
@@ -1289,7 +1297,7 @@ public class Argument<M extends Model> {
                     break;
                 }
                 case "Domination Law": {
-                    if (cE == "F") {
+                    if (cE.equals("F")) {
                         equivalencies = new String[1];
                         equivalencies[0] = "PaF";
                     } else if (cE == "T") {
@@ -1299,18 +1307,18 @@ public class Argument<M extends Model> {
                     break;
                 }
                 case "Double Negation Law": {
-                    if (cE == "P") {
+                    if (cE.equals("P")) {
                         equivalencies = new String[1];
                         equivalencies[0] = "nnP";
                     }
                     break;
                 }
                 case "Complement Law": {
-                    if (cE == "F") {
+                    if (cE.equals("F")) {
                         equivalencies = new String[2];
                         equivalencies[0] = "PanP";
                         equivalencies[1] = "nT";
-                    } else if (cE == "T") {
+                    } else if (cE.equals("T")) {
                         equivalencies = new String[2];
                         equivalencies[0] = "PonP";
                         equivalencies[1] = "nF";
@@ -1318,7 +1326,7 @@ public class Argument<M extends Model> {
                     break;
                 }
                 case "Absorption Law": {
-                    if (cE == "P") {
+                    if (cE.equals("P")) {
                         equivalencies = new String[2];
                         equivalencies[0] = "Po(PaQ)";
                         equivalencies[1] = "Pa(PoQ)";
