@@ -206,6 +206,26 @@ public class Argument<M extends Model> {
 
     // }
 
+    public boolean isValidArgument(String kbQuery) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+        if (kbQuery == null || kbQuery.length() == 0)
+            throw new IllegalArgumentException("String query cannot be null or empty.");
+        
+        boolean foundQuery = false;
+        String[] kbExpressions = this.getKnowledgeBaseExpressions();
+        for (String premise : kbExpressions) {
+            if (premise.equals(kbQuery)) {
+                foundQuery = true;
+                continue;
+            } else
+                break;
+        }
+        if (!foundQuery)
+            throw new IllegalArgumentException("No common operand found in query when compared with knowledge base.");
+
+        DirectedDeductionGraph dg = new DirectedDeductionGraph(kbExpressions, new Proposition(kbQuery));
+        return bidirectionalIterativeDeepeningSearch(dg, false);
+    }
+
     public <G> G deduce(String query)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (query == null || query.length() == 0)
@@ -252,11 +272,11 @@ public class Argument<M extends Model> {
         
         DirectedDeductionGraph dg = new DirectedDeductionGraph(this.getKnowledgeBaseExpressions(), query);
 
-        return iterativeDeepeningSearch(dg);
+        return bidirectionalIterativeDeepeningSearch(dg);
 
     }
 
-    private <G> G iterativeDeepeningSearch(DirectedDeductionGraph graph, G returnType) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+    private <G> G bidirectionalIterativeDeepeningSearch(DirectedDeductionGraph graph, G returnType) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         InferenceLaws inferences = new InferenceLaws();
         EquivalencyLaws equivalencies = new EquivalencyLaws();
 
@@ -806,7 +826,7 @@ public class Argument<M extends Model> {
 
                 }
                 Map<String, ArrayList<String>> answerSet = answerTemplate;
-                
+
             return answerSet;
         }
 
