@@ -66,7 +66,7 @@ public class Proposition {
                     if (operandCount > 15) {
                         this.expression = null;
                         throw new InvalidExpressionException(
-                                "Too many operands; only 15 allowed; there are " + operandCount + " operands.");
+                                "Too many unique operands; only 15 allowed; there are " + operandCount + " operands.");
                     }
                 }
             }
@@ -583,7 +583,7 @@ public class Proposition {
         /** converted logical expression string for easier back-end operations */
         private String convertedExpression;
         /** Maximum number of characters accepted in converted expression String */
-        private final short MAX_CHARACTERS = 256;
+        private final short MAX_CHARACTERS = 255;
 
         /**
          * @throws InvalidExpressionException
