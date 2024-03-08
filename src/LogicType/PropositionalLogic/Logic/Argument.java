@@ -892,29 +892,40 @@ public class Argument<M extends Model> {
                             break;
                         }
                         case "Associative Law": {
-                            String associativeLaw = "(" + ".*" + "o" + ".*" + ")" + ".*";
-                            String[] cESubstrings = subdivideExpression(cE, associativeLaw);
-                            if (cESubstrings != null) {
-                                encodings.add(new HashMap<Character, String>() {
-                                    {
-                                        put(lawOperands[0], cESubstrings[0]);
-                                        put(lawOperands[1], cESubstrings[1]);
-                                        put(lawOperands[2], cESubstrings[2]);
-                                    }
-                                });
-                            }
-                            associativeLaw = "(" + ".*" + "a" + ".*" + ")" + ".*";
-                                cESubstrings = subdivideExpression(cE, associativeLaw);
+                            String[] cESubstrings = new String[];
+                            String[] associativeLaw = new String[4];
+                            associativeLaw[0] = "(" + ".*" + "o" + ".*" + ")" + "o" + ".*";
+                            associativeLaw[1] = ".*" + "o" +"(" + ".*" + "o" + ".*" + ")";
+                            associativeLaw[2] = "(" + ".*" + "a" + ".*" + ")" + ".*";
+                            associativeLaw[3] = ".*" + "a" +"(" + ".*" + "a" + ".*" + ")";
+                            for (int i = 0; i < associativeLaw.length; i++) {
+                                cESubstrings = subdivideExpression(cE, associativeLaw[i]);
                                 if (cESubstrings != null) {
-                                    encodings.add(new HashMap<Character, String>() {
-                                        {
-                                            put(lawOperands[0], cESubstrings[0]);
-                                            put(lawOperands[1], cESubstrings[1]);
-                                            put(lawOperands[2], cESubstrings[2]);
+                                    if (i <= 2) {
+                                        if (findMatchingSubstring(cE, lawOperands[0], false) == null) {
+                                            encodings.add(new HashMap<Character, String>() {
+                                                {
+                                                    put(lawOperands[0], cESubstrings[0]);
+                                                    put(lawOperands[1], cESubstrings[1]);
+                                                    put(lawOperands[2], cESubstrings[2]);
+                                                }
+                                            });
                                         }
-                                    });
+                                    } else {
+                                        if (findMatchingSubstring(cE, lawOperands[1], false) == null) {
+                                            encodings.add(new HashMap<Character, String>() {
+                                                {
+                                                    put(lawOperands[0], cESubstrings[0]);
+                                                    put(lawOperands[1], cESubstrings[1]);
+                                                    put(lawOperands[2], cESubstrings[2]);
+                                                }
+                                            });
+                                        }
+                                    }
                                 }
                             }
+                            break;
+                        }
                         case "Commutative Law": {
                             String commutativeLaw = ".*" + "o" + ".*";
                             String[] cESubstrings = subdivideExpression(cE, commutativeLaw);
@@ -954,41 +965,44 @@ public class Argument<M extends Model> {
                             break;
                         }
                         case "Identity Law": {
-                            if (cE.contains("o")) {
-                                String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
-                                if (matchingSubstring != null) {
-
-                                }
+                            String identityLaw = ".*" + "oF";
+                            String[] cESubstrings = subdivideExpression(cE, identityLaw);
+                            if (cESubstrings != null) {
+                                encodings.add(new HashMap<Character, String>() {
+                                    {
+                                        put(lawOperands[0], cESubstrings[0]);
+                                    }
+                                });
                             }
-                            if (cE.contains("a")) {
-                                String matchingSubstring = findMatchingSubstring(cE, lawOperators[1]);
-                                if (matchingSubstring != null) {
-
-                                }
+                            identityLaw = ".*" + "aT";
+                            cESubstrings = subdivideExpression(cE, identityLaw);
+                            if (cESubstrings != null) {
+                                encodings.add(new HashMap<Character, String>() {
+                                    {
+                                        put(lawOperands[0], cESubstrings[0]);
+                                    }
+                                });
                             }
                             break;
                         }
                         case "Dominant Law": {
-                            if (cE.contains("o")) {
-                                String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
-                                if (matchingSubstring != null) {
-
-                                }
+                            String dominationLaw = ".*" + "aF";
+                            String[] cESubstrings = subdivideExpression(cE, identityLaw);
+                            if (cESubstrings != null) {
+                                encodings.add(new HashMap<Character, String>() {
+                                    {
+                                        put(lawOperands[0], cESubstrings[0]);
+                                    }
+                                });
                             }
-                            if (cE.contains("a")) {
-                                String matchingSubstring = findMatchingSubstring(cE, lawOperators[1]);
-                                if (matchingSubstring != null) {
-
-                                }
-                            }
-                            break;
-                        }
-                        case "Double Negation Law": {
-                            if (cE.contains("nn")) {
-                                String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
-                                if (matchingSubstring != null) {
-
-                                }
+                            identityLaw = ".*" + "oT";
+                            cESubstrings = subdivideExpression(cE, identityLaw);
+                            if (cESubstrings != null) {
+                                encodings.add(new HashMap<Character, String>() {
+                                    {
+                                        put(lawOperands[0], cESubstrings[0]);
+                                    }
+                                });
                             }
                             break;
                         }
@@ -1105,7 +1119,7 @@ public class Argument<M extends Model> {
 
         private void subexpressionDecoder(Map<Character, String>)
 
-        private static String findMatchingSubstring(String cE, Character operator) {
+        private static String findMatchingSubstring(String cE, Character operator, boolean countParentheses) {
             if (cE == null)
                 return null;
 
