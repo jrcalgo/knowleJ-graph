@@ -845,7 +845,7 @@ public class Argument<M extends Model> {
             return answerSet;
         }
 
-        private Map<String, ArrayList<Map<Character, String>>> subexpressionEncoder(String cE) {
+        private Map<String, ArrayList<Map<Character, String>>> expressionEncoder(String cE) {
             Map<String, ArrayList<Map<Character, String>>> encodedLawMap = new HashMap<>();
             for (String law : answerTemplate.keySet()) 
                 encodedLawMap.put(law, null);
@@ -869,7 +869,7 @@ public class Argument<M extends Model> {
                     ArrayList<Map<Character, String>> encodings = new ArrayList<>();
                     switch (law) {
                         case "Idempotent Law": {
-                            String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
+                            String matchingSubstring = findMatchingSubstring(cE, lawOperators[0], true);
                             if (matchingSubstring != null) {
                                 if (cE.equals(matchingSubstring + "o" + matchingSubstring)) {
                                     encodings.add(new HashMap<Character, String>() {
@@ -901,8 +901,8 @@ public class Argument<M extends Model> {
                             for (int i = 0; i < associativeLaw.length; i++) {
                                 cESubstrings = subdivideExpression(cE, associativeLaw[i]);
                                 if (cESubstrings != null) {
-                                    if (i <= 2) {
-                                        if (findMatchingSubstring(cE, lawOperands[0], false) == null) {
+                                    if (i <= 1) {
+                                        if (findMatchingSubstring(cE, lawOperators[0], false) == null) {
                                             encodings.add(new HashMap<Character, String>() {
                                                 {
                                                     put(lawOperands[0], cESubstrings[0]);
@@ -912,7 +912,7 @@ public class Argument<M extends Model> {
                                             });
                                         }
                                     } else {
-                                        if (findMatchingSubstring(cE, lawOperands[1], false) == null) {
+                                        if (findMatchingSubstring(cE, lawOperators[1], false) == null) {
                                             encodings.add(new HashMap<Character, String>() {
                                                 {
                                                     put(lawOperands[0], cESubstrings[0]);
@@ -927,25 +927,32 @@ public class Argument<M extends Model> {
                             break;
                         }
                         case "Commutative Law": {
-                            String commutativeLaw = ".*" + "o" + ".*";
-                            String[] cESubstrings = subdivideExpression(cE, commutativeLaw);
-                            if (cESubstrings != null) {
-                                encodings.add(new HashMap<Character, String>() {
-                                    {
-                                        put(lawOperands[0], cESubstrings[0]);
-                                        put(lawOperands[1], cESubstrings[1]);
+                            String[] commutativeLaw = new String[2];
+                            commutativeLaw[0] = ".*" + "o" + ".*";
+                            commutativeLaw[1] = ".*" + "a" + ".*";
+                            for (int i = 0; i < commutativeLaw.length; i++) {
+                                cESubstrings = subdivideExpression(cE, commutativeLaw[i]);
+                                if (cESubstrings != null) {
+                                    if (i == 0) {
+                                        if (findMatchingSubstring(cE, lawOperators[0], false) == null) {
+                                            encodings.add(new HashMap<Character, String>() {
+                                                {
+                                                    put(lawOperands[0], cESubstrings[0]);
+                                                    put(lawOperands[1], cESubstrings[1]);
+                                                }
+                                            });
+                                        }
+                                    } else {
+                                        if (findMatchingSubstring(cE, lawOperators[1], false) == null) {
+                                            encodings.add(new HashMap<Character, String>() {
+                                                {
+                                                    put(lawOperands[0], cESubstrings[0]);
+                                                    put(lawOperands[1], cESubstrings[1]);
+                                                }
+                                            });
+                                        }
                                     }
-                                });
-                            }
-                            commutativeLaw = ".*" + "a" + ".*";
-                            cESubstrings = subdivideExpression(cE, commutativeLaw);
-                            if (cESubstrings != null) {
-                                encodings.add(new HashMap<Character, String>() {
-                                    {
-                                        put(lawOperands[0], cESubstrings[0]);
-                                        put(lawOperands[1], cESubstrings[1]);
-                                    }
-                                });
+                                }
                             }
                             break;
                         }
@@ -1113,11 +1120,12 @@ public class Argument<M extends Model> {
                     
                 }
                 encodedLawMap.put(law, encodings);
+                System.gc();
             }
             return encodedLawMap;
         }
 
-        private void subexpressionDecoder(Map<Character, String>)
+        private void expressionDecoder(Map<Character, String>)
 
         private static String findMatchingSubstring(String cE, Character operator, boolean countParentheses) {
             if (cE == null)
