@@ -851,60 +851,61 @@ public class Argument<M extends Model> {
                 encodedLawMap.put(law, null);
 
             static final String[] idempotentLaw = new String[2];
-            idempotentLaw[0] = ".*" + "o" + ".*";
-            idempotentLaw[1] = ".*" + "a" + ".*";
+            idempotentLaw[0] = ".*o.*";
+            idempotentLaw[1] = ".*a.*";
 
             static final String[] associativeLaw = new String[4];
-            associativeLaw[0] = "(" + ".*" + "o" + ".*" + ")" + "o" + ".*";
-            associativeLaw[1] = ".*" + "o" +"(" + ".*" + "o" + ".*" + ")";
-            associativeLaw[2] = "(" + ".*" + "a" + ".*" + ")" + ".*";
-            associativeLaw[3] = ".*" + "a" +"(" + ".*" + "a" + ".*" + ")";
+            
+            associativeLaw[0] = "(.*o.*)o.*";
+            associativeLaw[1] = ".*o(.*o.*)";
+            associativeLaw[2] = "(.*a.*)a.*";
+            associativeLaw[3] = ".*a(.*a.*)";
 
             static final String[] commutativeLaw = new String[2];
-            commutativeLaw[0] = ".*" + "o" + ".*";
-            commutativeLaw[1] = ".*" + "a" + ".*";
+            commutativeLaw[0] = ".*o.*";
+            commutativeLaw[1] = ".*a.*";
 
-            static final String[] distributiveLaw = new String[4];
-            distributiveLaw[0] = ".*" + "o" + "(" + ".*" + "a" + ".*" + ")";
-            distributiveLaw[1] = "(" + ".*" + "o" + ".*" + ")" + "a" + "(" + ".*" + "o" + ".*" + ")";
-            distributiveLaw[2] = ".*" + "a" + "(" + ".*" + "o" + ".*" + ")";
-            distributiveLaw[3] = "(" + ".*" + "a" + ".*" + ")" + "o" + "(" + ".*" + "a" + ".*" + ")";
+            static final String[] distributiveLaw = new String[4];            
+            distributiveLaw[0] = ".*o(.*a.*)";
+            distributiveLaw[1] = "(.*o.*)a(.*o.*)";
+            distributiveLaw[2] = ".*a(.*o.*)";
+            distributiveLaw[3] = "(.*a.*)o(.*a.*)";
 
             static final String[] identityLaw = new String[2];
-            identityLaw[0] = ".*" + "o" + "F";
-            identityLaw[1] = ".*" + "a" + "T";
+            identityLaw[0] = ".*oF";
+            identityLaw[1] = ".*aT";
 
             static final String[] dominationLaw = new String[2];
-            dominationLaw[0] = ".*" + "a" + "F";
-            dominationLaw[1] = ".*" + "o" + "T";
+            dominationLaw[0] = ".*aF";
+            dominationLaw[1] = ".*oT";
 
             static final String[] complementLaw = new String[2];
-            complementLaw[0] = ".*" + "a" + "n" + ".*";
-            complementLaw[1] = ".*" + "o" + "n" + ".*";
+            complementLaw[0] = ".*an.*";
+            complementLaw[1] = ".*on.*";
 
             static final String[] deMorgansLaw = new String[4];
-            deMorgansLaw[0] = "n" + "(" + ".*" + "o" + ".*" + ")";
-            deMorgansLaw[1] = "n" + " .*" + "a" + "n" + " .*";
-            deMorgansLaw[2] = "n" + "(" + ".*" + "a" + ".*" + ")";
-            deMorgansLaw[3] = "n" + " .*" + "o" + "n" + " .*";
+            deMorgansLaw[0] = "n(.*o.*)";
+            deMorgansLaw[1] = "n.*an.*"; 
+            deMorgansLaw[2] = "n(.*a.*)";
+            deMorgansLaw[3] = "n.*on.*";
 
             static final String[] absorptionLaw = new String[2];
-            absorptionLaw[0] = ".*" + "o" + "(" + ".*" + "a" + ".*" + ")";
-            absorptionLaw[1] = ".*" + "a" + "(" + ".*" + "o" + ".*" + ")";
+            absorptionLaw[0] =  ".*o(.*a.*)";
+            absorptionLaw[1] =  ".*a(.*o.*)";
 
             static final String[] conditionalIdentity = new String[4];
-            conditionalIdentity[0] = ".*" + "m" + ".*";
-            conditionalIdentity[1] = "n" + ".*" + "o" + ".*";
-            conditionalIdentity[2] = ".*" + "i" + ".*";
-            conditionalIdentity[3] = "(" + ".*" + "m" + ".*" + ")" + "a" + "(" + ".*" + "m" + ".*" + ")";
+            conditionalIdentity[0] = ".*m.*";
+            conditionalIdentity[1] = "n.*o.*";
+            conditionalIdentity[2] = ".*i.*";
+            conditionalIdentity[3] = "(.*m.*)a(.*m.*)";
             
-            Character[] lawOperators = new Character[5];
+            static final Character[] lawOperators = new Character[5];
             lawOperators[0] = 'o';
             lawOperators[1] = 'a';
             lawOperators[2] = 'n';
             lawOperators[3] = 'm';
             lawOperators[4] = 'i';
-            Character[] lawOperands = new Character[5];
+            static final Character[] lawOperands = new Character[5];
             lawOperands[0] = 'P';
             lawOperands[1] = 'Q';
             lawOperands[2] = 'R';
@@ -1020,7 +1021,6 @@ public class Argument<M extends Model> {
                                     }
                                 });
                             }
-                            identityLaw = ".*" + "aT";
                             cESubstrings = subdivideExpression(cE, identityLaw);
                             if (cESubstrings != null) {
                                 encodings.add(new HashMap<Character, String>() {
@@ -1040,7 +1040,6 @@ public class Argument<M extends Model> {
                                     }
                                 });
                             }
-                            identityLaw = ".*" + "oT";
                             cESubstrings = subdivideExpression(cE, identityLaw);
                             if (cESubstrings != null) {
                                 encodings.add(new HashMap<Character, String>() {
