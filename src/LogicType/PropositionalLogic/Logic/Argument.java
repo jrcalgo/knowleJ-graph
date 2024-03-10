@@ -850,6 +850,54 @@ public class Argument<M extends Model> {
             for (String law : answerTemplate.keySet()) 
                 encodedLawMap.put(law, null);
 
+            static final String[] idempotentLaw = new String[2];
+            idempotentLaw[0] = ".*" + "o" + ".*";
+            idempotentLaw[1] = ".*" + "a" + ".*";
+
+            static final String[] associativeLaw = new String[4];
+            associativeLaw[0] = "(" + ".*" + "o" + ".*" + ")" + "o" + ".*";
+            associativeLaw[1] = ".*" + "o" +"(" + ".*" + "o" + ".*" + ")";
+            associativeLaw[2] = "(" + ".*" + "a" + ".*" + ")" + ".*";
+            associativeLaw[3] = ".*" + "a" +"(" + ".*" + "a" + ".*" + ")";
+
+            static final String[] commutativeLaw = new String[2];
+            commutativeLaw[0] = ".*" + "o" + ".*";
+            commutativeLaw[1] = ".*" + "a" + ".*";
+
+            static final String[] distributiveLaw = new String[4];
+            distributiveLaw[0] = ".*" + "o" + "(" + ".*" + "a" + ".*" + ")";
+            distributiveLaw[1] = "(" + ".*" + "o" + ".*" + ")" + "a" + "(" + ".*" + "o" + ".*" + ")";
+            distributiveLaw[2] = ".*" + "a" + "(" + ".*" + "o" + ".*" + ")";
+            distributiveLaw[3] = "(" + ".*" + "a" + ".*" + ")" + "o" + "(" + ".*" + "a" + ".*" + ")";
+
+            static final String[] identityLaw = new String[2];
+            identityLaw[0] = ".*" + "o" + "F";
+            identityLaw[1] = ".*" + "a" + "T";
+
+            static final String[] dominationLaw = new String[2];
+            dominationLaw[0] = ".*" + "a" + "F";
+            dominationLaw[1] = ".*" + "o" + "T";
+
+            static final String[] complementLaw = new String[2];
+            complementLaw[0] = ".*" + "a" + "n" + ".*";
+            complementLaw[1] = ".*" + "o" + "n" + ".*";
+
+            static final String[] deMorgansLaw = new String[4];
+            deMorgansLaw[0] = "n" + "(" + ".*" + "o" + ".*" + ")";
+            deMorgansLaw[1] = "n" + " .*" + "a" + "n" + " .*";
+            deMorgansLaw[2] = "n" + "(" + ".*" + "a" + ".*" + ")";
+            deMorgansLaw[3] = "n" + " .*" + "o" + "n" + " .*";
+
+            static final String[] absorptionLaw = new String[2];
+            absorptionLaw[0] = ".*" + "o" + "(" + ".*" + "a" + ".*" + ")";
+            absorptionLaw[1] = ".*" + "a" + "(" + ".*" + "o" + ".*" + ")";
+
+            static final String[] conditionalIdentity = new String[4];
+            conditionalIdentity[0] = ".*" + "m" + ".*";
+            conditionalIdentity[1] = "n" + ".*" + "o" + ".*";
+            conditionalIdentity[2] = ".*" + "i" + ".*";
+            conditionalIdentity[3] = "(" + ".*" + "m" + ".*" + ")" + "a" + "(" + ".*" + "m" + ".*" + ")";
+            
             Character[] lawOperators = new Character[5];
             lawOperators[0] = 'o';
             lawOperators[1] = 'a';
@@ -892,12 +940,7 @@ public class Argument<M extends Model> {
                             break;
                         }
                         case "Associative Law": {
-                            String[] cESubstrings = new String[];
-                            String[] associativeLaw = new String[4];
-                            associativeLaw[0] = "(" + ".*" + "o" + ".*" + ")" + "o" + ".*";
-                            associativeLaw[1] = ".*" + "o" +"(" + ".*" + "o" + ".*" + ")";
-                            associativeLaw[2] = "(" + ".*" + "a" + ".*" + ")" + ".*";
-                            associativeLaw[3] = ".*" + "a" +"(" + ".*" + "a" + ".*" + ")";
+                            String[] cESubstrings;
                             for (int i = 0; i < associativeLaw.length; i++) {
                                 cESubstrings = subdivideExpression(cE, associativeLaw[i]);
                                 if (cESubstrings != null) {
@@ -927,9 +970,6 @@ public class Argument<M extends Model> {
                             break;
                         }
                         case "Commutative Law": {
-                            String[] commutativeLaw = new String[2];
-                            commutativeLaw[0] = ".*" + "o" + ".*";
-                            commutativeLaw[1] = ".*" + "a" + ".*";
                             for (int i = 0; i < commutativeLaw.length; i++) {
                                 cESubstrings = subdivideExpression(cE, commutativeLaw[i]);
                                 if (cESubstrings != null) {
@@ -957,11 +997,6 @@ public class Argument<M extends Model> {
                             break;
                         }
                         case "Distributive Law": {
-                            String[] distributiveLaw = new String[4];
-                            distributiveLaw[0] = ".*" + "o" + "(" + ".*" + "a" + ".*" + ")";
-                            distributiveLaw[1] = "(" + ".*" + "o" + ".*" + ")" + "a" + "(" + ".*" + "o" + ".*" + ")";
-                            distributiveLaw[2] = ".*" + "a" + "(" + ".*" + "o" + ".*" + ")";
-                            distributiveLaw[3] = "(" + ".*" + "a" + ".*" + ")" + "o" + "(" + ".*" + "a" + ".*" + ")";
                             if (cE.contains("o")) {
                                 String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
                                 if (matchingSubstring != null) {
@@ -977,9 +1012,6 @@ public class Argument<M extends Model> {
                             break;
                         }
                         case "Identity Law": {
-                            String[] identityLaw = new String[];
-                            identityLaw[0] = ".*" + "oF";
-                            identityLaw[1] = ".*" + "aT";
                             String[] cESubstrings = subdivideExpression(cE, identityLaw);
                             if (cESubstrings != null) {
                                 encodings.add(new HashMap<Character, String>() {
@@ -1000,9 +1032,6 @@ public class Argument<M extends Model> {
                             break;
                         }
                         case "Domination Law": {
-                            String[] dominationLaw = new String[2];
-                            dominationLaw[0] = ".*" + "aF";
-                            dominationLaw[1] = ".*" + "oT";
                             String[] cESubstrings = subdivideExpression(cE, identityLaw);
                             if (cESubstrings != null) {
                                 encodings.add(new HashMap<Character, String>() {
