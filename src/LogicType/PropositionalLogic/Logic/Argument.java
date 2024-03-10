@@ -957,6 +957,11 @@ public class Argument<M extends Model> {
                             break;
                         }
                         case "Distributive Law": {
+                            String[] distributiveLaw = new String[4];
+                            distributiveLaw[0] = ".*" + "o" + "(" + ".*" + "a" + ".*" + ")";
+                            distributiveLaw[1] = "(" + ".*" + "o" + ".*" + ")" + "a" + "(" + ".*" + "o" + ".*" + ")";
+                            distributiveLaw[2] = ".*" + "a" + "(" + ".*" + "o" + ".*" + ")";
+                            distributiveLaw[3] = "(" + ".*" + "a" + ".*" + ")" + "o" + "(" + ".*" + "a" + ".*" + ")";
                             if (cE.contains("o")) {
                                 String matchingSubstring = findMatchingSubstring(cE, lawOperators[0]);
                                 if (matchingSubstring != null) {
@@ -972,7 +977,9 @@ public class Argument<M extends Model> {
                             break;
                         }
                         case "Identity Law": {
-                            String identityLaw = ".*" + "oF";
+                            String[] identityLaw = new String[];
+                            identityLaw[0] = ".*" + "oF";
+                            identityLaw[1] = ".*" + "aT";
                             String[] cESubstrings = subdivideExpression(cE, identityLaw);
                             if (cESubstrings != null) {
                                 encodings.add(new HashMap<Character, String>() {
@@ -992,8 +999,10 @@ public class Argument<M extends Model> {
                             }
                             break;
                         }
-                        case "Dominant Law": {
-                            String dominationLaw = ".*" + "aF";
+                        case "Domination Law": {
+                            String[] dominationLaw = new String[2];
+                            dominationLaw[0] = ".*" + "aF";
+                            dominationLaw[1] = ".*" + "oT";
                             String[] cESubstrings = subdivideExpression(cE, identityLaw);
                             if (cESubstrings != null) {
                                 encodings.add(new HashMap<Character, String>() {
@@ -1117,7 +1126,7 @@ public class Argument<M extends Model> {
                         }
                     }
                 } else {
-                    
+                    String[] equivalencies = singleOperandEquivalencies(law, cE);
                 }
                 encodedLawMap.put(law, encodings);
                 System.gc();
@@ -1125,7 +1134,7 @@ public class Argument<M extends Model> {
             return encodedLawMap;
         }
 
-        private void expressionDecoder(Map<Character, String>)
+        // private void expressionDecoder(Map<Character, String>)
 
         private static String findMatchingSubstring(String cE, Character operator, boolean countParentheses) {
             if (cE == null)
