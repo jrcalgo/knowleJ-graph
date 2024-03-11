@@ -853,46 +853,36 @@ public class Argument<M extends Model> {
             static final String[] idempotentLaw = new String[2];
             idempotentLaw[0] = ".*o.*";
             idempotentLaw[1] = ".*a.*";
-
             static final String[] associativeLaw = new String[4];
-            
             associativeLaw[0] = "(.*o.*)o.*";
             associativeLaw[1] = ".*o(.*o.*)";
             associativeLaw[2] = "(.*a.*)a.*";
             associativeLaw[3] = ".*a(.*a.*)";
-
             static final String[] commutativeLaw = new String[2];
             commutativeLaw[0] = ".*o.*";
             commutativeLaw[1] = ".*a.*";
-
             static final String[] distributiveLaw = new String[4];            
             distributiveLaw[0] = ".*o(.*a.*)";
             distributiveLaw[1] = "(.*o.*)a(.*o.*)";
             distributiveLaw[2] = ".*a(.*o.*)";
             distributiveLaw[3] = "(.*a.*)o(.*a.*)";
-
             static final String[] identityLaw = new String[2];
             identityLaw[0] = ".*oF";
             identityLaw[1] = ".*aT";
-
             static final String[] dominationLaw = new String[2];
             dominationLaw[0] = ".*aF";
             dominationLaw[1] = ".*oT";
-
             static final String[] complementLaw = new String[2];
             complementLaw[0] = ".*an.*";
             complementLaw[1] = ".*on.*";
-
             static final String[] deMorgansLaw = new String[4];
             deMorgansLaw[0] = "n(.*o.*)";
             deMorgansLaw[1] = "n.*an.*"; 
             deMorgansLaw[2] = "n(.*a.*)";
             deMorgansLaw[3] = "n.*on.*";
-
             static final String[] absorptionLaw = new String[2];
             absorptionLaw[0] =  ".*o(.*a.*)";
             absorptionLaw[1] =  ".*a(.*o.*)";
-
             static final String[] conditionalIdentity = new String[4];
             conditionalIdentity[0] = ".*m.*";
             conditionalIdentity[1] = "n.*o.*";
