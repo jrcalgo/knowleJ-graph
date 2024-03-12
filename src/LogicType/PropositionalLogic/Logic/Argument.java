@@ -766,85 +766,76 @@ public class Argument<M extends Model> {
              * ## REMEMBER: Do not store repeated evaluations in answerSet, i.e.
              */
             String cE = p.getConvertedExpression(); // easier to work with
+            Map<String, ArrayList<String>> answerSet = answerTemplate;
             Map<String, ArrayList<Map<Character, String>>> answerEncodings = expressionEncoder(cE);
-            for (String key : answerTemplate.keySet())
-                answerEncodings.put(key, null);
-            // This will have to be refactored; for each law check for each abstraction is flawed logically
+            String encoded_cE = cE;
             for (String law : answerEncodings.keySet()) {
-                if (cE.length() == 1) {
-
-                } else {
-                        for (Map<Character, String> abstraction : answerEncodings.values()) {
-                            String abstracted_cE = cE;
-                            for (Map.Entry<Character, String> entry : abstraction.entrySet()) {
-                                abstracted_cE = abstracted_cE.replace(entry.getValue(), entry.getKey().toString());
+                if (cE.length() > 1) {
+                    for (Map<Character, String> encoding : answerEncodings.get(law)) {
+                        for (Map.Entry<Character, String> entry : encoding.entrySet()) {
+                            encoded_cE = encoded_cE.replace(entry.getValue(), entry.getKey().toString());
+                        }
+                        ArrayList<String> answerDecodings = new ArrayList<>();
+                        switch (law) {
+                            case "Idempotent Law": {
+                                answerDecodings.add(expressionDecoder(idempotentLaw(encoded_cE), encoding));
+                                break;
                             }
-                            ArrayList<String> new_cE = new ArrayList<>();
-                            switch () {
-                                case "Idempotent Law": {
-                                    new_cE.add(idempotentLaw(abstracted_cE).replace("P", abstraction.get('P')));
-                                }
-                                case "Associative Law": {
-                                    new_cE.add(associativeLaw(abstracted_cE).replace("P", abstraction.get('P'))
-                                            .replace("Q", abstraction.get('Q'))
-                                            .replace("R", abstraction.get('R')));
-                                }
-                                case "Commutative Law": {
-                                    new_cE.add(commutativeLaw(abstracted_cE).replace("P", abstraction.get('P'))
-                                            .replace("Q", abstraction.get('Q')));
-                                }
-                                case "Distributive Law": {
-                                    new_cE.add(distributiveLaw(abstracted_cE).replace("P", abstraction.get('P'))
-                                            .replace("Q", abstraction.get('Q'))
-                                            .replace("R", abstraction.get('R')));
-                                }
-                                case "Identity Law": {
-                                    new_cE.add(identityLaw(abstracted_cE).replace("P", abstraction.get('P'))
-                                            .replace("T", abstraction.get('T'))
-                                            .replace("F", abstraction.get('F')));
-                                }
-                                case "Domination Law": {
-                                    new_cE.add(dominationLaw(abstracted_cE).replace("P", abstraction.get('P'))
-                                            .replace("T", abstraction.get('T'))
-                                            .replace("F", abstraction.get('F')));
-                                }
-                                case "Double Negation Law": {
-                                    new_cE.add(doubleNegationLaw(abstracted_cE).replace("P", abstraction.get('P')));
-                                }
-                                case "Complement Law": {
-                                    new_cE.add(complementLaw(abstracted_cE).replace("P", abstraction.get('P'))
-                                            .replace("T", abstraction.get('T'))
-                                            .replace("F", abstraction.get('F')));
-                                }
-                                case "DeMorgan's Law": {
-                                    new_cE.add(deMorgansLaw(abstracted_cE).replace("P", abstraction.get('P'))
-                                            .replace("Q", abstraction.get('Q')));
-                                }
-                                case "Absorption Law": {
-                                    new_cE.add(absorptionLaw(abstracted_cE).replace("P", abstraction.get('P'))
-                                            .replace("Q", abstraction.get('Q')));
-                                }
-                                case "Conditional Identity": {
-                                    new_cE.add(conditionalIdentity(abstracted_cE).replace("P", abstraction.get('P'))
-                                            .replace("Q", abstraction.get('Q')));
-                                }
+                            case "Associative Law": {
+                                answerDecodings.add(expressionDecoder(associativeLaw(encoded_cE), encoding));
+                                break;
                             }
-                            for (String law_cE : new_cE) {
-                                if (law_cE == null) {
-                                    continue;
-                                } else {
-
-                                }
+                            case "Commutative Law": {
+                                answerDecodings.add(expressionDecoder(commutativeLaw(encoded_cE), encoding));
+                                break;
                             }
-                            abstractions.remove(abstraction);
-                            if (abstractions.isEmpty()) {
-                                answerSet.put(law, law_cE_collection);
-                                System.gc();
+                            case "Distributive Law": {
+                                answerDecodings.add(expressionDecoder(distributiveLaw(encoded_cE), encoding));
+                                break;
+                            }
+                            case "Identity Law": {
+                                answerDecodings.add(expressionDecoder(identityLaw(encoded_cE), encoding));
+                                break;
+                            }
+                            case "Domination Law": {
+                                answerDecodings.add(expressionDecoder(dominationLaw(encoded_cE), encoding));
+                                break;
+                            }
+                            case "Double Negation Law": {
+                                answerDecodings.add(expressionDecoder(doubleNegationLaw(encoded_cE), encoding));
+                                break;
+                            }
+                            case "Complement Law": {
+                                answerDecodings.add(expressionDecoder(complementLaw(encoded_cE), encoding));
+                                break;
+                            }
+                            case "DeMorgan's Law": {
+                                answerDecodings.add(expressionDecoder(deMorgansLaw(encoded_cE), encoding));
+                                break;
+                            }
+                            case "Absorption Law": {
+                                answerDecodings.add(expressionDecoder(absorptionLaw(encoded_cE), encoding));
+                                break;
+                            }
+                            case "Conditional Identity": {
+                                answerDecodings.add(expressionDecoder(conditionalIdentity(encoded_cE), encoding));
+                                break;
+                            }
+                            default: {
+                                break;
                             }
                         }
+
+                        answerEncodings.get(law).remove(encoding);
+                        if (answerEncodings.get(law).isEmpty()) {
+                            answerSet.put(law, answerDecodings);
+                            encoded_cE = cE;
+                        }
+                    }
+                } else {
+
                     }
                 }
-                Map<String, ArrayList<String>> answerSet = answerTemplate;
 
             return answerSet;
         }
@@ -1135,17 +1126,21 @@ public class Argument<M extends Model> {
                             break;
                         }
                     }
+                    encodedLawMap.put(law, encodings);
                 }
-                encodedLawMap.put(law, encodings);
+                
+                
                 System.gc();
             }
             return encodedLawMap;
         }
 
-        private ArrayList<String> expressionDecoder(Map<Character, String> encoding) {
-            ArrayList<String> decodings = new ArrayList<>();
-
-            return decodings;
+        private String expressionDecoder(String cE, Map<Character, String> encodings) {
+            String decoding = "";
+            for (Map.Entry<Character, String> entry : encodings.entrySet()) {
+                decoding = cE.replaceAll(entry.getKey().toString(), entry.getValue());
+            }
+            return decoding;
         }
 
         private static String findMatchingSubstring(String cE, Character operator, boolean countParentheses) {
