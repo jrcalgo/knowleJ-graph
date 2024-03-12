@@ -893,6 +893,8 @@ public class Argument<M extends Model> {
                 'P', 'Q', 'R', 'T', 'F'
             };
             Character[] expressionOperands = findOperands(cE);
+            String[] cESubstrings;
+            String[] matchingSubstrings;
 
             for (String law : encodedLawMap.keySet()) {
                 if (cE.length() > 1) {
@@ -921,8 +923,7 @@ public class Argument<M extends Model> {
                             }
                             break;
                         }
-                        case "Associative Law": {
-                            String[] cESubstrings;
+                        case "Associative Law": {   
                             for (int i = 0; i < associativeLaw.length; i++) {
                                 cESubstrings = subdivideExpression(cE, associativeLaw[i]);
                                 if (cESubstrings != null) {
@@ -994,7 +995,7 @@ public class Argument<M extends Model> {
                             break;
                         }
                         case "Identity Law": {
-                            String[] cESubstrings = subdivideExpression(cE, identityLaw);
+                            Substrings = subdivideExpression(cE, identityLaw);
                             if (cESubstrings != null) {
                                 encodings.add(new HashMap<Character, String>() {
                                     {
@@ -1013,7 +1014,7 @@ public class Argument<M extends Model> {
                             break;
                         }
                         case "Domination Law": {
-                            String[] cESubstrings = subdivideExpression(cE, identityLaw);
+                            cESubstrings = subdivideExpression(cE, identityLaw);
                             if (cESubstrings != null) {
                                 encodings.add(new HashMap<Character, String>() {
                                     {
@@ -1137,11 +1138,14 @@ public class Argument<M extends Model> {
                 }
                 encodedLawMap.put(law, encodings);
                 System.gc();
+            }
             return encodedLawMap;
         }
 
         private ArrayList<String> expressionDecoder(Map<Character, String> encoding) {
-            
+            ArrayList<String> decodings = new ArrayList<>();
+
+            return decodings;
         }
 
         private static String findMatchingSubstring(String cE, Character operator, boolean countParentheses) {
@@ -1446,3 +1450,4 @@ public class Argument<M extends Model> {
             return equivalencies;
         }
     }
+}
