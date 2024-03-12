@@ -842,7 +842,7 @@ public class Argument<M extends Model> {
                                 System.gc();
                             }
                         }
-
+                    }
                 }
                 Map<String, ArrayList<String>> answerSet = answerTemplate;
 
@@ -855,49 +855,43 @@ public class Argument<M extends Model> {
                 encodedLawMap.put(law, null);
             }
 
-            final String[] idempotentLaw = new String[2] {
+            final String[] idempotentLaw = new String[] {
                 ".*o.*", ".*a.*"
             };
-            final String[] associativeLaw = new String[4] {
+            final String[] associativeLaw = new String[] {
                 "(.*o.*)o.*", ".*o(.*o.*)", "(.*a.*)a.*", ".*a(.*a.*)"
             };
-            final String[] commutativeLaw = new String[2] {
+            final String[] commutativeLaw = new String[] {
                 ".*o.*", ".*a.*"
             };
-            final String[] distributiveLaw = new String[4] {
+            final String[] distributiveLaw = new String[] {
                 ".*o(.*a.*)", "(.*o.*)a(.*o.*)", ".*a(.*o.*)", "(.*a.*)o(.*a.*)"
             };
-            final String[] identityLaw = new String[2] {
+            final String[] identityLaw = new String[] {
                 ".*oF", ".*aT"
             };
-            final String[] dominationLaw = new String[2] {
+            final String[] dominationLaw = new String[] {
                 ".*aF", ".*oT"
             };
-            final String[] complementLaw = new String[2] {
+            final String[] complementLaw = new String[] {
                 ".*an.*", ".*on.*"
             };
-            final String[] deMorgansLaw = new String[4] {
+            final String[] deMorgansLaw = new String[] {
                 "n(.*o.*)", "n.*an.*", "n(.*a.*)", "n.*on.*"
             };
-            final String[] absorptionLaw = new String[2] {
+            final String[] absorptionLaw = new String[] {
                 ".*o(.*a.*)", ".*a(.*o.*)"
             };
-            final String[] conditionalIdentity = new String[4] {
+            final String[] conditionalIdentity = new String[] {
                 ".*m.*", "n.*o.*", ".*i.*", "(.*m.*)a(.*m.*)"
             };
             
-            final Character[] lawOperators = new Character[5];
-            lawOperators[0] = 'o';
-            lawOperators[1] = 'a';
-            lawOperators[2] = 'n';
-            lawOperators[3] = 'm';
-            lawOperators[4] = 'i';
-            final Character[] lawOperands = new Character[5];
-            lawOperands[0] = 'P';
-            lawOperands[1] = 'Q';
-            lawOperands[2] = 'R';
-            lawOperands[3] = 'T';
-            lawOperands[4] = 'F';
+            final Character[] lawOperators = new Character[] {
+                'o', 'a', 'n', 'm', 'i'
+            };
+            final Character[] lawOperands = new Character[] {
+                'P', 'Q', 'R', 'T', 'F'
+            };
             Character[] expressionOperands = findOperands(cE);
 
             for (String law : encodedLawMap.keySet()) {
@@ -1140,12 +1134,9 @@ public class Argument<M extends Model> {
                             break;
                         }
                     }
-                } else {
-                    String[] equivalencies = singleOperandEquivalencies(law, cE);
                 }
                 encodedLawMap.put(law, encodings);
                 System.gc();
-            }
             return encodedLawMap;
         }
 
@@ -1455,4 +1446,3 @@ public class Argument<M extends Model> {
             return equivalencies;
         }
     }
-}
