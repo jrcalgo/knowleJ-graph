@@ -499,7 +499,7 @@ public class Argument<M extends Model> {
             return answerSet;
         }
 
-        private ArrayList<Map<Character, String>> subexpressionAbstraction(String law, String[] cE) {
+        private Map<String, ArrayList<Map<Character, String>>> argumentEncoder(Argument<Model> a) {
             Character[] lawOperators;
             Character[] lawOperands;
             Character[][] premiseOperands;
@@ -542,6 +542,10 @@ public class Argument<M extends Model> {
                 }
             }
             return abstractions;
+        }
+
+        private ArrayList<String> argumentDecoder(Map<Character, String> encoding) {
+
         }
 
         private String findMatchingSubstring(String cE, String operator) {
@@ -762,15 +766,15 @@ public class Argument<M extends Model> {
              * ## REMEMBER: Do not store repeated evaluations in answerSet, i.e.
              */
             String cE = p.getConvertedExpression(); // easier to work with
-            Map<String, ArrayList<Map<Character, String>>> answerAbstractions = subexpressionEncoder(cE);
+            Map<String, ArrayList<Map<Character, String>>> answerEncodings = expressionEncoder(cE);
             for (String key : answerTemplate.keySet())
-                answerAbstractions.put(key, null);
+                answerEncodings.put(key, null);
             // This will have to be refactored; for each law check for each abstraction is flawed logically
-            for (String law : answerAbstractions.keySet()) {
+            for (String law : answerEncodings.keySet()) {
                 if (cE.length() == 1) {
 
                 } else {
-                        for (Map<Character, String> abstraction : answerAbstractions.values()) {
+                        for (Map<Character, String> abstraction : answerEncodings.values()) {
                             String abstracted_cE = cE;
                             for (Map.Entry<Character, String> entry : abstraction.entrySet()) {
                                 abstracted_cE = abstracted_cE.replace(entry.getValue(), entry.getKey().toString());
@@ -847,55 +851,48 @@ public class Argument<M extends Model> {
 
         private Map<String, ArrayList<Map<Character, String>>> expressionEncoder(String cE) {
             Map<String, ArrayList<Map<Character, String>>> encodedLawMap = new HashMap<>();
-            for (String law : answerTemplate.keySet()) 
+            for (String law : answerTemplate.keySet()) {
                 encodedLawMap.put(law, null);
+            }
 
-            static final String[] idempotentLaw = new String[2];
-            idempotentLaw[0] = ".*o.*";
-            idempotentLaw[1] = ".*a.*";
-            static final String[] associativeLaw = new String[4];
-            associativeLaw[0] = "(.*o.*)o.*";
-            associativeLaw[1] = ".*o(.*o.*)";
-            associativeLaw[2] = "(.*a.*)a.*";
-            associativeLaw[3] = ".*a(.*a.*)";
-            static final String[] commutativeLaw = new String[2];
-            commutativeLaw[0] = ".*o.*";
-            commutativeLaw[1] = ".*a.*";
-            static final String[] distributiveLaw = new String[4];            
-            distributiveLaw[0] = ".*o(.*a.*)";
-            distributiveLaw[1] = "(.*o.*)a(.*o.*)";
-            distributiveLaw[2] = ".*a(.*o.*)";
-            distributiveLaw[3] = "(.*a.*)o(.*a.*)";
-            static final String[] identityLaw = new String[2];
-            identityLaw[0] = ".*oF";
-            identityLaw[1] = ".*aT";
-            static final String[] dominationLaw = new String[2];
-            dominationLaw[0] = ".*aF";
-            dominationLaw[1] = ".*oT";
-            static final String[] complementLaw = new String[2];
-            complementLaw[0] = ".*an.*";
-            complementLaw[1] = ".*on.*";
-            static final String[] deMorgansLaw = new String[4];
-            deMorgansLaw[0] = "n(.*o.*)";
-            deMorgansLaw[1] = "n.*an.*"; 
-            deMorgansLaw[2] = "n(.*a.*)";
-            deMorgansLaw[3] = "n.*on.*";
-            static final String[] absorptionLaw = new String[2];
-            absorptionLaw[0] =  ".*o(.*a.*)";
-            absorptionLaw[1] =  ".*a(.*o.*)";
-            static final String[] conditionalIdentity = new String[4];
-            conditionalIdentity[0] = ".*m.*";
-            conditionalIdentity[1] = "n.*o.*";
-            conditionalIdentity[2] = ".*i.*";
-            conditionalIdentity[3] = "(.*m.*)a(.*m.*)";
+            final String[] idempotentLaw = new String[2] {
+                ".*o.*", ".*a.*"
+            };
+            final String[] associativeLaw = new String[4] {
+                "(.*o.*)o.*", ".*o(.*o.*)", "(.*a.*)a.*", ".*a(.*a.*)"
+            };
+            final String[] commutativeLaw = new String[2] {
+                ".*o.*", ".*a.*"
+            };
+            final String[] distributiveLaw = new String[4] {
+                ".*o(.*a.*)", "(.*o.*)a(.*o.*)", ".*a(.*o.*)", "(.*a.*)o(.*a.*)"
+            };
+            final String[] identityLaw = new String[2] {
+                ".*oF", ".*aT"
+            };
+            final String[] dominationLaw = new String[2] {
+                ".*aF", ".*oT"
+            };
+            final String[] complementLaw = new String[2] {
+                ".*an.*", ".*on.*"
+            };
+            final String[] deMorgansLaw = new String[4] {
+                "n(.*o.*)", "n.*an.*", "n(.*a.*)", "n.*on.*"
+            };
+            final String[] absorptionLaw = new String[2] {
+                ".*o(.*a.*)", ".*a(.*o.*)"
+            };
+            final String[] conditionalIdentity = new String[4] {
+                ".*m.*", "n.*o.*", ".*i.*", "(.*m.*)a(.*m.*)"
+            };
             
-            static final Character[] lawOperators = new Character[5];
+            final Character[] lawOperators = new Character[5];
             lawOperators[0] = 'o';
             lawOperators[1] = 'a';
             lawOperators[2] = 'n';
             lawOperators[3] = 'm';
             lawOperators[4] = 'i';
-            static final Character[] lawOperands = new Character[5];
+            final Character[] lawOperands = new Character[5];
             lawOperands[0] = 'P';
             lawOperands[1] = 'Q';
             lawOperands[2] = 'R';
@@ -1152,7 +1149,9 @@ public class Argument<M extends Model> {
             return encodedLawMap;
         }
 
-        // private void expressionDecoder(Map<Character, String>)
+        private ArrayList<String> expressionDecoder(Map<Character, String> encoding) {
+            
+        }
 
         private static String findMatchingSubstring(String cE, Character operator, boolean countParentheses) {
             if (cE == null)
