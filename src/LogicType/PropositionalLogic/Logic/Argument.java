@@ -949,122 +949,83 @@ public class Argument<M extends Model> {
                             for (int i = 0; i < distributiveLaw.length; i++) {
                                 if (cE.matches(distributiveLaw[i])) {
                                     cESubstrings = subdivideExpressionCharacters(cE, distributiveLaw[i]);
-                                    if 
-                                }
-                                cESubstrings = matchExpressionToRegex(cE, distributiveLaw[i]);
-                                if (cE.matches(distributiveLaw[i])) {
-                                    if (i == 0) {
-
+                                    if (findMatchingSubstringPairs(cE, cESubstrings) == null) {
+                                        encodings.add(new HashMap<Character, String>() {
+                                            {
+                                                put(lawOperands[0], cESubstrings[0]);
+                                                put(lawOperands[1], cESubstrings[1]);
+                                                put(lawOperands[2], cESubstrings[2]);
+                                            }
+                                        });
                                     }
-                                }
-                            }
-                            if (cE.contains("o")) {
-                                String matchingSubstring = findMatchingSubstringPairs(cE, lawOperators[0]);
-                                if (matchingSubstring != null) {
-
-                                }
-                            }
-                            if (cE.contains("a")) {
-                                String matchingSubstring = findMatchingSubstringPairs(cE, lawOperators[1]);
-                                if (matchingSubstring != null) {
-
                                 }
                             }
                             break;
                         }
                         case "Identity Law": {
-                            Substrings = matchExpressionToRegex(cE, identityLaw);
-                            if (cESubstrings != null) {
-                                encodings.add(new HashMap<Character, String>() {
-                                    {
-                                        put(lawOperands[0], cESubstrings[0]);
-                                    }
-                                });
-                            }
-                            cESubstrings = matchExpressionToRegex(cE, identityLaw);
-                            if (cESubstrings != null) {
-                                encodings.add(new HashMap<Character, String>() {
-                                    {
-                                        put(lawOperands[0], cESubstrings[0]);
-                                    }
-                                });
+                            for (int i = 0; i < identityLaw.length; i++) {
+                                if (cE.matches(identityLaw[i])) {
+                                    cESubstrings = subdivideExpressionCharacters(cE, identityLaw[i]);
+                                    encodings.add(new HashMap<Character, String>() {
+                                        {
+                                            put(lawOperands[0], cESubstrings[0]);
+                                        }
+                                    });  
+                                }
                             }
                             break;
                         }
                         case "Domination Law": {
-                            cESubstrings = matchExpressionToRegex(cE, identityLaw);
-                            if (cESubstrings != null) {
-                                encodings.add(new HashMap<Character, String>() {
-                                    {
-                                        put(lawOperands[0], cESubstrings[0]);
-                                    }
-                                });
-                            }
-                            cESubstrings = matchExpressionToRegex(cE, identityLaw);
-                            if (cESubstrings != null) {
-                                encodings.add(new HashMap<Character, String>() {
-                                    {
-                                        put(lawOperands[0], cESubstrings[0]);
-                                    }
-                                });
+                            for (int i = 0; i < dominationLaw.length; i++) {
+                                if (cE.matches(dominationLaw[i])) {
+                                    cESubstrings = subdivideExpressionCharacters(cE, dominationLaw[i]);
+                                    encodings.add(new HashMap<Character, String>() {
+                                        {
+                                            put(lawOperands[0], cESubstrings[0]);
+                                        }
+                                    });
+                                }
                             }
                             break;
                         }
-                        // case "Complement Law": {
-                        //     if (cE.contains("on")) {
-                        //         String matchingSubstring = findMatchingSubstringPairs(cE, lawOperators[0]);
-                        //         if (matchingSubstring != null) {
-                        //             if (cE.equals(matchingSubstring + "on" + matchingSubstring)) {
-                        //                 encodings.add(new HashMap<Character, String>() {
-                        //                     {
-                        //                         put(lawOperands[0], matchingSubstring);
-                        //                     }
-                        //                 });
-                        //             }
-                        //         }
-                        //     }
-                            
-                                    
-                                
-                            
-                        //     // if (cE.contains("an")) {
-                        //     //     String matchingSubstring = findMatchingSubstringPairs(cE, lawOperators[1]);
-                        //     //     if (matchingSubstring != null) {
-                        //     //         if (cE.equals(matchingSubstring + "an" + matchingSubstring)) {
-                        //     //             encodings.add(new HashMap<Character, String>() {
-                        //     //                 {
-                        //     //                     put(lawOperands[0], matchingSubstring);
-                        //     //                 }
-                        //     //             });
-                        //     //         }
-                        //     //     }
-                        //     // }
-
-                        //     // abstractionLawMap.put(law, encodings);
-                        //     // break;
-                        // }
+                        case "Complement Law": {
+                            for (int i = 0; i < complementLaw.length; i++) {
+                                if (cE.matches(complementLaw[i])) {
+                                    cESubstrings = subdivideExpressionCharacters(cE, complementLaw[i]);
+                                    if (findMatchingSubstringPairs(cE, cESubstrings) != null) {
+                                        encodings.add(new HashMap<Character, String>() {
+                                            {
+                                                put(lawOperands[0], cESubstrings[0]);
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                            break;
+                        }
                         case "DeMorgan's Law": {
-                            if (cE.contains("o")) {
-                                String matchingSubstring = findMatchingSubstringPairs(cE, lawOperators[0]);
-                                if (matchingSubstring != null) {
-
-                                }
-                            }
-                            if (cE.contains("a")) {
-                                String matchingSubstring = findMatchingSubstringPairs(cE, lawOperators[1]);
-                                if (matchingSubstring != null) {
-
-                                }
-                            }
-                            if (cE.contains("n")) {
-                                String matchingSubstring = findMatchingSubstringPairs(cE, lawOperators[2]);
-                                if (matchingSubstring != null) {
-
+                            for (int i = 0; i < deMorgansLaw.length; i++) {
+                                if (cE.matches(deMorgansLaw[i])) {
+                                    cESubstrings = subdivideExpressionCharacters(cE, deMorgansLaw[i]);
+                                    if (findMatchingSubstringPairs(cE, cESubstrings) == null) {
+                                        encodings.add(new HashMap<Character, String>() {
+                                            {
+                                                put(lawOperands[0], cESubstrings[0]);
+                                                put(lawOperands[1], cESubstrings[1]);
+                                            }
+                                        });
+                                    }
                                 }
                             }
                             break;
                         }
                         case "Absorption Law": {
+                            for (int i = 0; i < absorptionLaw.length; i++) {
+                                if (cE.matches(absorptionLaw[i])) {
+                                    cESubstrings = subdivideExpressionCharacters(cE, absorptionLaw[i]);
+                                    if ()
+                                }
+                            }
                             if (cE.contains("o")) {
                                 String matchingSubstring = findMatchingSubstringPairs(cE, lawOperators[0]);
                                 if (matchingSubstring != null) {
