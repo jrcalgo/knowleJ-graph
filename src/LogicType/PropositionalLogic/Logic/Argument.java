@@ -87,7 +87,8 @@ public class Argument<M extends Model> {
             for (int i = 0; i < this.knowledgeBase.length; i++) {
                 Proposition p = new Proposition(this.knowledgeBase[i].getExpression());
                 this.allTruthValues[rows][operandCount + i] = p.evaluateExpression(valueMap);
-                this.allTruthTable[rows + 1][operandCount + i] = this.allTruthValues[rows][operandCount + i] ? "T" : "F";
+                this.allTruthTable[rows + 1][operandCount + i] = this.allTruthValues[rows][operandCount + i] ? "T"
+                        : "F";
             }
             valueMap.clear();
 
@@ -206,17 +207,20 @@ public class Argument<M extends Model> {
     // }
 
     /**
-     * in other words, is there a valid argument to be had in the current knowledge base for a query that is also in the current knowledge base
+     * in other words, is there a valid argument to be had in the current knowledge
+     * base for a query that is also in the current knowledge base
+     * 
      * @param kbQuery
      * @return
      * @throws InvalidExpressionException
      * @throws InvalidOperandException
      * @throws InvalidLogicOperatorException
      */
-    public boolean isValidArgument(String kbQuery) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+    public boolean isValidArgument(String kbQuery)
+            throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (kbQuery == null || kbQuery.length() == 0)
             throw new IllegalArgumentException("String query cannot be null or empty.");
-        
+
         boolean foundQuery = false;
         String[] kbExpressions = this.getKnowledgeBaseExpressions();
         for (String premise : kbExpressions) {
@@ -251,8 +255,8 @@ public class Argument<M extends Model> {
     public <G> G deduce(Proposition query, G returnType) {
         if (query == null)
             throw new IllegalArgumentException("Proposition query cannot be null or empty.");
-        
-        ArrayList<String> qOperands = query.getSentences(0, query.getOperandCount()-1);
+
+        ArrayList<String> qOperands = query.getSentences(0, query.getOperandCount() - 1);
         boolean commonOperand = false;
         for (String qOp : qOperands) {
             for (char op : this.operands) {
@@ -276,7 +280,7 @@ public class Argument<M extends Model> {
         ArrayList<ArrayList<String>> deductionPaths = new ArrayList<>();
         InferenceLaws inferences = new InferenceLaws();
         EquivalencyLaws equivalencies = new EquivalencyLaws();
-        
+
         DirectedDeductionGraph dg = new DirectedDeductionGraph(this.getKnowledgeBaseExpressions(), query);
 
         return bidirectionalIterativeDeepeningSearch(dg);
@@ -577,9 +581,11 @@ public class Argument<M extends Model> {
          */
         private String modusPonens(String[] premises) {
             String conclusion = null;
-            if ((premises[0].equals("P") && premises[1].equals("PmQ")) || (premises[0].equals("PmQ") && premises[1].equals("P"))) 
+            if ((premises[0].equals("P") && premises[1].equals("PmQ"))
+                    || (premises[0].equals("PmQ") && premises[1].equals("P")))
                 conclusion = "Q";
-            else if ((premises[0].equals("Q") && premises[1].equals("QmP")) || (premises[0].equals("QmP") && premises[1].equals("Q")))
+            else if ((premises[0].equals("Q") && premises[1].equals("QmP"))
+                    || (premises[0].equals("QmP") && premises[1].equals("Q")))
                 conclusion = "P";
 
             return conclusion;
@@ -612,7 +618,7 @@ public class Argument<M extends Model> {
          */
         private String addition(String premise) {
             String conclusion = null;
-            if (premise.equals("P")) 
+            if (premise.equals("P"))
                 conclusion = "PoQ";
             else if (premise.equals("Q"))
                 conclusion = "QoP";
@@ -630,7 +636,7 @@ public class Argument<M extends Model> {
             String conclusion = null;
             if (premises[0].equals("PaQ"))
                 conclusion = "P";
-            else if (premises[0].equals("QaP")) 
+            else if (premises[0].equals("QaP"))
                 conclusion = "Q";
 
             return conclusion;
@@ -660,11 +666,14 @@ public class Argument<M extends Model> {
          */
         private String hypotheticalSyllogism(String[] premises) {
             String conclusion = null;
-            if ((premises[0].equals("PmQ") && premises[1].equals("QmR")) || (premises[0].equals("QmR") && premises[1].equals("PmQ")))
+            if ((premises[0].equals("PmQ") && premises[1].equals("QmR"))
+                    || (premises[0].equals("QmR") && premises[1].equals("PmQ")))
                 conclusion = "PmR";
-            else if ((premises[0].equals("QmR") && premises[1].equals("RmP")) || (premises[0].equals("RmP") && premises[1].equals("QmR")))
+            else if ((premises[0].equals("QmR") && premises[1].equals("RmP"))
+                    || (premises[0].equals("RmP") && premises[1].equals("QmR")))
                 conclusion = "QmP";
-            else if ((premises[0].equals("RmP") && premises[1].equals("PmQ")) || (premises[0].equals("PmQ") && premises[1].equals("RmP")))
+            else if ((premises[0].equals("RmP") && premises[1].equals("PmQ"))
+                    || (premises[0].equals("PmQ") && premises[1].equals("RmP")))
                 conclusion = "RmQ";
 
             return conclusion;
@@ -837,12 +846,6 @@ public class Argument<M extends Model> {
                 }
             }
 
-            for (String law : answerSet.keySet()) {
-                if (answerSet.get(law).isEmpty() || answerSet.get(law) == null) {
-                    answerSet.remove(law);
-                }
-            }
-
             return answerSet;
         }
 
@@ -853,45 +856,42 @@ public class Argument<M extends Model> {
             }
 
             final String[] idempotentLaw = new String[] {
-                ".*o.*", ".*a.*"
+                    ".*o.*", ".*a.*"
             };
             final String[] associativeLaw = new String[] {
-                "(.*o.*)o.*", ".*o(.*o.*)", "(.*a.*)a.*", ".*a(.*a.*)"
+                    "(.*o.*)o.*", ".*o(.*o.*)", "(.*a.*)a.*", ".*a(.*a.*)"
             };
             final String[] commutativeLaw = new String[] {
-                ".*o.*", ".*a.*"
+                    ".*o.*", ".*a.*"
             };
             final String[] distributiveLaw = new String[] {
-                ".*o(.*a.*)", "(.*o.*)a(.*o.*)", ".*a(.*o.*)", "(.*a.*)o(.*a.*)"
+                    ".*o(.*a.*)", "(.*o.*)a(.*o.*)", ".*a(.*o.*)", "(.*a.*)o(.*a.*)"
             };
             final String[] identityLaw = new String[] {
-                ".*oF", ".*aT"
+                    ".*oF", ".*aT"
             };
             final String[] dominationLaw = new String[] {
-                ".*aF", ".*oT"
+                    ".*aF", ".*oT"
             };
             final String[] complementLaw = new String[] {
-                ".*an.*", ".*on.*"
+                    ".*an.*", ".*on.*"
             };
             final String[] deMorgansLaw = new String[] {
-                "n(.*o.*)", "n.*an.*", "n(.*a.*)", "n.*on.*"
+                    "n(.*o.*)", "n.*an.*", "n(.*a.*)", "n.*on.*"
             };
             final String[] absorptionLaw = new String[] {
-                ".*o(.*a.*)", ".*a(.*o.*)"
+                    ".*o(.*a.*)", ".*a(.*o.*)"
             };
             final String[] conditionalIdentity = new String[] {
-                ".*m.*", "n.*o.*", ".*i.*", "(.*m.*)a(.*m.*)"
+                    ".*m.*", "n.*o.*", ".*i.*", "(.*m.*)a(.*m.*)"
             };
-            
+
             final Character[] lawOperators = new Character[] {
-                'o', 'a', 'n', 'm', 'i'
+                    'o', 'a', 'n', 'm', 'i'
             };
             final Character[] lawOperands = new Character[] {
-                'P', 'Q', 'R', 'T', 'F'
+                    'P', 'Q', 'R', 'T', 'F'
             };
-            Character[] expressionOperands = findOperands(cE);
-            String[] cESubstrings;
-            String[] matchingSubstrings;
 
             for (String law : encodedLawMap.keySet()) {
                 if (cE.length() > 1) {
@@ -900,22 +900,22 @@ public class Argument<M extends Model> {
                         case "Idempotent Law": {
                             for (int i = 0; i < idempotentLaw.length; i++) {
                                 if (cE.matches(idempotentLaw[i])) {
-                                    cESubstrings = subdivideExpressionCharacters(cE, idempotentLaw[i]);
+                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, idempotentLaw[i]);
                                     if (cESubstrings[0].equals(cESubstrings[1])) {
                                         encodings.add(new HashMap<Character, String>() {
                                             {
                                                 put(lawOperands[0], cESubstrings[0]);
                                             }
                                         });
-                                    } 
+                                    }
                                 }
                             }
                             break;
                         }
-                        case "Associative Law": {   
+                        case "Associative Law": {
                             for (int i = 0; i < associativeLaw.length; i++) {
                                 if (cE.matches(associativeLaw[i])) {
-                                    cESubstrings = subdivideExpressionCharacters(cE, associativeLaw[i]);
+                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, associativeLaw[i]);
                                     if (findMatchingSubstringPairs(cE, cESubstrings) == null) {
                                         encodings.add(new HashMap<Character, String>() {
                                             {
@@ -932,7 +932,7 @@ public class Argument<M extends Model> {
                         case "Commutative Law": {
                             for (int i = 0; i < commutativeLaw.length; i++) {
                                 if (cE.matches(commutativeLaw[i])) {
-                                    cESubstrings = subdivideExpressionCharacters(cE, commutativeLaw[i]);
+                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, commutativeLaw[i]);
                                     if (findMatchingSubstringPairs(cE, cESubstrings) == null) {
                                         encodings.add(new HashMap<Character, String>() {
                                             {
@@ -948,15 +948,57 @@ public class Argument<M extends Model> {
                         case "Distributive Law": {
                             for (int i = 0; i < distributiveLaw.length; i++) {
                                 if (cE.matches(distributiveLaw[i])) {
-                                    cESubstrings = subdivideExpressionCharacters(cE, distributiveLaw[i]);
-                                    if (findMatchingSubstringPairs(cE, cESubstrings) == null) {
-                                        encodings.add(new HashMap<Character, String>() {
-                                            {
-                                                put(lawOperands[0], cESubstrings[0]);
-                                                put(lawOperands[1], cESubstrings[1]);
-                                                put(lawOperands[2], cESubstrings[2]);
+                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, distributiveLaw[i]);
+                                    if (i == 0 || i == 2) {
+                                        if (findMatchingSubstringPairs(cE, cESubstrings) == null) {
+                                            encodings.add(new HashMap<Character, String>() {
+                                                {
+                                                    put(lawOperands[0], cESubstrings[0]);
+                                                    put(lawOperands[1], cESubstrings[1]);
+                                                    put(lawOperands[2], cESubstrings[2]);
+                                                }
+                                            });
+                                        }
+                                    } else {
+                                        if (findMatchingSubstringPairs(cE, cESubstrings) != null) {
+                                            if (cESubstrings[0].equals(cESubstrings[2])
+                                                    && !cESubstrings[1].equals(cESubstrings[3])) {
+                                                encodings.add(new HashMap<Character, String>() {
+                                                    {
+                                                        put(lawOperands[0], cESubstrings[0]);
+                                                        put(lawOperands[1], cESubstrings[1]);
+                                                        put(lawOperands[2], cESubstrings[3]);
+                                                    }
+                                                });
+                                            } else if (cESubstrings[1].equals(cESubstrings[2])
+                                                    && !cESubstrings[0].equals(cESubstrings[3])) {
+                                                encodings.add(new HashMap<Character, String>() {
+                                                    {
+                                                        put(lawOperands[0], cESubstrings[1]);
+                                                        put(lawOperands[1], cESubstrings[0]);
+                                                        put(lawOperands[2], cESubstrings[3]);
+                                                    }
+                                                });
+                                            } else if (cESubstrings[0].equals(cESubstrings[3])
+                                                    && !cESubstrings[1].equals(cESubstrings[2])) {
+                                                encodings.add(new HashMap<Character, String>() {
+                                                    {
+                                                        put(lawOperands[0], cESubstrings[0]);
+                                                        put(lawOperands[1], cESubstrings[1]);
+                                                        put(lawOperands[2], cESubstrings[2]);
+                                                    }
+                                                });
+                                            } else if (cESubstrings[1].equals(cESubstrings[3])
+                                                    && !cESubstrings[0].equals(cESubstrings[2])) {
+                                                encodings.add(new HashMap<Character, String>() {
+                                                    {
+                                                        put(lawOperands[0], cESubstrings[1]);
+                                                        put(lawOperands[1], cESubstrings[0]);
+                                                        put(lawOperands[2], cESubstrings[2]);
+                                                    }
+                                                });
                                             }
-                                        });
+                                        }
                                     }
                                 }
                             }
@@ -965,12 +1007,12 @@ public class Argument<M extends Model> {
                         case "Identity Law": {
                             for (int i = 0; i < identityLaw.length; i++) {
                                 if (cE.matches(identityLaw[i])) {
-                                    cESubstrings = subdivideExpressionCharacters(cE, identityLaw[i]);
+                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, identityLaw[i]);
                                     encodings.add(new HashMap<Character, String>() {
                                         {
                                             put(lawOperands[0], cESubstrings[0]);
                                         }
-                                    });  
+                                    });
                                 }
                             }
                             break;
@@ -978,7 +1020,7 @@ public class Argument<M extends Model> {
                         case "Domination Law": {
                             for (int i = 0; i < dominationLaw.length; i++) {
                                 if (cE.matches(dominationLaw[i])) {
-                                    cESubstrings = subdivideExpressionCharacters(cE, dominationLaw[i]);
+                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, dominationLaw[i]);
                                     encodings.add(new HashMap<Character, String>() {
                                         {
                                             put(lawOperands[0], cESubstrings[0]);
@@ -991,7 +1033,7 @@ public class Argument<M extends Model> {
                         case "Complement Law": {
                             for (int i = 0; i < complementLaw.length; i++) {
                                 if (cE.matches(complementLaw[i])) {
-                                    cESubstrings = subdivideExpressionCharacters(cE, complementLaw[i]);
+                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, complementLaw[i]);
                                     if (findMatchingSubstringPairs(cE, cESubstrings) != null) {
                                         encodings.add(new HashMap<Character, String>() {
                                             {
@@ -1006,7 +1048,7 @@ public class Argument<M extends Model> {
                         case "DeMorgan's Law": {
                             for (int i = 0; i < deMorgansLaw.length; i++) {
                                 if (cE.matches(deMorgansLaw[i])) {
-                                    cESubstrings = subdivideExpressionCharacters(cE, deMorgansLaw[i]);
+                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, deMorgansLaw[i]);
                                     if (findMatchingSubstringPairs(cE, cESubstrings) == null) {
                                         encodings.add(new HashMap<Character, String>() {
                                             {
@@ -1022,53 +1064,57 @@ public class Argument<M extends Model> {
                         case "Absorption Law": {
                             for (int i = 0; i < absorptionLaw.length; i++) {
                                 if (cE.matches(absorptionLaw[i])) {
-                                    cESubstrings = subdivideExpressionCharacters(cE, absorptionLaw[i]);
-                                    if ()
-                                }
-                            }
-                            if (cE.contains("o")) {
-                                String matchingSubstring = findMatchingSubstringPairs(cE, lawOperators[0]);
-                                if (matchingSubstring != null) {
-
-                                }
-                            }
-                            if (cE.contains("a")) {
-                                String matchingSubstring = findMatchingSubstringPairs(cE, lawOperators[1]);
-                                if (matchingSubstring != null) {
-
+                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, absorptionLaw[i]);
+                                    if (findMatchingSubstringPairs(cE, cESubstrings) != null) {
+                                        if (cESubstrings[0].equals(cESubstrings[1])
+                                                && !cESubstrings[2].equals(cESubstrings[0])) {
+                                            encodings.add(new HashMap<Character, String>() {
+                                                {
+                                                    put(lawOperands[0], cESubstrings[0]);
+                                                    put(lawOperands[1], cESubstrings[2]);
+                                                }
+                                            });
+                                        } else if (cESubstrings[0].equals(cESubstrings[2])
+                                                && !cESubstrings[1].equals(cESubstrings[0])) {
+                                            encodings.add(new HashMap<Character, String>() {
+                                                {
+                                                    put(lawOperands[0], cESubstrings[0]);
+                                                    put(lawOperands[1], cESubstrings[1]);
+                                                }
+                                            });
+                                        }
+                                    }
                                 }
                             }
                             break;
                         }
                         case "Conditional Identity": {
-                            if (cE.contains("o")) {
-                                String matchingSubstring = findMatchingSubstringPairs(cE, lawOperators[0]);
-                                if (matchingSubstring != null) {
-
-                                }
-                            }
-                            if (cE.contains("a")) {
-                                String matchingSubstring = findMatchingSubstringPairs(cE, lawOperators[1]);
-                                if (matchingSubstring != null) {
-
-                                }
-                            }
-                            if (cE.contains("n")) {
-                                String matchingSubstring = findMatchingSubstringPairs(cE, lawOperators[2]);
-                                if (matchingSubstring != null) {
-
-                                }
-                            }
-                            if (cE.contains("m")) {
-                                String matchingSubstring = findMatchingSubstringPairs(cE, lawOperators[3]);
-                                if (matchingSubstring != null) {
-
-                                }
-                            }
-                            if (cE.contains("i")) {
-                                String matchingSubstring = findMatchingSubstringPairs(cE, lawOperators[4]);
-                                if (matchingSubstring != null) {
-
+                            for (int i = 0; i < conditionalIdentity.length; i++) {
+                                if (cE.matches(conditionalIdentity[i])) {
+                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, conditionalIdentity[i]);
+                                    if (i <= 2) {
+                                        if (findMatchingSubstringPairs(cE, cESubstrings) == null) {
+                                            encodings.add(new HashMap<Character, String>() {
+                                                {
+                                                    put(lawOperands[0], cESubstrings[0]);
+                                                    put(lawOperands[1], cESubstrings[1]);
+                                                }
+                                            });
+                                        }
+                                    } else {
+                                        if (findMatchingSubstringPairs(cE, cESubstrings) != null) {
+                                            if (cESubstrings[0].equals(cESubstrings[3])
+                                                    && cESubstrings[1].equals(cESubstrings[2])
+                                                    && !cESubstrings[0].equals(cESubstrings[1])) {
+                                                encodings.add(new HashMap<Character, String>() {
+                                                    {
+                                                        put(lawOperands[0], cESubstrings[0]);
+                                                        put(lawOperands[1], cESubstrings[1]);
+                                                    }
+                                                });
+                                            } 
+                                        }
+                                    }
                                 }
                             }
                             break;
@@ -1076,9 +1122,15 @@ public class Argument<M extends Model> {
                     }
                     encodedLawMap.put(law, encodings);
                 }
-
                 System.gc();
             }
+
+            for (String law : encodedLawMap.keySet()) {
+                if (encodedLawMap.get(law).isEmpty() || encodedLawMap.get(law) == null) {
+                    encodedLawMap.remove(law);
+                }
+            }
+
             return encodedLawMap;
         }
 
@@ -1112,9 +1164,9 @@ public class Argument<M extends Model> {
         }
 
         private static String[] subdivideExpressionCharacters(String cE, String regex) {
-            if (cE == null) 
+            if (cE == null)
                 return null;
-            
+
             if (fromIndex < 0 || toIndex > cE.length()) {
                 return null;
             } else if (fromIndex > toIndex) {
