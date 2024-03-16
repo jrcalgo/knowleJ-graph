@@ -886,9 +886,6 @@ public class Argument<M extends Model> {
                     ".*m.*", "n.*o.*", ".*i.*", "(.*m.*)a(.*m.*)"
             };
 
-            final Character[] lawOperators = new Character[] {
-                    'o', 'a', 'n', 'm', 'i'
-            };
             final Character[] lawOperands = new Character[] {
                     'P', 'Q', 'R', 'T', 'F'
             };
@@ -916,7 +913,7 @@ public class Argument<M extends Model> {
                             for (int i = 0; i < associativeLaw.length; i++) {
                                 if (cE.matches(associativeLaw[i])) {
                                     final String[] cESubstrings = subdivideExpressionCharacters(cE, associativeLaw[i]);
-                                    if (findMatchingSubstringPairs(cE, cESubstrings) == null) {
+                                    if (!findMatchingSubstringPairs(cESubstrings)) {
                                         encodings.add(new HashMap<Character, String>() {
                                             {
                                                 put(lawOperands[0], cESubstrings[0]);
@@ -933,7 +930,7 @@ public class Argument<M extends Model> {
                             for (int i = 0; i < commutativeLaw.length; i++) {
                                 if (cE.matches(commutativeLaw[i])) {
                                     final String[] cESubstrings = subdivideExpressionCharacters(cE, commutativeLaw[i]);
-                                    if (findMatchingSubstringPairs(cE, cESubstrings) == null) {
+                                    if (!findMatchingSubstringPairs(cESubstrings)) {
                                         encodings.add(new HashMap<Character, String>() {
                                             {
                                                 put(lawOperands[0], cESubstrings[0]);
@@ -950,7 +947,7 @@ public class Argument<M extends Model> {
                                 if (cE.matches(distributiveLaw[i])) {
                                     final String[] cESubstrings = subdivideExpressionCharacters(cE, distributiveLaw[i]);
                                     if (i == 0 || i == 2) {
-                                        if (findMatchingSubstringPairs(cE, cESubstrings) == null) {
+                                        if (!findMatchingSubstringPairs(cESubstrings)) {
                                             encodings.add(new HashMap<Character, String>() {
                                                 {
                                                     put(lawOperands[0], cESubstrings[0]);
@@ -960,7 +957,7 @@ public class Argument<M extends Model> {
                                             });
                                         }
                                     } else {
-                                        if (findMatchingSubstringPairs(cE, cESubstrings) != null) {
+                                        if (findMatchingSubstringPairs(cESubstrings)) {
                                             if (cESubstrings[0].equals(cESubstrings[2])
                                                     && !cESubstrings[1].equals(cESubstrings[3])) {
                                                 encodings.add(new HashMap<Character, String>() {
@@ -1034,7 +1031,7 @@ public class Argument<M extends Model> {
                             for (int i = 0; i < complementLaw.length; i++) {
                                 if (cE.matches(complementLaw[i])) {
                                     final String[] cESubstrings = subdivideExpressionCharacters(cE, complementLaw[i]);
-                                    if (findMatchingSubstringPairs(cE, cESubstrings) != null) {
+                                    if (findMatchingSubstringPairs(cESubstrings)) {
                                         encodings.add(new HashMap<Character, String>() {
                                             {
                                                 put(lawOperands[0], cESubstrings[0]);
@@ -1049,7 +1046,7 @@ public class Argument<M extends Model> {
                             for (int i = 0; i < deMorgansLaw.length; i++) {
                                 if (cE.matches(deMorgansLaw[i])) {
                                     final String[] cESubstrings = subdivideExpressionCharacters(cE, deMorgansLaw[i]);
-                                    if (findMatchingSubstringPairs(cE, cESubstrings) == null) {
+                                    if (!findMatchingSubstringPairs(cESubstrings)) {
                                         encodings.add(new HashMap<Character, String>() {
                                             {
                                                 put(lawOperands[0], cESubstrings[0]);
@@ -1065,7 +1062,7 @@ public class Argument<M extends Model> {
                             for (int i = 0; i < absorptionLaw.length; i++) {
                                 if (cE.matches(absorptionLaw[i])) {
                                     final String[] cESubstrings = subdivideExpressionCharacters(cE, absorptionLaw[i]);
-                                    if (findMatchingSubstringPairs(cE, cESubstrings) != null) {
+                                    if (findMatchingSubstringPairs(cESubstrings)) {
                                         if (cESubstrings[0].equals(cESubstrings[1])
                                                 && !cESubstrings[2].equals(cESubstrings[0])) {
                                             encodings.add(new HashMap<Character, String>() {
@@ -1091,9 +1088,10 @@ public class Argument<M extends Model> {
                         case "Conditional Identity": {
                             for (int i = 0; i < conditionalIdentity.length; i++) {
                                 if (cE.matches(conditionalIdentity[i])) {
-                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, conditionalIdentity[i]);
+                                    final String[] cESubstrings = subdivideExpressionCharacters(cE,
+                                            conditionalIdentity[i]);
                                     if (i <= 2) {
-                                        if (findMatchingSubstringPairs(cE, cESubstrings) == null) {
+                                        if (!findMatchingSubstringPairs(cESubstrings)) {
                                             encodings.add(new HashMap<Character, String>() {
                                                 {
                                                     put(lawOperands[0], cESubstrings[0]);
@@ -1102,7 +1100,7 @@ public class Argument<M extends Model> {
                                             });
                                         }
                                     } else {
-                                        if (findMatchingSubstringPairs(cE, cESubstrings) != null) {
+                                        if (findMatchingSubstringPairs(cESubstrings)) {
                                             if (cESubstrings[0].equals(cESubstrings[3])
                                                     && cESubstrings[1].equals(cESubstrings[2])
                                                     && !cESubstrings[0].equals(cESubstrings[1])) {
@@ -1112,7 +1110,7 @@ public class Argument<M extends Model> {
                                                         put(lawOperands[1], cESubstrings[1]);
                                                     }
                                                 });
-                                            } 
+                                            }
                                         }
                                     }
                                 }
@@ -1142,25 +1140,19 @@ public class Argument<M extends Model> {
             return decoding;
         }
 
-        private static String findMatchingSubstringPairs(String cE, String[] substrings) {
-            if (cE == null || substrings == null)
-                return null;
+        private static boolean findMatchingSubstringPairs(String[] substrings) {
+            if (substrings == null)
+                throw new IllegalArgumentException();
 
-            String[] cESubstrings = cE.split(operator.toString());
-
-            if (cESubstrings.length < 2) {
-                return null;
-            }
-
-            for (int i = 0; i < cESubstrings.length; i++) {
-                for (int j = cESubstrings.length; j > 0; j--) {
+            for (int i = 0; i < substrings.length; i++) {
+                for (int j = substrings.length; j > 0; j--) {
                     if (j == i)
                         break;
-                    if (cESubstrings[i].equals(cESubstrings[j]))
-                        return cESubstrings[i];
+                    if (substrings[i].equals(substrings[j]))
+                        return true;
                 }
             }
-            return null;
+            return false;
         }
 
         private static String[] subdivideExpressionCharacters(String cE, String regex) {
@@ -1382,6 +1374,10 @@ public class Argument<M extends Model> {
         }
 
         private String[] singleOperandEquivalencies(String law, String cE) {
+            if (cE.length() > 1) {
+                return null;
+            }
+
             String[] equivalencies = null;
             switch (law) {
                 case "Idempotent Law": {
