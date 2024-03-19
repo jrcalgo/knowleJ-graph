@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 import src.DataStructures.DirectedDeductionGraph;
 import src.DataStructures.DeductionGraphNode;
@@ -743,10 +745,6 @@ public class Argument<M extends Model> {
             }
         };
 
-        public EquivalencyLaws() {
-            super();
-        }
-
         /**
          * 
          * @param p A single propositional expression
@@ -838,6 +836,7 @@ public class Argument<M extends Model> {
                         answerEncodings.get(law).remove(encoding);
                         if (answerEncodings.get(law).isEmpty()) {
                             answerSet.put(law, answerDecodings);
+                            answerDecodings.clear();
                             encoded_cE = cE;
                         }
                     }
@@ -1156,31 +1155,24 @@ public class Argument<M extends Model> {
         }
 
         private static String[] subdivideExpressionCharacters(String cE, String regex) {
-            if (cE == null)
+            if (cE == null || regex == null)
                 return null;
 
-            if (fromIndex < 0 || toIndex > cE.length()) {
-                return null;
-            } else if (fromIndex > toIndex) {
-                return null;
-            }
-            String[] cESubstrings = cE.split(cE.substring(fromIndex, toIndex));
-            if (cESubstrings == null) {
+            if (!cE.matches(regex)) {
                 return null;
             } else {
-                return cESubstrings;
-            }
-        }
+                ArrayList<String> cESubstrings = new ArrayList<>();
+                Pattern pattern = Pattern.compile(regex);
+                Matcher matcher = pattern.matcher(cE);
 
-        private static Character[] findOperands(String e) {
-            ArrayList<Character> operands = new ArrayList<>();
-            for (int i = 0; i < e.length(); i++) {
-                if (Character.isUpperCase(e.charAt(i))) {
-                    operands.add(e.charAt(i));
+                while (matcher.find()) {
+                    for (int i = 1; i <= matcher.groupCount(); i++) {
+                        cESubstrings.add(matcher.group(i));
+                    }
                 }
-            }
 
-            return operands.toArray(new Character[operands.size()]);
+                return cESubstrings.toArray(new String[cESubstrings.size()]);
+            }
         }
 
         /**
