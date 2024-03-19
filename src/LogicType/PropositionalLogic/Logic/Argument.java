@@ -506,10 +506,37 @@ public class Argument<M extends Model> {
         }
 
         private Map<String, ArrayList<Map<Character, String>>> argumentEncoder(Argument<Model> a) {
-            Character[] lawOperators;
-            Character[] lawOperands;
-            Character[][] premiseOperands;
-            ArrayList<Map<Character, String>> encoded = null;
+            Map<String, ArrayList<Map<Character, String>>> encodedLawMap = new HashMap<>();
+            for (String law : answerTemplate.keySet()) {
+                encodedLawMap.put(law, null);
+            }
+
+            final String[] modusPonens = new String[] {
+                ".*", ".*m.*"
+            };
+            final String[] modusTollens = new String[] {
+                "n.*", ".*m.*"
+            };
+            final String[] addition = new String[] {
+                ".*"
+            };
+            final String[] simplification = new String[] {
+                ".*a.*"
+            };
+            final String[] conjunction = new String[] {
+                ".*", ".*"
+            };
+            final String[] hypotheticalSyllogism = new String[] {
+                ".*m.*", ".*m.*"
+            };
+            final String[] disjunctiveSyllogism = new String[] {
+                ".*o.*", "n.*"
+            };
+            final String[] resolution = new String[] {
+                ".*o.*", "n.*o.*"
+            };
+            
+
             switch (law) {
                 case "Modus Ponens": {
                     for (String conversion : kbConversions) {
@@ -1158,21 +1185,18 @@ public class Argument<M extends Model> {
             if (cE == null || regex == null)
                 return null;
 
-            if (!cE.matches(regex)) {
-                return null;
-            } else {
-                ArrayList<String> cESubstrings = new ArrayList<>();
-                Pattern pattern = Pattern.compile(regex);
-                Matcher matcher = pattern.matcher(cE);
+            ArrayList<String> cESubstrings = new ArrayList<>();
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(cE);
 
-                while (matcher.find()) {
-                    for (int i = 1; i <= matcher.groupCount(); i++) {
-                        cESubstrings.add(matcher.group(i));
-                    }
+            while (matcher.find()) {
+                for (int i = 1; i <= matcher.groupCount(); i++) {
+                    cESubstrings.add(matcher.group(i));
                 }
-
-                return cESubstrings.toArray(new String[cESubstrings.size()]);
             }
+
+            return cESubstrings.toArray(new String[cESubstrings.size()]);
+        
         }
 
         /**
