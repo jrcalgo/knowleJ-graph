@@ -489,13 +489,60 @@ public class Argument<M extends Model> {
             }
 
             Map<String, ArrayList<String>> answerSet = answerTemplate;
-            Map<Character, String> subExpressions = new HashMap<>();
-            ArrayList<String> returnedLawExpressions = new ArrayList<>();
-            boolean foundLaw = false;
-            for (String law : answerSet.keySet()) {
-                subExpressions.clear();
-                returnedLawExpressions.clear();
-                foundLaw = false;
+            Map<Character, ArrayList<Map<Character, String>>> answerEncodings = argumentEncoder(kbConversions);
+            String[] encoded_kb = kbConversions;
+            for (String law : answerEncodings.keySet()) {
+                for (Map<Character, String> encoding : answerEncodings.get(law)) {
+                    for (Map.Entry<Character, String> entry : encoding.entrySet()) {
+                        for (int i = 0; i < encoded_kb.length; i++) 
+                            encoded_kb[i] = encoded_kb[i].replace(entry.getValue(), entry.getKey().toString());
+                    }
+                    ArrayList<String> answerDecodings = new ArrayList<>();
+                    switch(law) {
+                        case "Modus Ponens": {
+                            answerDecodings.add(argumentDecoder(modusPonens(encoded_kb), encoding));
+                            break;
+                        }
+                        case "Modus Tollens": {
+                            answerDecodings.add(argumentDecoder(modusTollens(encoded_kb), encoding));
+                            break;
+                        }
+                        case "Addition": {
+                            answerDecodings.add(argumentDecoder(addition(encoded_kb), encoding));
+                            break;
+                        }
+                        case "Simplification": {
+                            answerDecodings.add(argumentDecoder(simplification(encoded_kb), encoding));
+                            break;
+                        }
+                        case "Conjunction": {
+                            answerDecodings.add(argumentDecoder(conjunction(encoded_kb), encoding));
+                            break;
+                        }
+                        case "Hypothetical Syllogism": {
+                            answerDecodings.add(argumentDecoder(hypotheticalSyllogism(encoded_kb), encoding));
+                            break;
+                        }
+                        case "Disjunctive Syllogism": {
+                            answerDecodings.add(argumentDecoder(disjunctiveSyllogism(encoded_kb), encoding));
+                            break;
+                        }
+                        case "Resolution": {
+                            answerDecodings.add(argumentDecoder(resolution(encoded_kb), encoding));
+                            break;
+                        }
+                        default: {
+                            break;
+                        }
+                    }
+
+                    answerEncodings.get(law).remove(encoding);
+                    if (answerEncodings.get(law).isEmpty()) {
+                        answerSet.put(law, answerDecodings);
+                        answerDecodings.clear();
+                        encoded_kb = kbConversions;
+                    }
+                }       
             }
             
             return answerSet;
@@ -540,28 +587,36 @@ public class Argument<M extends Model> {
                 ArrayList<Map<Character, String>> encodings = new ArrayList<>();
                 switch (law) {
                     case "Modus Ponens": {
-                        
+                    
+                        break;
                     }
                     case "Modus Tollens": {
-
+                    
+                        break;
                     }
                     case "Addition": {
-
+                    
+                        break;
                     }
                     case "Simplification": {
-
+                    
+                        break;
                     }
                     case "Conjunction": {
-
+                    
+                        break;
                     }
                     case "Hypothetical Syllogism": {
-
+                    
+                        break;
                     }
                     case "Disjunctive Syllogism": {
-
+                    
+                        break;
                     }
                     case "Resolution": {
-
+                    
+                        break;
                     }
                 }
                 encodedLawMap.put(law, encodings);
@@ -569,7 +624,7 @@ public class Argument<M extends Model> {
             return encodedLawMap;
         }
 
-        private ArrayList<String> argumentDecoder(Argument<Model> a,Map<Character, String> encoding) {
+        private ArrayList<String> argumentDecoder(String[] kb, Map<Character, String> encoding) {
 
             return null;
         }
