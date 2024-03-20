@@ -476,10 +476,6 @@ public class Argument<M extends Model> {
             }
         };
 
-        public InferenceLaws() {
-            super();
-        }
-
         /**
          * 
          * @param arg an Argument object containing given knowledge base and each successive deduction; knowledge history
@@ -505,7 +501,7 @@ public class Argument<M extends Model> {
             return answerSet;
         }
 
-        private Map<String, ArrayList<Map<Character, String>>> argumentEncoder(Argument<Model> a) {
+        private Map<String, ArrayList<Map<Character, String>>> argumentEncoder(String[] cEs) {
             Map<String, ArrayList<Map<Character, String>>> encodedLawMap = new HashMap<>();
             for (String law : answerTemplate.keySet()) {
                 encodedLawMap.put(law, null);
@@ -535,50 +531,47 @@ public class Argument<M extends Model> {
             final String[] resolution = new String[] {
                 ".*o.*", "n.*o.*"
             };
+
+            final Character[] lawOperands = new Character[] {
+                'P', 'Q', 'R'
+            };
             
-
-            switch (law) {
-                case "Modus Ponens": {
-                    for (String conversion : kbConversions) {
-                        if (conversion.contains("m")) {
-                            foundLaw = true;
-                            break;
-                        }
+            for (String law : encodedLawMap.keySet()) {
+                ArrayList<Map<Character, String>> encodings = new ArrayList<>();
+                switch (law) {
+                    case "Modus Ponens": {
+                        
                     }
-                    if (foundLaw) {
+                    case "Modus Tollens": {
 
                     }
-                }
-                case "Modus Tollens": {
+                    case "Addition": {
 
-                }
-                case "Addition": {
+                    }
+                    case "Simplification": {
 
-                }
-                case "Simplification": {
+                    }
+                    case "Conjunction": {
 
-                }
-                case "Conjunction": {
+                    }
+                    case "Hypothetical Syllogism": {
 
-                }
-                case "Hypothetical Syllogism": {
+                    }
+                    case "Disjunctive Syllogism": {
 
-                }
-                case "Disjunctive Syllogism": {
+                    }
+                    case "Resolution": {
 
+                    }
                 }
-                case "Resolution": {
-
-                }
-                default: {
-                    return null;
-                }
+                encodedLawMap.put(law, encodings);
             }
-            return abstractions;
+            return encodedLawMap;
         }
 
-        private ArrayList<String> argumentDecoder(Map<Character, String> encoding) {
+        private ArrayList<String> argumentDecoder(Argument<Model> a,Map<Character, String> encoding) {
 
+            return null;
         }
 
         private String findMatchingSubstringPairs(String cE, String operator) {
