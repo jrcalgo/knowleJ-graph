@@ -544,6 +544,10 @@ public class Argument<M extends Model> {
                     }
                 }       
             }
+            for (String law : answerTemplate.keySet()) {
+                if (answerSet.get(law) == null) 
+                    answerSet.remove(law);
+            }
             
             return answerSet;
         }
@@ -918,6 +922,10 @@ public class Argument<M extends Model> {
                 } else {
 
                 }
+            }
+            for (String law : answerTemplate.keySet()) {
+                if (answerSet.get(law) == null) 
+                    answerSet.remove(law);
             }
 
             return answerSet;
