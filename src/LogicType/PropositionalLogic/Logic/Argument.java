@@ -510,7 +510,6 @@ public class Argument<M extends Model> {
                         case "Addition": {
                             if (encoded_kb.length == 1)
                                 answerDecodings.add(argumentDecoder(addition(encoded_kb[0]), encoding));
-
                             break;
                         }
                         case "Simplification": {
@@ -546,11 +545,6 @@ public class Argument<M extends Model> {
                     }
                 }       
             }
-            for (String law : answerTemplate.keySet()) {
-                if (answerSet.get(law) == null) 
-                    answerSet.remove(law);
-            }
-            
             return answerSet;
         }
 
@@ -585,96 +579,110 @@ public class Argument<M extends Model> {
                 ArrayList<Map<Character, String>> encodings = new ArrayList<>();
                 switch (law) {
                     case "Modus Ponens": {
-                        final String[] kb2Substrings = subdivideExpressionCharacters(kb[1], modusPonens[1]);
-                        if (kb[0].equals(kb2Substrings[0]) && !kb[0].equals(kb2Substrings[1])) {
-                            encodings.add(new HashMap<Character, String>() {
-                                {
-                                    put(lawOperands[0], kb[0]);
-                                    put(lawOperands[1], kb2Substrings[1]);
-                                }
-                            });
+                        if (kb.length == 2) {
+                            final String[] kb2Substrings = subdivideExpressionCharacters(kb[1], modusPonens[1]);
+                            if (kb[0].equals(kb2Substrings[0]) && !kb[0].equals(kb2Substrings[1])) {
+                                encodings.add(new HashMap<Character, String>() {
+                                    {
+                                        put(lawOperands[0], kb[0]);
+                                        put(lawOperands[1], kb2Substrings[1]);
+                                    }
+                                });
+                            }
                         }
                         break;
                     }
                     case "Modus Tollens": {
-                        final String[] kb2Substrings = subdivideExpressionCharacters(kb[1], modusTollens[1]);
-                        if (kb[0].equals(kb2Substrings[1]) && !kb[0].equals(kb2Substrings[0])) {
-                            encodings.add(new HashMap<Character, String>() {
-                                {
-                                    put(lawOperands[0], kb2Substrings[0]);
-                                    put(lawOperands[1], kb[0]);
-                                }
-                            });
+                        if (kb.length == 2) {
+                            final String[] kb2Substrings = subdivideExpressionCharacters(kb[1], modusTollens[1]);
+                            if (kb[0].equals(kb2Substrings[1]) && !kb[0].equals(kb2Substrings[0])) {
+                                encodings.add(new HashMap<Character, String>() {
+                                    {
+                                        put(lawOperands[0], kb2Substrings[0]);
+                                        put(lawOperands[1], kb[0]);
+                                    }
+                                });
+                            }
                         }
                         break;
                     }
                     case "Addition": {
-                        
+                        if (kb.length == 1) {
 
-
+                        }
                         break;
                     }
                     case "Simplification": {
-                        final String[] kb1Substrings = subdivideExpressionCharacters(kb[0], simplification);
-                        if (!kb1Substrings[0].equals(kb1Substrings[1])) {
-                            encodings.add(new HashMap<Character, String>() {
-                                {
-                                    put(lawOperands[0], kb1Substrings[0]);
-                                    put(lawOperands[1], kb1Substrings[1]);
-                                }
-                            });
+                        if (kb.length == 2) {
+                            final String[] kb1Substrings = subdivideExpressionCharacters(kb[0], simplification);
+                            if (!kb1Substrings[0].equals(kb1Substrings[1])) {
+                                encodings.add(new HashMap<Character, String>() {
+                                    {
+                                        put(lawOperands[0], kb1Substrings[0]);
+                                        put(lawOperands[1], kb1Substrings[1]);
+                                    }
+                                });
+                            }
                         }
                         break;
                     }
                     case "Conjunction": {
-                        if (!kb[0].equals(kb[1])) {
-                            encodings.add(new HashMap<Character, String>() {
-                                {
-                                    put(lawOperands[0], kb[0]);
-                                    put(lawOperands[1], kb[1]);
-                                }
-                            });
-                        }   
+                        if (kb.length == 2) { 
+                            if (!kb[0].equals(kb[1])) {
+                                encodings.add(new HashMap<Character, String>() {
+                                    {
+                                        put(lawOperands[0], kb[0]);
+                                        put(lawOperands[1], kb[1]);
+                                    }
+                                });
+                            }     
+                        } 
                         break;
                     }
                     case "Hypothetical Syllogism": {
-                        final String[] kb1Substrings = subdivideExpressionCharacters(kb[0], hypotheticalSyllogism[0]);
-                        final String[] kb2Substrings = subdivideExpressionCharacters(kb[1], hypotheticalSyllogism[1]);
-                        if (!kb1Substrings[0].equals(kb1Substrings[1]) && !kb1Substrings[0].equals(kb2Substrings[1]) && !kb2Substrings[0].equals(kb2Substrings[1]) && kb1Substrings[1].equals(kb2Substrings[0])) {
-                            encodings.add(new HashMap<Character, String>() {
-                                {
-                                    put(lawOperands[0], kb1Substrings[0]);
-                                    put(lawOperands[1], kb1Substrings[1]);
-                                    put(lawOperands[2], kb2Substrings[1]);
-                                }
-                            });
+                        if (kb.length == 2) {
+                            final String[] kb1Substrings = subdivideExpressionCharacters(kb[0], hypotheticalSyllogism[0]);
+                            final String[] kb2Substrings = subdivideExpressionCharacters(kb[1], hypotheticalSyllogism[1]);
+                            if (!kb1Substrings[0].equals(kb1Substrings[1]) && !kb1Substrings[0].equals(kb2Substrings[1]) && !kb2Substrings[0].equals(kb2Substrings[1]) && kb1Substrings[1].equals(kb2Substrings[0])) {
+                                encodings.add(new HashMap<Character, String>() {
+                                    {
+                                        put(lawOperands[0], kb1Substrings[0]);
+                                        put(lawOperands[1], kb1Substrings[1]);
+                                        put(lawOperands[2], kb2Substrings[1]);
+                                    }
+                                });
+                            }
                         }
                         break;
                     }
                     case "Disjunctive Syllogism": {
-                        final String[] kb1Substrings = subdivideExpressionCharacters(kb[0], disjunctiveSyllogism[0]);
-                        final String[] kb2Substrings = subdivideExpressionCharacters(kb[1], disjunctiveSyllogism[1]);
-                        if (!kb1Substrings[0].equals(kb1Substrings[1]) && kb1Substrings[0].equals(kb2Substrings[0])) {
-                            encodings.add(new HashMap<Character, String>() {
-                                {
-                                    put(lawOperands[0], kb1Substrings[0]);
-                                    put(lawOperands[1], kb1Substrings[1]);
-                                }
-                            });
+                        if (kb.length == 2) {
+                            final String[] kb1Substrings = subdivideExpressionCharacters(kb[0], disjunctiveSyllogism[0]);
+                            final String[] kb2Substrings = subdivideExpressionCharacters(kb[1], disjunctiveSyllogism[1]);
+                            if (!kb1Substrings[0].equals(kb1Substrings[1]) && kb1Substrings[0].equals(kb2Substrings[0])) {
+                                encodings.add(new HashMap<Character, String>() {
+                                    {
+                                        put(lawOperands[0], kb1Substrings[0]);
+                                        put(lawOperands[1], kb1Substrings[1]);
+                                    }
+                                });
+                            }
                         }
                         break;
                     }
                     case "Resolution": {
-                        final String[] kb1Substrings = subdivideExpressionCharacters(kb[0], resolution[0]);
-                        final String[] kb2Substrings = subdivideExpressionCharacters(kb[1], resolution[1]);
-                        if (!kb1Substrings[0].equals(kb1Substrings[1]) && !kb1Substrings[0].equals(kb2Substrings[1]) && !kb1Substrings[1].equals(kb2Substrings[1]) && kb1Substrings[0].equals(kb2Substrings[0])) {
-                            encodings.add(new HashMap<Character, String>() {
-                                {
-                                    put(lawOperands[0], kb1Substrings[0]);
-                                    put(lawOperands[1], kb1Substrings[1]);
-                                    put(lawOperands[2], kb2Substrings[1]);
-                                }
-                            });
+                        if (kb.length == 2) {
+                            final String[] kb1Substrings = subdivideExpressionCharacters(kb[0], resolution[0]);
+                            final String[] kb2Substrings = subdivideExpressionCharacters(kb[1], resolution[1]);
+                            if (!kb1Substrings[0].equals(kb1Substrings[1]) && !kb1Substrings[0].equals(kb2Substrings[1]) && !kb1Substrings[1].equals(kb2Substrings[1]) && kb1Substrings[0].equals(kb2Substrings[0])) {
+                                encodings.add(new HashMap<Character, String>() {
+                                    {
+                                        put(lawOperands[0], kb1Substrings[0]);
+                                        put(lawOperands[1], kb1Substrings[1]);
+                                        put(lawOperands[2], kb2Substrings[1]);
+                                    }
+                                });
+                            }
                         }
                         break;
                     }
@@ -682,6 +690,12 @@ public class Argument<M extends Model> {
                 encodedLawMap.put(law, encodings);
                 System.gc();
             }
+
+            for (String law : encodedLawMap.keySet()) {
+                if (encodedLawMap.get(law) == null) 
+                    encodedLawMap.remove(law);
+            }
+
             return encodedLawMap;
         }
 
@@ -996,10 +1010,6 @@ public class Argument<M extends Model> {
                 } else {
 
                 }
-            }
-            for (String law : answerTemplate.keySet()) {
-                if (answerSet.get(law) == null) 
-                    answerSet.remove(law);
             }
 
             return answerSet;
