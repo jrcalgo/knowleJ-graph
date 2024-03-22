@@ -198,7 +198,7 @@ public class Proposition {
                                         result);
                                 break;
                             }
-                            case "i": { // TODO: Needs to be debugged, not outputting correct results
+                            case "i": {
                                 result = operator.iff(leftOperand, rightOperand);
                                 expression = expression.replaceFirst(expression.substring(index - 1, index + 2),
                                         result);
@@ -241,37 +241,49 @@ public class Proposition {
         return answer;
     }
 
-    public String inverse(String p) throws InvalidExpressionException {
-        if (!p.contains("->") || !p.contains("m"))
+    /**
+     * Form: P->Q == ~P->~Q
+     * @return all possible inverses of current proposition.
+     */
+    public String[] inverse() throws InvalidExpressionException {
+        if (!this.expression.getConvertedExpression().contains("m"))
             throw new InvalidExpressionException("Invalid proposition; must contain implication");
 
-        if (p.contains("->")) {
-
-        } else if (p.contains("m")) {
+        String[] inverses = null;
+        for (Character m : this.expression.getConvertedExpression().toCharArray()) {
 
         }
+        return inverses;
     }
 
-    public String converse(String p) throws InvalidExpressionException {
-        if (!p.contains("->") || !p.contains("m"))
+    /**
+     * Form: P->Q == Q->P
+     * @return all possible converses of current proposition.
+     */
+    public String[] converse() throws InvalidExpressionException {
+        if (!this.expression.getConvertedExpression().contains("m"))
             throw new InvalidExpressionException("Invalid proposition; must contain implication");
 
-        if (p.contains("->")) {
-
-        } else if (p.contains("m")) {
+        String[] converses = null;
+        for (Character m : this.expression.getConvertedExpression().toCharArray()) {
 
         }
+        return converses;
     }
 
-    public String contrapositive(String p) throws InvalidExpressionException {
-        if (!p.contains("->") || !p.contains("m"))
+    /**
+     * Form: P->Q == ~Q->~P
+     * @return all possible contrapositives of current proposition.
+     */
+    public String[] contrapositive() throws InvalidExpressionException {
+        if (!this.expression.getConvertedExpression().contains("m"))
             throw new InvalidExpressionException("Invalid proposition; must contain implication");
 
-        if (p.contains("->")) {
-
-        } else if (p.contains("m")) {
-
+        String[] contrapositives = null;
+        for (Character m : this.expression.getConvertedExpression().toCharArray()) {
+            
         }
+        return contrapositives;
     }
 
     public String getExpression() {
