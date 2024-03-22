@@ -580,12 +580,12 @@ public class Argument<M extends Model> {
                 switch (law) {
                     case "Modus Ponens": {
                         if (kb.length == 2) {
-                            final String[] kb2Substrings = subdivideExpressionCharacters(kb[1], modusPonens[1]);
-                            if (kb[0].equals(kb2Substrings[0]) && !kb[0].equals(kb2Substrings[1])) {
+                            final String[] premise2Substrings = subdivideExpressionCharacters(kb[1], modusPonens[1]);
+                            if (kb[0].equals(premise2Substrings[0]) && !kb[0].equals(premise2Substrings[1])) {
                                 encodings.add(new HashMap<Character, String>() {
                                     {
                                         put(lawOperands[0], kb[0]);
-                                        put(lawOperands[1], kb2Substrings[1]);
+                                        put(lawOperands[1], premise2Substrings[1]);
                                     }
                                 });
                             }
@@ -594,11 +594,11 @@ public class Argument<M extends Model> {
                     }
                     case "Modus Tollens": {
                         if (kb.length == 2) {
-                            final String[] kb2Substrings = subdivideExpressionCharacters(kb[1], modusTollens[1]);
-                            if (kb[0].equals(kb2Substrings[1]) && !kb[0].equals(kb2Substrings[0])) {
+                            final String[] premise2Substrings = subdivideExpressionCharacters(kb[1], modusTollens[1]);
+                            if (kb[0].equals(premise2Substrings[1]) && !kb[0].equals(premise2Substrings[0])) {
                                 encodings.add(new HashMap<Character, String>() {
                                     {
-                                        put(lawOperands[0], kb2Substrings[0]);
+                                        put(lawOperands[0], premise2Substrings[0]);
                                         put(lawOperands[1], kb[0]);
                                     }
                                 });
@@ -614,12 +614,12 @@ public class Argument<M extends Model> {
                     }
                     case "Simplification": {
                         if (kb.length == 2) {
-                            final String[] kb1Substrings = subdivideExpressionCharacters(kb[0], simplification);
-                            if (!kb1Substrings[0].equals(kb1Substrings[1])) {
+                            final String[] premise1Substrings = subdivideExpressionCharacters(kb[0], simplification);
+                            if (!premise1Substrings[0].equals(premise1Substrings[1])) {
                                 encodings.add(new HashMap<Character, String>() {
                                     {
-                                        put(lawOperands[0], kb1Substrings[0]);
-                                        put(lawOperands[1], kb1Substrings[1]);
+                                        put(lawOperands[0], premise1Substrings[0]);
+                                        put(lawOperands[1], premise1Substrings[1]);
                                     }
                                 });
                             }
@@ -641,14 +641,14 @@ public class Argument<M extends Model> {
                     }
                     case "Hypothetical Syllogism": {
                         if (kb.length == 2) {
-                            final String[] kb1Substrings = subdivideExpressionCharacters(kb[0], hypotheticalSyllogism[0]);
-                            final String[] kb2Substrings = subdivideExpressionCharacters(kb[1], hypotheticalSyllogism[1]);
-                            if (!kb1Substrings[0].equals(kb1Substrings[1]) && !kb1Substrings[0].equals(kb2Substrings[1]) && !kb2Substrings[0].equals(kb2Substrings[1]) && kb1Substrings[1].equals(kb2Substrings[0])) {
+                            final String[] premise1Substrings = subdivideExpressionCharacters(kb[0], hypotheticalSyllogism[0]);
+                            final String[] premise2Substrings = subdivideExpressionCharacters(kb[1], hypotheticalSyllogism[1]);
+                            if (!premise1Substrings[0].equals(premise1Substrings[1]) && !premise1Substrings[0].equals(premise2Substrings[1]) && !premise2Substrings[0].equals(premise2Substrings[1]) && premise1Substrings[1].equals(premise2Substrings[0])) {
                                 encodings.add(new HashMap<Character, String>() {
                                     {
-                                        put(lawOperands[0], kb1Substrings[0]);
-                                        put(lawOperands[1], kb1Substrings[1]);
-                                        put(lawOperands[2], kb2Substrings[1]);
+                                        put(lawOperands[0], premise1Substrings[0]);
+                                        put(lawOperands[1], premise1Substrings[1]);
+                                        put(lawOperands[2], premise2Substrings[1]);
                                     }
                                 });
                             }
@@ -657,13 +657,13 @@ public class Argument<M extends Model> {
                     }
                     case "Disjunctive Syllogism": {
                         if (kb.length == 2) {
-                            final String[] kb1Substrings = subdivideExpressionCharacters(kb[0], disjunctiveSyllogism[0]);
-                            final String[] kb2Substrings = subdivideExpressionCharacters(kb[1], disjunctiveSyllogism[1]);
-                            if (!kb1Substrings[0].equals(kb1Substrings[1]) && kb1Substrings[0].equals(kb2Substrings[0])) {
+                            final String[] premise1Substrings = subdivideExpressionCharacters(kb[0], disjunctiveSyllogism[0]);
+                            final String[] premise2Substrings = subdivideExpressionCharacters(kb[1], disjunctiveSyllogism[1]);
+                            if (!premise1Substrings[0].equals(premise1Substrings[1]) && premise1Substrings[0].equals(premise2Substrings[0])) {
                                 encodings.add(new HashMap<Character, String>() {
                                     {
-                                        put(lawOperands[0], kb1Substrings[0]);
-                                        put(lawOperands[1], kb1Substrings[1]);
+                                        put(lawOperands[0], premise1Substrings[0]);
+                                        put(lawOperands[1], premise1Substrings[1]);
                                     }
                                 });
                             }
@@ -672,14 +672,14 @@ public class Argument<M extends Model> {
                     }
                     case "Resolution": {
                         if (kb.length == 2) {
-                            final String[] kb1Substrings = subdivideExpressionCharacters(kb[0], resolution[0]);
-                            final String[] kb2Substrings = subdivideExpressionCharacters(kb[1], resolution[1]);
-                            if (!kb1Substrings[0].equals(kb1Substrings[1]) && !kb1Substrings[0].equals(kb2Substrings[1]) && !kb1Substrings[1].equals(kb2Substrings[1]) && kb1Substrings[0].equals(kb2Substrings[0])) {
+                            final String[] premise1Substrings = subdivideExpressionCharacters(kb[0], resolution[0]);
+                            final String[] premise2Substrings = subdivideExpressionCharacters(kb[1], resolution[1]);
+                            if (!premise1Substrings[0].equals(premise1Substrings[1]) && !premise1Substrings[0].equals(premise2Substrings[1]) && !premise1Substrings[1].equals(premise2Substrings[1]) && premise1Substrings[0].equals(premise2Substrings[0])) {
                                 encodings.add(new HashMap<Character, String>() {
                                     {
-                                        put(lawOperands[0], kb1Substrings[0]);
-                                        put(lawOperands[1], kb1Substrings[1]);
-                                        put(lawOperands[2], kb2Substrings[1]);
+                                        put(lawOperands[0], premise1Substrings[0]);
+                                        put(lawOperands[1], premise1Substrings[1]);
+                                        put(lawOperands[2], premise2Substrings[1]);
                                     }
                                 });
                             }
