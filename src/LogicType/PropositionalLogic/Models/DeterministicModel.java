@@ -20,12 +20,28 @@ public class DeterministicModel extends Model {
     private boolean predicateEvaluation;
     private char[] allPredicateCharValues;
     private boolean[] totalPredicateBooleanValues;
-    private String equivalencyEvaluation;
+    private String validityEvaluation;
 
     private String symbolRepresentation;
     private Map<Character, String> operandSymbolicRepresentation;
 
-    public DeterministicModel(String modelName, Map<Character, Character> defaultOperandTruthValues, String expression)
+    public DeterministicModel(String modelName, String expression) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+        if (expression == null || expression.isEmpty())
+            throw new IllegalArgumentException("Expression cannot be null or empty.");
+
+        this.modelName = modelName;
+        this.expression = new Proposition(expression);
+    }
+
+    public DeterministicModel(String modelName, Proposition expression) {
+        if (expression == null)
+            throw new IllegalArgumentException("Expression cannot be null or empty.");
+            
+        this.modelName = modelName;
+        this.expression = expression;
+    }
+
+    public DeterministicModel(String modelName, String expression, Map<Character, Character> defaultOperandTruthValues)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null || expression.isEmpty())
             throw new IllegalArgumentException("Expression cannot be null or empty.");
@@ -42,8 +58,7 @@ public class DeterministicModel extends Model {
         setValidityEvaluation();
     }
 
-    public DeterministicModel(String modelName, Map<Character, Character> defaultOperandTruthValues,
-            Proposition expression)
+    public DeterministicModel(String modelName, Proposition expression, Map<Character, Character> defaultOperandTruthValues)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null)
             throw new IllegalArgumentException("Expression cannot be null or empty.");
@@ -60,8 +75,8 @@ public class DeterministicModel extends Model {
         setValidityEvaluation();
     }
 
-    public DeterministicModel(String modelName, Map<Character, String> operandSymbolicRepresentation,
-            Map<Character, Character> defaultOperandTruthValues, String expression)
+    public DeterministicModel(String modelName, String expression, Map<Character, String> operandSymbolicRepresentation,
+            Map<Character, Character> defaultOperandTruthValues)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null || expression.isEmpty())
             throw new IllegalArgumentException("Expression cannot be null or empty.");
@@ -81,8 +96,8 @@ public class DeterministicModel extends Model {
         setSymbolicString(this.operandSymbolicRepresentation);
     }
 
-    public DeterministicModel(String modelName, Map<Character, String> operandSymbolicRepresentation,
-            Map<Character, Character> defaultOperandTruthValues, Proposition expression)
+    public DeterministicModel(String modelName, Proposition expression, Map<Character, String> operandSymbolicRepresentation,
+            Map<Character, Character> defaultOperandTruthValues)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null)
             throw new IllegalArgumentException("Expression cannot be null or empty.");
@@ -139,13 +154,13 @@ public class DeterministicModel extends Model {
         Validity validity = new Validity();
 
         if (validity.isTautology(this.allPredicateCharValues))
-            this.equivalencyEvaluation = "Tautology";
+            this.validityEvaluation = "Tautology";
         else if (validity.isContradiction(this.allPredicateCharValues))
-            this.equivalencyEvaluation = "Contradiction";
+            this.validityEvaluation = "Contradiction";
         else if (validity.isContingency(this.allPredicateCharValues))
-            this.equivalencyEvaluation = "Contingency";
+            this.validityEvaluation = "Contingency";
         else
-            this.equivalencyEvaluation = null;
+            this.validityEvaluation = null;
     }
 
     private void setSymbolicString(Map<Character, String> operandSymbolicRepresentation) {
@@ -220,7 +235,7 @@ public class DeterministicModel extends Model {
         return this.expression;
     }
 
-    public String[][] getTruthTable() {
+    public String[][] getTruthTable() throws InvalidExpressionException {
         return this.expression.getTruthTable();
     }
 
@@ -255,8 +270,8 @@ public class DeterministicModel extends Model {
         return this.totalPredicateBooleanValues;
     }
 
-    public String getEquivalencyEvaluation() {
-        return this.equivalencyEvaluation;
+    public String getValidityEvaluation() {
+        return this.validityEvaluation;
     }
 
     public String getPredicateModel() {
