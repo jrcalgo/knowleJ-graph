@@ -552,7 +552,7 @@ public class Proposition {
         public String iff(String left, String right) {
             if ((!left.equals("T") && !left.equals("F")) || (!right.equals("T") && !right.equals("F")))
                 throw new IllegalArgumentException("Invalid operand(s) for iff operation.");
-            else if (left == right)
+            else if (left.equals(right))
                 return "T";
             else
                 return "F";
