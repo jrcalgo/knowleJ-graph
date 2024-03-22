@@ -24,7 +24,7 @@ public abstract class Model {
 
     public abstract boolean[] getAllPredicateBooleanValues();
 
-    public abstract String getEquivalencyEvaluation();
+    public abstract String getValidityEvaluation();
 
     public abstract String getPredicateModel();
 
