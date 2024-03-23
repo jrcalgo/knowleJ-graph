@@ -1,43 +1,24 @@
 package src.LogicType.PropositionalLogic.Logic;
 
 public class Validity {
-    public boolean isTautology(char[] rowOrColumn) {
-        for (char c : rowOrColumn) {
-            if (c == 'F')
-                return false;
-        }
-        return true;
-    }
 
-    public boolean isTautology(Boolean[] rowOrColumn) {
-        for (Boolean b : rowOrColumn) {
+    public boolean isTautology(boolean[] rowOrColumn) {
+        for (boolean b : rowOrColumn) {
             if (b == false)
                 return false;
         }
         return true;
     }
 
-    public boolean isContradiction(char[] rowOrColumn) {
-        for (char c : rowOrColumn) {
-            if (c == 'T')
-                return false;
-        }
-        return true;
-    }
-
-    public boolean isContradiction(Boolean[] rowOrColumn) {
-        for (Boolean b : rowOrColumn) {
+    public boolean isContradiction(boolean[] rowOrColumn) {
+        for (boolean b : rowOrColumn) {
             if (b == true)
                 return false;
         }
         return true;
     }
 
-    public boolean isContingency(char[] rowOrColumn) {
-        return !(isTautology(rowOrColumn) || isContradiction(rowOrColumn));
-    }
-
-    public boolean isContingency(Boolean[] rowOrColumn) {
+    public boolean isContingency(boolean[] rowOrColumn) {
         return !(isTautology(rowOrColumn) || isContradiction(rowOrColumn));
     }
 }
