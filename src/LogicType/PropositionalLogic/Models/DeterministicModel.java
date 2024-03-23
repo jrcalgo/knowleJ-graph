@@ -19,7 +19,7 @@ public class DeterministicModel extends Model {
     private String predicateModel;
     private boolean predicateEvaluation;
     private char[] allPredicateCharValues;
-    private boolean[] totalPredicateBooleanValues;
+    private boolean[] allPredicateBooleanValues;
     private String validityEvaluation;
 
     private String symbolRepresentation;
@@ -138,26 +138,26 @@ public class DeterministicModel extends Model {
 
     private void setAllPredicateTruthValues() {
         this.allPredicateCharValues = new char[this.defaultOperandTruthValues.size() + 1];
-        this.totalPredicateBooleanValues = new boolean[this.defaultOperandTruthValues.size() + 1];
+        this.allPredicateBooleanValues = new boolean[this.defaultOperandTruthValues.size() + 1];
         for (int i = 0; i < this.defaultOperandTruthValues.size(); i++) {
             if (i < this.operands.length && i < this.allPredicateCharValues.length) {
                 this.allPredicateCharValues[i] = this.defaultOperandTruthValues.get(this.operands[i]);
-                this.totalPredicateBooleanValues[i] = this.allPredicateCharValues[i] == 'T' ? true : false;
+                this.allPredicateBooleanValues[i] = this.allPredicateCharValues[i] == 'T' ? true : false;
             }
         }
 
         this.allPredicateCharValues[this.defaultOperandTruthValues.size()] = this.predicateEvaluation ? 'T' : 'F';
-        this.totalPredicateBooleanValues[this.defaultOperandTruthValues.size()] = this.predicateEvaluation;
+        this.allPredicateBooleanValues[this.defaultOperandTruthValues.size()] = this.predicateEvaluation;
     }
 
     private void setValidityEvaluation() {
         Validity validity = new Validity();
 
-        if (validity.isTautology(this.allPredicateCharValues))
+        if (validity.isTautology(this.allPredicateBooleanValues))
             this.validityEvaluation = "Tautology";
-        else if (validity.isContradiction(this.allPredicateCharValues))
+        else if (validity.isContradiction(this.allPredicateBooleanValues))
             this.validityEvaluation = "Contradiction";
-        else if (validity.isContingency(this.allPredicateCharValues))
+        else if (validity.isContingency(this.allPredicateBooleanValues))
             this.validityEvaluation = "Contingency";
         else
             this.validityEvaluation = null;
@@ -267,7 +267,7 @@ public class DeterministicModel extends Model {
     }
 
     public boolean[] getAllPredicateBooleanValues() {
-        return this.totalPredicateBooleanValues;
+        return this.allPredicateBooleanValues;
     }
 
     public String getValidityEvaluation() {
