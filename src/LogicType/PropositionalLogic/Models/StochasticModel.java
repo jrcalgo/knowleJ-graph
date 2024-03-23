@@ -176,8 +176,8 @@ public class StochasticModel extends Model {
     }
 
     @Override
-    public String getEquivalencyEvaluation() {
-        return this.equivalencyEvaluation;
+    public String getValidityEvaluation() {
+        return this.validityEvaluation;
     }
 
     @Override
