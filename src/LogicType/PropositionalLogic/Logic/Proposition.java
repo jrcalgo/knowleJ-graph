@@ -249,11 +249,7 @@ public class Proposition {
         if (!this.expression.getConvertedExpression().contains("m"))
             throw new InvalidExpressionException("Invalid proposition; must contain implication");
 
-        String[] inverses = null;
-        for (Character m : this.expression.getConvertedExpression().toCharArray()) {
-
-        }
-        return inverses;
+        return implicationSubstringInversion(null);
     }
 
     /**
@@ -264,11 +260,7 @@ public class Proposition {
         if (!this.expression.getConvertedExpression().contains("m"))
             throw new InvalidExpressionException("Invalid proposition; must contain implication");
 
-        String[] converses = null;
-        for (Character m : this.expression.getConvertedExpression().toCharArray()) {
-
-        }
-        return converses;
+        return implicationSubstringSwap(Math.toIntExact(this.expression.getConvertedExpression().chars().filter(c -> c == 'm').count()), false);
     }
 
     /**
@@ -280,10 +272,59 @@ public class Proposition {
             throw new InvalidExpressionException("Invalid proposition; must contain implication");
 
         String[] contrapositives = null;
-        for (Character m : this.expression.getConvertedExpression().toCharArray()) {
-            
+        String cE = this.expression.getConvertedExpression();
+        ArrayList<String[]> operandEncodings = new ArrayList<>();
+        int implicationCount = Math.toIntExact(cE.chars().filter(c -> c == 'm').count());
+        if (implicationCount > 0) {
+            do {
+                OptionalInt max = cE.chars().filter(Character::isDigit).map(Character::getNumericValue).max();
+                if (max.isPresent()) {
+                    for (int m = max.getAsInt(); m >= 0; m--) {
+
+                    }
+                }
+            } while (implicationCount > 0);
         }
-        return contrapositives;
+
+        for (int i = 0; i < implicationCount; i++) {
+            if (this.expression.getConvertedExpression().charAt(i) == 'm') {
+                operandEncodings.add(new String[2]);
+                operandEncodings.getLast()[0] = cE.substring(0, i-1);
+                operandEncodings.getLast()[1] = cE.substring(i+1, cE.length());
+            }
+        }
+        for (int i = 0; i < operandEncodings.size(); i++) {
+
+        }
+        
+        return implicationSubstringSwap(Math.toIntExact(this.expression.getConvertedExpression().chars().filter(c -> c == 'm').count()), true);
+    }
+
+    private String[] implicationSubstringInversion(String[] pairs) {
+        return null;
+    }
+
+    private String[] implicationSubstringSwap(int implicationCount, boolean inversion) {
+        if (implicationCount > 0) {
+            String[] implicationSwaps = new String[2];
+            String implicationSubstring;
+            String cE = this.expression.getConvertedExpression();
+
+            do {
+                OptionalInt max = cE.chars().filter(Character::isDigit).map(Character::getNumericValue).max();
+                for (int m = max.getAsInt(); m >= 0; m--) {
+                    implicationSubstring = cE.substring(cE.indexOf(m), cE.lastIndexOf(m) + Integer.toString(m).length());
+                    if (implicationSubstring.contains("m")) {
+                        implicationSwaps[0] = implicationSubstring.substring(0, implicationSubstring.indexOf("m")-1);
+                        implicationSwaps[1] = implicationSubstring.substring(implicationSubstring.indexOf("m")+1, implicationSubstring.length()-1);
+                    }
+                }
+            } while (implicationCount > 0);
+            
+            return implicationSwaps;
+        }
+
+        return null;
     }
 
     public String getExpression() {
