@@ -20,8 +20,8 @@ public class StochasticModel extends Model {
 
     private String predicateModel;
     private boolean predicateEvaluation;
-    private char[] allPredicateCharValues;
-    private boolean[] totalPredicateBooleanValues;
+    private double[] allPredicateProbabilityValues;
+    private boolean[] allPredicateBooleanValues;
     private String validityEvaluation;
 
     private String symbolRepresentation;
@@ -38,6 +38,7 @@ public class StochasticModel extends Model {
     public StochasticModel(String modelName, Proposition expression) {
         if (expression == null) 
             throw new IllegalArgumentException("Expression cannot be null or empty.");
+
         this.modelName = modelName;
         this.expression = expression;
     }
@@ -45,28 +46,44 @@ public class StochasticModel extends Model {
     public StochasticModel(String modelName, String expression, Map<Character, String> operandSymbolicRepresentation) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null || expression.isEmpty()) 
             throw new IllegalArgumentException("Expression cannot be null or empty.");
+
         this.modelName = modelName;
         this.expression = new Proposition(expression);
+
+        this.operandSymbolicRepresentation = operandSymbolicRepresentation;
+        setSymbolicString(this.operandSymbolicRepresentation);
 
     }
 
     public StochasticModel(String modelName, Proposition expression, Map<Character, String> operandSymbolicRepresentation) {
         if (expression == null) 
             throw new IllegalArgumentException("Expression cannot be null or empty.");
+
         this.modelName = modelName;
         this.expression = expression;
+
+        this.operandSymbolicRepresentation = operandSymbolicRepresentation;
+        setSymbolicString(this.operandSymbolicRepresentation);
     }
 
     public StochasticModel(String modelName, String expression, Map<Character, String> operandSymbolicRepresentation, Map<Character, Double> defaultOperandTruthValues,  double defaultTruthThreshold) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null || expression.isEmpty()) 
             throw new IllegalArgumentException("Expression cannot be null or empty.");
+
         this.modelName = modelName;
         this.expression = new Proposition(expression);
+
+        this.operandSymbolicRepresentation = operandSymbolicRepresentation;
+        setSymbolicString(this.operandSymbolicRepresentation);
+
+        setOperands(defaultOperandTruthValues);
+        
     }
 
     public StochasticModel(String modelName, Proposition expression, Map<Character, String> operandSymbolicRepresentation, Map<Character, Double> defaultOperandTruthValues, double defaultTruthThreshold) {
         if (expression == null) 
             throw new IllegalArgumentException("Expression cannot be null or empty.");
+
         this.modelName = modelName;
         this.expression = expression;
     }
@@ -74,6 +91,7 @@ public class StochasticModel extends Model {
     public StochasticModel(String modelName, String expression, Map<Character, String> operandSymbolicRepresentation, double defaultTruthThreshold, Map<Character, Double> defaultOperandTruthValues, Map<Character, Double> operandTruthThresholds) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null || expression.isEmpty()) 
             throw new IllegalArgumentException("Expression cannot be null or empty.");
+
         this.modelName = modelName;
         this.expression = new Proposition(expression);
     }
@@ -81,6 +99,7 @@ public class StochasticModel extends Model {
     public StochasticModel(String modelName, Proposition expression, Map<Character, String> operandSymbolicRepresentation, double defaultTruthThreshold, Map<Character, Double> defaultOperandTruthValues, Map<Character, Double> operandTruthThresholds) {
         if (expression == null) 
             throw new IllegalArgumentException("Expression cannot be null or empty.");
+
         this.modelName = modelName;
         this.expression = expression;
     }
@@ -108,11 +127,11 @@ public class StochasticModel extends Model {
     private void setValidityEvaluation() {
         Validity validity = new Validity();
 
-        if (validity.isTautology(this.allPredicateCharValues))
+        if (validity.isTautology(this.allPredicateBooleanValues))
             this.validityEvaluation = "Tautology";
-        else if (validity.isContradiction(this.allPredicateCharValues))
+        else if (validity.isContradiction(this.allPredicateBooleanValues))
             this.validityEvaluation = "Contradiction";
-        else if (validity.isContingency(this.allPredicateCharValues))
+        else if (validity.isContingency(this.allPredicateBooleanValues))
             this.validityEvaluation = "Contingency";
         else
             this.validityEvaluation = null;
@@ -166,13 +185,13 @@ public class StochasticModel extends Model {
     }
 
     @Override
-    public char[] getAllPredicateTruthValues() {
-        return this.allPredicateCharValues;
+    public double[] getAllPredicateTruthValues() {
+        return this.allPredicateProbabilityValues;
     }
 
     @Override
     public boolean[] getAllPredicateBooleanValues() {
-        return this.totalPredicateBooleanValues;
+        return this.allPredicateBooleanValues;
     }
 
     @Override
@@ -194,5 +213,4 @@ public class StochasticModel extends Model {
     public Boolean getPredicateEvaluation() {
         return this.predicateEvaluation;
     }
-    
 }
