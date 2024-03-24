@@ -1,6 +1,7 @@
 package src.LogicType.PropositionalLogic.Models;
 
 import java.util.Map;
+import java.util.Stack;
 
 import src.Exceptions.InvalidExpressionException;
 import src.Exceptions.InvalidLogicOperatorException;
@@ -13,7 +14,8 @@ public class StochasticModel extends Model {
     private Proposition expression;
 
     private char[] operands;
-    private Map<Character, Double> defaultOperandTruthValues;
+    private Map<Character, Double> defaultOperandProbabilityValues;
+    private Map<Character, Character> defaultOperandTruthValues;
 
     private double defaultTruthThreshold;
     private Map<Character, Double> operandTruthThresholds;
@@ -52,7 +54,6 @@ public class StochasticModel extends Model {
 
         this.operandSymbolicRepresentation = operandSymbolicRepresentation;
         setSymbolicString(this.operandSymbolicRepresentation);
-
     }
 
     public StochasticModel(String modelName, Proposition expression, Map<Character, String> operandSymbolicRepresentation) {
@@ -66,7 +67,7 @@ public class StochasticModel extends Model {
         setSymbolicString(this.operandSymbolicRepresentation);
     }
 
-    public StochasticModel(String modelName, String expression, Map<Character, String> operandSymbolicRepresentation, Map<Character, Double> defaultOperandTruthValues,  double defaultTruthThreshold) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+    public StochasticModel(String modelName, String expression, Map<Character, String> operandSymbolicRepresentation, double defaultTruthThreshold, Map<Character, Double> defaultOperandProbabilityValues) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null || expression.isEmpty()) 
             throw new IllegalArgumentException("Expression cannot be null or empty.");
 
@@ -76,51 +77,101 @@ public class StochasticModel extends Model {
         this.operandSymbolicRepresentation = operandSymbolicRepresentation;
         setSymbolicString(this.operandSymbolicRepresentation);
 
-        setOperands(defaultOperandTruthValues);
-        
+        setOperands(defaultTruthThreshold, defaultOperandProbabilityValues, null);
+        this.defaultOperandProbabilityValues = defaultOperandProbabilityValues;
+        this.defaultTruthThreshold = defaultTruthThreshold;
+
+        setPredicateProbabilityString(this.defaultOperandProbabilityValues);
+        setPredicateBooleanString(this.defaultOperandProbabilityValues, defaultTruthThreshold, null);
+        this.predicateEvaluation = this.expression.evaluateExpression(defaultOperandTruthValues);
+        setAllPredicateValues();
+        setValidityEvaluation();
     }
 
-    public StochasticModel(String modelName, Proposition expression, Map<Character, String> operandSymbolicRepresentation, Map<Character, Double> defaultOperandTruthValues, double defaultTruthThreshold) {
+    public StochasticModel(String modelName, Proposition expression, Map<Character, String> operandSymbolicRepresentation, double defaultTruthThreshold, Map<Character, Double> defaultOperandProbabilityValues) throws InvalidExpressionException {
         if (expression == null) 
             throw new IllegalArgumentException("Expression cannot be null or empty.");
 
         this.modelName = modelName;
         this.expression = expression;
+
+        this.operandSymbolicRepresentation = operandSymbolicRepresentation;
+        setSymbolicString(this.operandSymbolicRepresentation);
+
+        setOperands(defaultTruthThreshold, defaultOperandProbabilityValues, null);
+        this.defaultOperandProbabilityValues = defaultOperandProbabilityValues;
+        this.defaultTruthThreshold = defaultTruthThreshold;
+
+        setPredicateProbabilityString(this.defaultOperandProbabilityValues);
+        setPredicateBooleanString(this.defaultOperandProbabilityValues, defaultTruthThreshold, null);
+        this.predicateEvaluation = this.expression.evaluateExpression(defaultOperandTruthValues);
+        setAllPredicateValues();
+        setValidityEvaluation();
     }
     
-    public StochasticModel(String modelName, String expression, Map<Character, String> operandSymbolicRepresentation, double defaultTruthThreshold, Map<Character, Double> defaultOperandTruthValues, Map<Character, Double> operandTruthThresholds) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+    public StochasticModel(String modelName, String expression, Map<Character, String> operandSymbolicRepresentation, double defaultTruthThreshold, Map<Character, Double> defaultOperandProbabilityValues, Map<Character, Double> operandTruthThresholds) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null || expression.isEmpty()) 
             throw new IllegalArgumentException("Expression cannot be null or empty.");
 
         this.modelName = modelName;
         this.expression = new Proposition(expression);
+
+        this.operandSymbolicRepresentation = operandSymbolicRepresentation;
+        setSymbolicString(this.operandSymbolicRepresentation);
+
+        setOperands(defaultTruthThreshold, defaultOperandProbabilityValues, operandTruthThresholds);
+        this.defaultOperandProbabilityValues = defaultOperandProbabilityValues;
+        this.defaultTruthThreshold = defaultTruthThreshold;
+
+        setPredicateProbabilityString(this.defaultOperandProbabilityValues);
+        setPredicateBooleanString(this.defaultOperandProbabilityValues, defaultTruthThreshold, operandTruthThresholds);
+        this.predicateEvaluation = this.expression.evaluateExpression(defaultOperandTruthValues);
+        setAllPredicateValues();
+        setValidityEvaluation();
     }
 
-    public StochasticModel(String modelName, Proposition expression, Map<Character, String> operandSymbolicRepresentation, double defaultTruthThreshold, Map<Character, Double> defaultOperandTruthValues, Map<Character, Double> operandTruthThresholds) {
+    public StochasticModel(String modelName, Proposition expression, Map<Character, String> operandSymbolicRepresentation, double defaultTruthThreshold, Map<Character, Double> defaultOperandProbabilityValues, Map<Character, Double> operandTruthThresholds) throws InvalidExpressionException {
         if (expression == null) 
             throw new IllegalArgumentException("Expression cannot be null or empty.");
 
         this.modelName = modelName;
         this.expression = expression;
+
+        this.operandSymbolicRepresentation = operandSymbolicRepresentation;
+        setSymbolicString(this.operandSymbolicRepresentation);
+
+        setOperands(defaultTruthThreshold, defaultOperandProbabilityValues, operandTruthThresholds);
+        this.defaultOperandProbabilityValues = defaultOperandProbabilityValues;
+        this.defaultTruthThreshold = defaultTruthThreshold;
+
+        setPredicateProbabilityString(this.defaultOperandProbabilityValues);
+        setPredicateBooleanString(this.defaultOperandProbabilityValues, defaultTruthThreshold, operandTruthThresholds);
+        this.predicateEvaluation = this.expression.evaluateExpression(defaultOperandTruthValues);
+        setAllPredicateValues();
+        setValidityEvaluation();
     }
 
-    private void setOperands(Map<Character, Double> defaultOperandTruthValues) {
+    private void setOperands(double defaultTruthThreshold, Map<Character, Double> defaultOperandProbabilityValues, Map<Character, Double> operandTruthThresholds) {
         operands = new char[this.expression.getOperandCount()];
         for (int i = 0; i < this.expression.getOperandCount(); i++) {
             String operand = this.expression.getSentence(i);
             operands[i] = operand.charAt(0);
         }
         for (int i = 0; i < operands.length; i++) {
-            if (!defaultOperandTruthValues.containsKey(operands[i]))
+            if (!defaultOperandProbabilityValues.containsKey(operands[i]))
                 throw new IllegalArgumentException(operands[i] + " not in expression.");
         }
     }
 
-    private void setPredicateString(Map<Character, Double> defaultOperandTruthValues, double defaultTruthThreshold, Map<Character, Double> operandTruthThresholds) {
+    private void setPredicateProbabilityString(Map<Character, Double> defaultOperandProbabilityValues) {
+
+    }
+
+    private void setPredicateBooleanString(Map<Character, Double> defaultOperandProbabilityValues, double defaultTruthThreshold, Map<Character, Double> operandTruthThresholds) {
             
     }
 
-    private void setAllPredicateTruthValues() {
+    private void setAllPredicateValues() {
 
     }
 
@@ -138,7 +189,63 @@ public class StochasticModel extends Model {
     }
 
     private void setSymbolicString(Map<Character, String> operandSymbolicRepresentation) {
-        
+                this.symbolRepresentation = this.expression.getConvertedExpression();
+
+        Stack<Integer> parenthesesStack = new Stack<>();
+        for (int i = 0; i < this.symbolRepresentation.length(); i++) {
+            if (Character.isDigit(this.symbolRepresentation.charAt(i))
+                    && !parenthesesStack.contains(this.symbolRepresentation.charAt(i) - '0')) {
+                parenthesesStack.push(this.symbolRepresentation.charAt(i) - '0');
+                this.symbolRepresentation = this.symbolRepresentation
+                        .replaceFirst(this.symbolRepresentation.charAt(i) + "", '(' + "");
+            } else if (parenthesesStack.contains(this.symbolRepresentation.charAt(i) - '0')) {
+                parenthesesStack.pop();
+                this.symbolRepresentation = this.symbolRepresentation
+                        .replaceFirst(this.symbolRepresentation.charAt(i) + "", ')' + "");
+            }
+        }
+        parenthesesStack.clear();
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < this.symbolRepresentation.length(); i++) {
+            if (this.operandSymbolicRepresentation.containsKey(this.symbolRepresentation.charAt(i))) {
+                if ((i+1 < this.symbolRepresentation.length()) && this.symbolRepresentation.charAt(i + 1) == ')') {
+                    sb.append("'" + this.operandSymbolicRepresentation.get(this.symbolRepresentation.charAt(i)) + "'");
+                } else
+                    sb.append("'" + this.operandSymbolicRepresentation.get(this.symbolRepresentation.charAt(i)) + "' ");
+            } else {
+                switch (this.symbolRepresentation.charAt(i)) {
+                    case '(':
+                        sb.append("(");
+                        break;
+                    case ')':
+                        sb.append(") ");
+                        break;
+                    case 'n':
+                        sb.append("not ");
+                        break;
+                    case 'a':
+                        sb.append("and ");
+                        break;
+                    case 'o':
+                        sb.append("or ");
+                        break;
+                    case 'x':
+                        sb.append("xor ");
+                        break;
+                    case 'm':
+                        sb.append("implies ");
+                        break;
+                    case 'i':
+                        sb.append("iff ");
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        this.symbolRepresentation = sb.toString();
     }
 
     @Override
@@ -176,7 +283,7 @@ public class StochasticModel extends Model {
 
     
     public Map<Character, Double> getOperandTruthValues() {
-        return this.defaultOperandTruthValues;
+        return this.defaultOperandProbabilityValues;
     }
 
     @Override
