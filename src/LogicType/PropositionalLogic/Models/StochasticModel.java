@@ -15,12 +15,13 @@ public class StochasticModel extends Model {
 
     private char[] operands;
     private Map<Character, Double> defaultOperandProbabilityValues;
-    private Map<Character, Character> defaultOperandTruthValues;
+    private Map<Character, Character> defaultOperandBooleanValues;
 
     private double defaultTruthThreshold;
-    private Map<Character, Double> operandTruthThresholds;
+    private Map<Character, Double> individualOperandTruthThresholds;
 
-    private String predicateModel;
+    private String predicateProbabilityModel;
+    private String predicateBooleanModel;
     private boolean predicateEvaluation;
     private double[] allPredicateProbabilityValues;
     private boolean[] allPredicateBooleanValues;
@@ -83,7 +84,7 @@ public class StochasticModel extends Model {
 
         setPredicateProbabilityString(this.defaultOperandProbabilityValues);
         setPredicateBooleanString(this.defaultOperandProbabilityValues, defaultTruthThreshold, null);
-        this.predicateEvaluation = this.expression.evaluateExpression(defaultOperandTruthValues);
+        this.predicateEvaluation = this.expression.evaluateExpression(defaultOperandBooleanValues);
         setAllPredicateValues();
         setValidityEvaluation();
     }
@@ -104,12 +105,12 @@ public class StochasticModel extends Model {
 
         setPredicateProbabilityString(this.defaultOperandProbabilityValues);
         setPredicateBooleanString(this.defaultOperandProbabilityValues, defaultTruthThreshold, null);
-        this.predicateEvaluation = this.expression.evaluateExpression(defaultOperandTruthValues);
-        setAllPredicateValues();
+        this.predicateEvaluation = this.expression.evaluateExpression(defaultOperandBooleanValues);
+        setAllPredicateValues(); b
         setValidityEvaluation();
     }
     
-    public StochasticModel(String modelName, String expression, Map<Character, String> operandSymbolicRepresentation, double defaultTruthThreshold, Map<Character, Double> defaultOperandProbabilityValues, Map<Character, Double> operandTruthThresholds) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+    public StochasticModel(String modelName, String expression, Map<Character, String> operandSymbolicRepresentation, double defaultTruthThreshold, Map<Character, Double> defaultOperandProbabilityValues, Map<Character, Double> individualOperandTruthThresholds) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null || expression.isEmpty()) 
             throw new IllegalArgumentException("Expression cannot be null or empty.");
 
@@ -119,18 +120,18 @@ public class StochasticModel extends Model {
         this.operandSymbolicRepresentation = operandSymbolicRepresentation;
         setSymbolicString(this.operandSymbolicRepresentation);
 
-        setOperands(defaultTruthThreshold, defaultOperandProbabilityValues, operandTruthThresholds);
+        setOperands(defaultTruthThreshold, defaultOperandProbabilityValues, individualOperandTruthThresholds);
         this.defaultOperandProbabilityValues = defaultOperandProbabilityValues;
         this.defaultTruthThreshold = defaultTruthThreshold;
 
         setPredicateProbabilityString(this.defaultOperandProbabilityValues);
-        setPredicateBooleanString(this.defaultOperandProbabilityValues, defaultTruthThreshold, operandTruthThresholds);
-        this.predicateEvaluation = this.expression.evaluateExpression(defaultOperandTruthValues);
+        setPredicateBooleanString(this.defaultOperandProbabilityValues, defaultTruthThreshold, individualOperandTruthThresholds);
+        this.predicateEvaluation = this.expression.evaluateExpression(defaultOperandBooleanValues);
         setAllPredicateValues();
         setValidityEvaluation();
     }
 
-    public StochasticModel(String modelName, Proposition expression, Map<Character, String> operandSymbolicRepresentation, double defaultTruthThreshold, Map<Character, Double> defaultOperandProbabilityValues, Map<Character, Double> operandTruthThresholds) throws InvalidExpressionException {
+    public StochasticModel(String modelName, Proposition expression, Map<Character, String> operandSymbolicRepresentation, double defaultTruthThreshold, Map<Character, Double> defaultOperandProbabilityValues, Map<Character, Double> individualOperandTruthThresholds) throws InvalidExpressionException {
         if (expression == null) 
             throw new IllegalArgumentException("Expression cannot be null or empty.");
 
@@ -140,39 +141,66 @@ public class StochasticModel extends Model {
         this.operandSymbolicRepresentation = operandSymbolicRepresentation;
         setSymbolicString(this.operandSymbolicRepresentation);
 
-        setOperands(defaultTruthThreshold, defaultOperandProbabilityValues, operandTruthThresholds);
+        setOperands(defaultTruthThreshold, defaultOperandProbabilityValues, individualOperandTruthThresholds);
         this.defaultOperandProbabilityValues = defaultOperandProbabilityValues;
         this.defaultTruthThreshold = defaultTruthThreshold;
 
         setPredicateProbabilityString(this.defaultOperandProbabilityValues);
-        setPredicateBooleanString(this.defaultOperandProbabilityValues, defaultTruthThreshold, operandTruthThresholds);
-        this.predicateEvaluation = this.expression.evaluateExpression(defaultOperandTruthValues);
+        setPredicateBooleanString(this.defaultOperandProbabilityValues, defaultTruthThreshold, individualOperandTruthThresholds);
+        this.predicateEvaluation = this.expression.evaluateExpression(defaultOperandBooleanValues);
         setAllPredicateValues();
         setValidityEvaluation();
     }
 
-    private void setOperands(double defaultTruthThreshold, Map<Character, Double> defaultOperandProbabilityValues, Map<Character, Double> operandTruthThresholds) {
-        operands = new char[this.expression.getOperandCount()];
+    private void setOperands(double defaultTruthThreshold, Map<Character, Double> defaultOperandProbabilityValues, Map<Character, Double> individualOperandTruthThresholds) {
+        this.operands = new char[this.expression.getOperandCount()];
         for (int i = 0; i < this.expression.getOperandCount(); i++) {
             String operand = this.expression.getSentence(i);
-            operands[i] = operand.charAt(0);
+            this.operands[i] = operand.charAt(0);
         }
         for (int i = 0; i < operands.length; i++) {
             if (!defaultOperandProbabilityValues.containsKey(operands[i]))
                 throw new IllegalArgumentException(operands[i] + " not in expression.");
         }
-    }
 
-    private void setPredicateProbabilityString(Map<Character, Double> defaultOperandProbabilityValues) {
+        if (individualOperandTruthThresholds == null) {
+            for (Character operand : defaultOperandProbabilityValues.keySet()) {
+                if (defaultOperandProbabilityValues.get(operand) < 0 || defaultOperandProbabilityValues.get(operand) > 1)
+                    throw new IllegalArgumentException(operand + " probability must be >= 0 or <= 1.");
 
-    }
-
-    private void setPredicateBooleanString(Map<Character, Double> defaultOperandProbabilityValues, double defaultTruthThreshold, Map<Character, Double> operandTruthThresholds) {
-            
+                this.defaultOperandBooleanValues.put(operand, (defaultOperandProbabilityValues.get(operand) >= defaultTruthThreshold) ? 'T' : 'F');
+            }
+        } else {
+            for (Character operand : defaultOperandProbabilityValues.keySet()) {
+                if (defaultOperandProbabilityValues.get(operand) < 0 || defaultOperandProbabilityValues.get(operand) > 1)
+                    throw new IllegalArgumentException(operand + " probability must be >= 0 or <= 1.");
+                
+                if (individualOperandTruthThresholds.get(operand) < 0 || individualOperandTruthThresholds.get(operand) > 1)
+                    throw new IllegalArgumentException(operand + " truth threshold must be >= 0 or <= 1.");
+                
+                for (Character operandThreshold : individualOperandTruthThresholds.keySet()) {
+                    if (!individualOperandTruthThresholds.containsKey(operand))
+                }
+            }
+        }
     }
 
     private void setAllPredicateValues() {
+        this.allPredicateProbabilityValues = new double
+    }
 
+    private void setPredicateProbabilityString(Map<Character, Double> defaultOperandProbabilityValues) {
+        this.predicateProbabilityModel = this.expression.getExpression();
+        for (char operand : this.operands) {
+            this.predicateProbabilityModel = this.predicateProbabilityModel.replace(Character.toString(operand), "{" + defaultOperandProbabilityValues.get(operand).toString() + "}");
+        }
+    }
+
+    private void setPredicateBooleanString(Map<Character, Double> defaultOperandProbabilityValues, double defaultTruthThreshold, Map<Character, Double> individualOperandTruthThresholds) {
+        this.predicateBooleanModel = this.expression.getExpression();
+        for (char operand : this.operands) {
+            this.predicateBooleanModel = this.predicateBooleanModel.replace(Character.toString(operand))
+        }
     }
 
     private void setValidityEvaluation() {
@@ -189,7 +217,7 @@ public class StochasticModel extends Model {
     }
 
     private void setSymbolicString(Map<Character, String> operandSymbolicRepresentation) {
-                this.symbolRepresentation = this.expression.getConvertedExpression();
+        this.symbolRepresentation = this.expression.getConvertedExpression();
 
         Stack<Integer> parenthesesStack = new Stack<>();
         for (int i = 0; i < this.symbolRepresentation.length(); i++) {
@@ -306,9 +334,12 @@ public class StochasticModel extends Model {
         return this.validityEvaluation;
     }
 
-    @Override
-    public String getPredicateModel() {
-        return this.predicateModel;
+    public String getPredicateProbabilityModel() {
+        return this.predicateProbabilityModel;
+    }
+
+    public String getPredicateBooleanModel() {
+        return this.predicateBooleanModel;
     }
 
     @Override
