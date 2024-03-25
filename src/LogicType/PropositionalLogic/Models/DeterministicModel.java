@@ -16,7 +16,7 @@ public class DeterministicModel extends Model {
     private char[] operands;
     private Map<Character, Character> defaultOperandTruthValues;
 
-    private String predicateModel;
+    private String predicateBooleanModel;
     private boolean predicateEvaluation;
     private char[] allPredicateCharValues;
     private boolean[] allPredicateBooleanValues;
@@ -52,7 +52,7 @@ public class DeterministicModel extends Model {
         setOperands(defaultOperandTruthValues);
         this.defaultOperandTruthValues = defaultOperandTruthValues;
 
-        setPredicateString(this.defaultOperandTruthValues);
+        setPredicateBooleanString(this.defaultOperandTruthValues);
         this.predicateEvaluation = this.expression.evaluateExpression(this.defaultOperandTruthValues);
         setAllPredicateTruthValues();
         setValidityEvaluation();
@@ -69,7 +69,7 @@ public class DeterministicModel extends Model {
         setOperands(this.defaultOperandTruthValues);
         this.defaultOperandTruthValues = defaultOperandTruthValues;
 
-        setPredicateString(this.defaultOperandTruthValues);
+        setPredicateBooleanString(this.defaultOperandTruthValues);
         this.predicateEvaluation = this.expression.evaluateExpression(this.defaultOperandTruthValues);
         setAllPredicateTruthValues();
         setValidityEvaluation();
@@ -87,7 +87,7 @@ public class DeterministicModel extends Model {
         setOperands(defaultOperandTruthValues);
         this.defaultOperandTruthValues = defaultOperandTruthValues;
 
-        setPredicateString(this.defaultOperandTruthValues);
+        setPredicateBooleanString(this.defaultOperandTruthValues);
         this.predicateEvaluation = this.expression.evaluateExpression(this.defaultOperandTruthValues);
         setAllPredicateTruthValues();
         setValidityEvaluation();
@@ -108,7 +108,7 @@ public class DeterministicModel extends Model {
         setOperands(defaultOperandTruthValues);
         this.defaultOperandTruthValues = defaultOperandTruthValues;
 
-        setPredicateString(this.defaultOperandTruthValues);
+        setPredicateBooleanString(this.defaultOperandTruthValues);
         this.predicateEvaluation = this.expression.evaluateExpression(this.defaultOperandTruthValues);
         setAllPredicateTruthValues();
         setValidityEvaluation();
@@ -130,10 +130,10 @@ public class DeterministicModel extends Model {
         }
     }
 
-    private void setPredicateString(Map<Character, Character> defaultOperandTruthValues) {
-        this.predicateModel = this.expression.getExpression();
+    private void setPredicateBooleanString(Map<Character, Character> defaultOperandTruthValues) {
+        this.predicateBooleanModel = this.expression.getExpression();
         for (char operand : this.operands)
-            this.predicateModel = this.predicateModel.replace(operand, defaultOperandTruthValues.get(operand));
+            this.predicateBooleanModel = this.predicateBooleanModel.replace(operand, defaultOperandTruthValues.get(operand));
     }
 
     private void setAllPredicateTruthValues() {
@@ -274,8 +274,8 @@ public class DeterministicModel extends Model {
         return this.validityEvaluation;
     }
 
-    public String getPredicateModel() {
-        return this.predicateModel;
+    public String getpredicateBooleanModel() {
+        return this.predicateBooleanModel;
     }
 
     public String getSymbolicRepresentation() {

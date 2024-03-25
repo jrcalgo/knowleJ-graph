@@ -26,8 +26,6 @@ public abstract class Model {
 
     public abstract String getValidityEvaluation();
 
-    public abstract String getPredicateModel();
-
     public abstract String getSymbolicRepresentation();
 
     public abstract Boolean getPredicateEvaluation();
