@@ -22,9 +22,10 @@ public class StochasticModel extends Model {
 
     private String predicateProbabilityModel;
     private String predicateBooleanModel;
-    private boolean predicateEvaluation;
     private double[] allPredicateProbabilityValues;
+    private char[] allPredicateCharValues;
     private boolean[] allPredicateBooleanValues;
+    private boolean predicateEvaluation;
     private String validityEvaluation;
 
     private String symbolRepresentation;
@@ -106,7 +107,7 @@ public class StochasticModel extends Model {
         setPredicateProbabilityString(this.defaultOperandProbabilityValues);
         setPredicateBooleanString(this.defaultOperandProbabilityValues, defaultTruthThreshold, null);
         this.predicateEvaluation = this.expression.evaluateExpression(defaultOperandBooleanValues);
-        setAllPredicateValues(); b
+        setAllPredicateValues(); 
         setValidityEvaluation();
     }
     
@@ -152,7 +153,7 @@ public class StochasticModel extends Model {
         setValidityEvaluation();
     }
 
-    private void setOperands(double defaultTruthThreshold, Map<Character, Double> defaultOperandProbabilityValues, Map<Character, Double> individualOperandTruthThresholds) {
+    private void setOperands(Double defaultTruthThreshold, Map<Character, Double> defaultOperandProbabilityValues, Map<Character, Double> individualOperandTruthThresholds) {
         this.operands = new char[this.expression.getOperandCount()];
         for (int i = 0; i < this.expression.getOperandCount(); i++) {
             String operand = this.expression.getSentence(i);
@@ -163,6 +164,12 @@ public class StochasticModel extends Model {
                 throw new IllegalArgumentException(operands[i] + " not in expression.");
         }
 
+        if (individualOperandTruthThresholds == null && defaultTruthThreshold == null)
+            throw new IllegalArgumentException("Either defaultTruthThreshold and/or individualOperandTruthThresholds must be specified.");
+
+        if (defaultTruthThreshold != null && (defaultTruthThreshold < 0 || defaultTruthThreshold > 1))
+            throw new IllegalArgumentException("Default truth threshold must be >= 0 or <= 1.");
+
         if (individualOperandTruthThresholds == null) {
             for (Character operand : defaultOperandProbabilityValues.keySet()) {
                 if (defaultOperandProbabilityValues.get(operand) < 0 || defaultOperandProbabilityValues.get(operand) > 1)
@@ -172,14 +179,25 @@ public class StochasticModel extends Model {
             }
         } else {
             for (Character operand : defaultOperandProbabilityValues.keySet()) {
+                if (!individualOperandTruthThresholds.containsKey(operand))
+                    throw new IllegalArgumentException(operand + " not in expression.");
+            }
+
+            for (Character operand : defaultOperandProbabilityValues.keySet()) {
                 if (defaultOperandProbabilityValues.get(operand) < 0 || defaultOperandProbabilityValues.get(operand) > 1)
                     throw new IllegalArgumentException(operand + " probability must be >= 0 or <= 1.");
                 
                 if (individualOperandTruthThresholds.get(operand) < 0 || individualOperandTruthThresholds.get(operand) > 1)
-                    throw new IllegalArgumentException(operand + " truth threshold must be >= 0 or <= 1.");
+                    throw new IllegalArgumentException(operand + "'s truth threshold must be >= 0 or <= 1.");
                 
-                for (Character operandThreshold : individualOperandTruthThresholds.keySet()) {
-                    if (!individualOperandTruthThresholds.containsKey(operand))
+                if (defaultTruthThreshold == null) {
+                    this.defaultOperandBooleanValues.put(operand, (defaultOperandProbabilityValues.get(operand) >= individualOperandTruthThresholds.get(operand)) ? 'T' : 'F');
+                } else {
+                    if (individualOperandTruthThresholds.containsKey(operand)) {
+                        this.defaultOperandBooleanValues.put(operand, (defaultOperandProbabilityValues.get(operand) >= individualOperandTruthThresholds.get(operand)) ? 'T' : 'F');
+                    } else {
+                        this.defaultOperandBooleanValues.put(operand, (defaultOperandProbabilityValues.get(operand) >= defaultTruthThreshold) ? 'T' : 'F');
+                    }
                 }
             }
         }
@@ -199,7 +217,7 @@ public class StochasticModel extends Model {
     private void setPredicateBooleanString(Map<Character, Double> defaultOperandProbabilityValues, double defaultTruthThreshold, Map<Character, Double> individualOperandTruthThresholds) {
         this.predicateBooleanModel = this.expression.getExpression();
         for (char operand : this.operands) {
-            this.predicateBooleanModel = this.predicateBooleanModel.replace(Character.toString(operand))
+            this.predicateBooleanModel = this.predicateBooleanModel.replace(Character.toString(operand), defaultOperandBooleanValues.get(operand).toString());
         }
     }
 
@@ -272,7 +290,6 @@ public class StochasticModel extends Model {
                 }
             }
         }
-
         this.symbolRepresentation = sb.toString();
     }
 
