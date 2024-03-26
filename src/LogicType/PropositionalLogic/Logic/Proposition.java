@@ -308,15 +308,20 @@ public class Proposition {
         if (implicationCount > 0) {
             String[] implicationSwaps = new String[2];
             String implicationSubstring;
+            String[] swappedExpressions = new String[implicationCount];
             String cE = this.expression.getConvertedExpression();
 
             do {
                 OptionalInt max = cE.chars().filter(Character::isDigit).map(Character::getNumericValue).max();
-                for (int m = max.getAsInt(); m >= 0; m--) {
+                for (int m = max.getAsInt()  ; m >= 0; m--) {
                     implicationSubstring = cE.substring(cE.indexOf(m), cE.lastIndexOf(m) + Integer.toString(m).length());
                     if (implicationSubstring.contains("m")) {
                         implicationSwaps[0] = implicationSubstring.substring(0, implicationSubstring.indexOf("m")-1);
-                        implicationSwaps[1] = implicationSubstring.substring(implicationSubstring.indexOf("m")+1, implicationSubstring.length()-1);
+                        implicationSwaps[1] = implicationSubstring.substring(implicationSubstring.indexOf("m")+1, implicationSubstring.length()-1);\
+                        if (inversion) {
+                            implicationSwaps = implicationSubstringInversion(implicationSwaps);
+                        }
+                        swappedExpressions[swappedExpressions.length] = implicationSwaps[1] + "m" + implicationSwaps[0];
                     }
                 }
             } while (implicationCount > 0);
