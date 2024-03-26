@@ -1,5 +1,6 @@
 package src.LogicType.PropositionalLogic.Models;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
@@ -16,7 +17,7 @@ public class StochasticModel extends Model {
     private char[] operands;
     private Map<Character, Double> defaultOperandProbabilityValues;
     private Map<Character, Character> defaultOperandCharValues;
-    private double defaultTruthThreshold;
+    private Double defaultTruthThreshold;
     private Map<Character, Double> individualOperandTruthThresholds;
 
     private String predicateProbabilityModel;
@@ -68,7 +69,7 @@ public class StochasticModel extends Model {
         setSymbolicString(this.operandSymbolicRepresentation);
     }
 
-    public StochasticModel(String modelName, String expression, Map<Character, String> operandSymbolicRepresentation, double defaultTruthThreshold, Map<Character, Double> defaultOperandProbabilityValues) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+    public StochasticModel(String modelName, String expression, Map<Character, String> operandSymbolicRepresentation, Double defaultTruthThreshold, Map<Character, Double> defaultOperandProbabilityValues) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null || expression.isEmpty()) 
             throw new IllegalArgumentException("Expression cannot be null or empty.");
 
@@ -89,7 +90,7 @@ public class StochasticModel extends Model {
         setValidityEvaluation();
     }
 
-    public StochasticModel(String modelName, Proposition expression, Map<Character, String> operandSymbolicRepresentation, double defaultTruthThreshold, Map<Character, Double> defaultOperandProbabilityValues) throws InvalidExpressionException {
+    public StochasticModel(String modelName, Proposition expression, Map<Character, String> operandSymbolicRepresentation, Double defaultTruthThreshold, Map<Character, Double> defaultOperandProbabilityValues) throws InvalidExpressionException {
         if (expression == null) 
             throw new IllegalArgumentException("Expression cannot be null or empty.");
 
@@ -110,7 +111,7 @@ public class StochasticModel extends Model {
         setValidityEvaluation();
     }
     
-    public StochasticModel(String modelName, String expression, Map<Character, String> operandSymbolicRepresentation, double defaultTruthThreshold, Map<Character, Double> defaultOperandProbabilityValues, Map<Character, Double> individualOperandTruthThresholds) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+    public StochasticModel(String modelName, String expression, Map<Character, String> operandSymbolicRepresentation, Double defaultTruthThreshold, Map<Character, Double> defaultOperandProbabilityValues, Map<Character, Double> individualOperandTruthThresholds) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (expression == null || expression.isEmpty()) 
             throw new IllegalArgumentException("Expression cannot be null or empty.");
 
@@ -131,7 +132,7 @@ public class StochasticModel extends Model {
         setValidityEvaluation();
     }
 
-    public StochasticModel(String modelName, Proposition expression, Map<Character, String> operandSymbolicRepresentation, double defaultTruthThreshold, Map<Character, Double> defaultOperandProbabilityValues, Map<Character, Double> individualOperandTruthThresholds) throws InvalidExpressionException {
+    public StochasticModel(String modelName, Proposition expression, Map<Character, String> operandSymbolicRepresentation, Double defaultTruthThreshold, Map<Character, Double> defaultOperandProbabilityValues, Map<Character, Double> individualOperandTruthThresholds) throws InvalidExpressionException {
         if (expression == null) 
             throw new IllegalArgumentException("Expression cannot be null or empty.");
 
@@ -170,32 +171,34 @@ public class StochasticModel extends Model {
             throw new IllegalArgumentException("Default truth threshold must be >= 0 or <= 1.");
 
         if (individualOperandTruthThresholds == null) {
+            this.defaultOperandCharValues = new HashMap<>();
             for (Character operand : defaultOperandProbabilityValues.keySet()) {
-                if (defaultOperandProbabilityValues.get(operand) < 0 || defaultOperandProbabilityValues.get(operand) > 1)
+                if (defaultOperandProbabilityValues.get(operand) < 0.0 || defaultOperandProbabilityValues.get(operand) > 1.0)
                     throw new IllegalArgumentException(operand + " probability must be >= 0 or <= 1.");
 
                 this.defaultOperandCharValues.put(operand, (defaultOperandProbabilityValues.get(operand) >= defaultTruthThreshold) ? 'T' : 'F');
             }
         } else {
+            this.defaultOperandCharValues = new HashMap<>();
             for (Character operand : defaultOperandProbabilityValues.keySet()) {
-                if (!individualOperandTruthThresholds.containsKey(operand))
-                    throw new IllegalArgumentException(operand + " not in expression.");
-            }
-
-            for (Character operand : defaultOperandProbabilityValues.keySet()) {
-                if (defaultOperandProbabilityValues.get(operand) < 0 || defaultOperandProbabilityValues.get(operand) > 1)
+                if (defaultOperandProbabilityValues.get(operand) < 0.0 || defaultOperandProbabilityValues.get(operand) > 1.0)
                     throw new IllegalArgumentException(operand + " probability must be >= 0 or <= 1.");
                 
-                if (individualOperandTruthThresholds.get(operand) < 0 || individualOperandTruthThresholds.get(operand) > 1)
-                    throw new IllegalArgumentException(operand + "'s truth threshold must be >= 0 or <= 1.");
+                if (individualOperandTruthThresholds.containsKey(operand)) {
+                    if (individualOperandTruthThresholds.get(operand) < 0.0 || individualOperandTruthThresholds.get(operand) > 1.0)
+                        throw new IllegalArgumentException(operand + "'s truth threshold must be >= 0 or <= 1.");
+                }
                 
                 if (defaultTruthThreshold == null) {
-                    defaultOperandCharValues.put(operand, (defaultOperandProbabilityValues.get(operand) >= individualOperandTruthThresholds.get(operand)) ? 'T' : 'F');
+                    if (!individualOperandTruthThresholds.containsKey(operand))
+                        throw new IllegalArgumentException(operand + " not in expression.");
+    
+                    this.defaultOperandCharValues.put(operand, (defaultOperandProbabilityValues.get(operand) >= individualOperandTruthThresholds.get(operand)) ? 'T' : 'F');
                 } else {
                     if (individualOperandTruthThresholds.containsKey(operand)) {
-                        defaultOperandCharValues.put(operand, (defaultOperandProbabilityValues.get(operand) >= individualOperandTruthThresholds.get(operand)) ? 'T' : 'F');
+                        this.defaultOperandCharValues.put(operand, (defaultOperandProbabilityValues.get(operand) >= individualOperandTruthThresholds.get(operand)) ? 'T' : 'F');
                     } else {
-                        defaultOperandCharValues.put(operand, (defaultOperandProbabilityValues.get(operand) >= defaultTruthThreshold) ? 'T' : 'F');
+                        this.defaultOperandCharValues.put(operand, (defaultOperandProbabilityValues.get(operand) >= defaultTruthThreshold) ? 'T' : 'F');
                     }
                 }
             }
@@ -224,7 +227,7 @@ public class StochasticModel extends Model {
         }
     }
 
-    private void setPredicateBooleanString(Map<Character, Double> defaultOperandProbabilityValues, double defaultTruthThreshold, Map<Character, Double> individualOperandTruthThresholds) {
+    private void setPredicateBooleanString(Map<Character, Double> defaultOperandProbabilityValues, Double defaultTruthThreshold, Map<Character, Double> individualOperandTruthThresholds) {
         this.predicateBooleanModel = this.expression.getExpression();
         for (char operand : this.operands) {
             this.predicateBooleanModel = this.predicateBooleanModel.replace(Character.toString(operand), defaultOperandCharValues.get(operand).toString());
