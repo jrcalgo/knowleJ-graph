@@ -20,7 +20,7 @@ public abstract class Model {
 
     public abstract Map<Character, String> getOperandSymbolicRepresentation();
 
-    public abstract char[] getAllPredicateTruthValues();
+    public abstract char[] getAllPredicateCharValues();
 
     public abstract boolean[] getAllPredicateBooleanValues();
 
