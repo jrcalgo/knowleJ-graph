@@ -1324,7 +1324,6 @@ public class Argument<M extends Model> {
                     encodedLawMap.put(law, encodings);
                 }
                 System.gc();
-            }
 
             for (String law : encodedLawMap.keySet()) {
                 if (encodedLawMap.get(law).isEmpty() || encodedLawMap.get(law) == null) {
