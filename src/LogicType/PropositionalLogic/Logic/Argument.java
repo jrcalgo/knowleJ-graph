@@ -247,14 +247,14 @@ public class Argument<M extends Model> {
             String[] queries = query.split(",");
             ArrayList<ArrayList<String>> answer = new ArrayList<>();
             for (String q : queries) {
-                answer.addAll(deduce(new Proposition(q)));
+                answer.addAll(deduce(new Proposition(q), returnType));
             }
             return answer;
         }
-        return deduce(new Proposition(query));
+        return deduce(new Proposition(query), returnType);
     }
 
-    public <G> G deduce(Proposition query, G returnType) {
+    public <G> G deduce(Proposition query, G returnType) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (query == null)
             throw new IllegalArgumentException("Proposition query cannot be null or empty.");
 
@@ -279,14 +279,9 @@ public class Argument<M extends Model> {
             kbConversions[i] = kbPropositions[i].getConvertedExpression();
         }
 
-        ArrayList<ArrayList<String>> deductionPaths = new ArrayList<>();
-        InferenceLaws inferences = new InferenceLaws();
-        EquivalencyLaws equivalencies = new EquivalencyLaws();
-
         DirectedDeductionGraph dg = new DirectedDeductionGraph(this.getKnowledgeBaseExpressions(), query);
 
-        return bidirectionalIterativeDeepeningSearch(dg);
-
+        return bidirectionalIterativeDeepeningSearch(dg, returnType);
     }
 
     private <G> G bidirectionalIterativeDeepeningSearch(DirectedDeductionGraph graph, G returnType) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
@@ -296,7 +291,7 @@ public class Argument<M extends Model> {
         Argument<Model> knowledgeHistory = new Argument<>(this.knowledgeBase); // serves as knowledge history container
         ArrayList<DeductionGraphNode> leafs = graph.getNodes();
         ArrayList<ArrayList<String>> optimalPaths;
-        int depth = 2;
+        int depth = 3;
         while (true) {
             Map<String, ArrayList<String>> inferenceMap = new HashMap<>();
             Map<String, ArrayList<String>> equivalencyMap = new HashMap<>();
@@ -336,10 +331,10 @@ public class Argument<M extends Model> {
             the `depth` by 1 and return to `mostRelevantLeaf` before moving onto other nodes.
             5. If a path has been found, return the path. If not, return an indication that no path could be found.
             */
-        return deductionReturnType(returnType);
+        return validateDeductionReturnType(returnType);
     }
 
-    private <G> G deductionReturnType(G type) {
+    private <G> G validateDeductionReturnType(G type) {
         if (type == null)
             throw new IllegalArgumentException("Type cannot be null.");
         else if (!(type instanceof DirectedDeductionGraph) || !(type instanceof ArrayList))
@@ -366,9 +361,17 @@ public class Argument<M extends Model> {
                 }
             }
         }
+        return type;
+    }
 
-        G returnType = type;
-        return returnType;
+    private ArrayList<Argument<M>> combineKBExpressions() {
+        ArrayList<Argument<M>> kbCombinations = new ArrayList<>();
+        for (int i = 0; i < this.knowledgeBase.length; i++) {
+            for (int j  = this.knowledgeBase.length-1; j )
+        }
+
+
+        return null;
     }
 
     public void setKnowledgeBase(M[] knowledgeBase)
@@ -699,7 +702,7 @@ public class Argument<M extends Model> {
         }
 
         private String argumentDecoder(String kbExpression, Map<Character, String> encoding) {
-            
+
             return null;
         }
 
