@@ -1077,8 +1077,7 @@ public class Argument<M extends Model> {
                             for (int i = 0; i < idempotentLaw.length; i++) {
                                 if (cE.matches(idempotentLaw[i])) {
                                     final String[] cESubstrings = subdivideExpressionCharacters(cE, idempotentLaw[i]);
-                                    final int substringSetCycles = (cESubstrings.length/2)%2 != 0 ? (Math.floorDiv(cESubstrings.length, 2) + 1)*2 : cESubstrings.length;
-                                    for (int j = 0; j < substringSetCycles; j = j+2) {
+                                    for (int j = 0; j < cESubstrings.length; j = j+2) {
                                         if (cESubstrings[j].equals(cESubstrings[j+1])) {
                                             encodings.add(new HashMap<Character, String>() {
                                                 {
@@ -1095,8 +1094,7 @@ public class Argument<M extends Model> {
                             for (int i = 0; i < associativeLaw.length; i++) {
                                 if (cE.matches(associativeLaw[i])) {
                                     final String[] cESubstrings = subdivideExpressionCharacters(cE, associativeLaw[i]);
-                                    final int substringSetCycles = (cESubstrings.length/3)%3 != 0? Math.ceilDiv(cESubstrings.length, 3) : (Math.ceilDiv(cESubstrings.length, 3)%3) + ();
-                                    for (int j = 0; j < substringSetCycles; j = j+3) {
+                                    for (int j = 0; j < cESubstrings.length; j = j+3) {
                                         if (!cESubstrings[j].equals(cESubstrings[j+1]) && !cESubstrings[j].equals(cESubstrings[j+2]) && !cESubstrings[j+1].equals(cESubstrings[j+2])) {
                                             encodings.add(new HashMap<Character, String>() {
                                                 {
@@ -1115,8 +1113,7 @@ public class Argument<M extends Model> {
                             for (int i = 0; i < commutativeLaw.length; i++) {
                                 if (cE.matches(commutativeLaw[i])) {
                                     final String[] cESubstrings = subdivideExpressionCharacters(cE, commutativeLaw[i]);
-                                    final int substringSetCycles = (cESubstrings.length/2)%2 != 0 ? (Math.floorDiv(cESubstrings.length, 2) + 1)*2 : cESubstrings.length;
-                                    for (int j = 0; j < substringSetCycles; j = j+2) {
+                                    for (int j = 0; j < cESubstrings.length; j = j+2) {
                                         if (!cESubstrings[j].equals(cESubstrings[j+1])) {
                                             encodings.add(new HashMap<Character, String>() {
                                                 {
@@ -1134,9 +1131,8 @@ public class Argument<M extends Model> {
                             for (int i = 0; i < distributiveLaw.length; i++) {
                                 if (cE.matches(distributiveLaw[i])) {
                                     final String[] cESubstrings = subdivideExpressionCharacters(cE, distributiveLaw[i]);
-                                    final int substringSetCycles;
                                     if (i == 0 || i == 2) {
-                                        for (int j = 0; j < substringSetCycles; j = j+3) {
+                                        for (int j = 0; j < cESubstrings.length; j = j+3) {
                                             if (!cESubstrings[j].equals(cESubstrings[j+1]) && !cESubstrings[j].equals(cESubstrings[j+2]) && !cESubstrings[j+1].equals(cESubstrings[j+2])) {
                                                 encodings.add(new HashMap<Character, String>() {
                                                     {
@@ -1148,7 +1144,7 @@ public class Argument<M extends Model> {
                                             }
                                         }
                                     } else if ((i == 1 || i == 3) && findMatchingSubstringPairs(cESubstrings)) {
-                                        for (int j = 0; j < substringSetCycles; j = j+3) {
+                                        for (int j = 0; j < cESubstrings.length; j = j+3) {
                                             if (cESubstrings[j].equals(cESubstrings[j+2])
                                             && !cESubstrings[j+1].equals(cESubstrings[j+3])) {
                                                 encodings.add(new HashMap<Character, String>() {
@@ -1221,9 +1217,8 @@ public class Argument<M extends Model> {
                         case "Complement Law": {
                             for (int i = 0; i < complementLaw.length; i++) {
                                 if (cE.matches(complementLaw[i])) {
-                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, complementLaw[i]);                                    
-                                    final int substringSetCycles = (cESubstrings.length)%2 != 0 ? (Math.floorDiv(cESubstrings.length, 2) + 1)*2 : cESubstrings.length;
-                                    for (int j = 0; j < substringSetCycles; j = j+2) {
+                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, complementLaw[i]);                                   
+                                    for (int j = 0; j < cESubstrings.length; j = j+2) {
                                         if (cESubstrings[j].equals(cESubstrings[j+1])) {
                                             encodings.add(new HashMap<Character, String>() {
                                                 {
@@ -1240,8 +1235,7 @@ public class Argument<M extends Model> {
                             for (int i = 0; i < deMorgansLaw.length; i++) {
                                 if (cE.matches(deMorgansLaw[i])) {
                                     final String[] cESubstrings = subdivideExpressionCharacters(cE, deMorgansLaw[i]);
-                                    final int substringSetCycles = (cESubstrings.length)%2 != 0 ? (Math.floorDiv(cESubstrings.length, 2) + 1)*2 : cESubstrings.length;
-                                    for (int j = 0; j < substringSetCycles; j = j+2) {
+                                    for (int j = 0; j < cESubstrings.length; j = j+2) {
                                         if (!cESubstrings[j].equals(cESubstrings[j+1])) {
                                             encodings.add(new HashMap<Character, String>() {
                                                 {
@@ -1259,8 +1253,7 @@ public class Argument<M extends Model> {
                             for (int i = 0; i < absorptionLaw.length; i++) {
                                 if (cE.matches(absorptionLaw[i])) {
                                     final String[] cESubstrings = subdivideExpressionCharacters(cE, absorptionLaw[i]);
-                                    final int substringSetCycles;
-                                    for (int j = 0; j < substringSetCycles; j = j+3) {
+                                    for (int j = 0; j < cESubstrings.length; j = j+3) {
                                         if (cESubstrings[j].equals(cESubstrings[j+1])
                                                 && !cESubstrings[j+2].equals(cESubstrings[j])) {
                                             encodings.add(new HashMap<Character, String>() {
@@ -1289,8 +1282,7 @@ public class Argument<M extends Model> {
                                     final String[] cESubstrings = subdivideExpressionCharacters(cE,
                                             conditionalIdentity[i]);
                                         if (i <= 2) {
-                                            final int substringSetCycles = (cESubstrings.length)%2 != 0 ? (Math.floorDiv(cESubstrings.length, 2) + 1)*2 : cESubstrings.length;
-                                            for (int j = 0; j < substringSetCycles; j = j+2) {
+                                            for (int j = 0; j < cESubstrings.length; j = j+2) {
                                                 if (!cESubstrings[j].equals(cESubstrings[j+1])) {
                                                     encodings.add(new HashMap<Character, String>() {
                                                         {
@@ -1301,8 +1293,7 @@ public class Argument<M extends Model> {
                                                 }
                                             }
                                         } else {
-                                            final int substringSetCycles = (cESubstrings.length)%4 != 0 ?    
-                                            for (int j = 0; j < substringSetCycles; j = j+4) {                                    
+                                            for (int j = 0; j < cESubstrings.length; j = j+4) {                                    
                                                 if (cESubstrings[j].equals(cESubstrings[j+3])
                                                 && cESubstrings[j+1].equals(cESubstrings[j+2])
                                                 && !cESubstrings[j].equals(cESubstrings[j+1])) {
@@ -1320,8 +1311,8 @@ public class Argument<M extends Model> {
                             }
                             break;
                         }
+                        encodedLawMap.put(law, encodings);
                     }
-                    encodedLawMap.put(law, encodings);
                 }
                 System.gc();
 
