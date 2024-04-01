@@ -499,7 +499,6 @@ public class Proposition {
         }
 
         try {
-
             csvWriter = new FileWriter(path.resolve(file).toString());
 
             for (int i = 0; i < truthTable.length; i++) {
