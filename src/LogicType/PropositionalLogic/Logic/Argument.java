@@ -281,39 +281,75 @@ public class Argument<M extends Model> {
 
         DirectedDeductionGraph dg = new DirectedDeductionGraph(this.getKnowledgeBaseExpressions(), query);
 
-        return bidirectionalIterativeDeepeningSearch(dg, returnType);
+        return bidirectionalIterativeDeepeningKBSearch(dg, returnType);
     }
 
-    private <G> G bidirectionalIterativeDeepeningSearch(DirectedDeductionGraph graph, G returnType) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
-        InferenceLaws inferences = new InferenceLaws();
+    private <G> G bidirectionalIterativeDeepeningKBSearch(DirectedDeductionGraph graph, G returnType) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+        InferenceLaws<Model> inferences = new InferenceLaws<>();
         EquivalencyLaws equivalencies = new EquivalencyLaws();
 
-        Argument<Model> knowledgeHistory = new Argument<>(this.knowledgeBase); // serves as knowledge history container
-        ArrayList<DeductionGraphNode> leafs = graph.getNodes();
+        ArrayList<M> forwardKnowledgeHistory = new ArrayList<>(); // serves as forward knowledge history container
+        for (DeductionGraphNode node : graph.getPremiseNodes()) {
+            forwardKnowledgeHistory.add(new Model(node.getExpression()));   
+        }
+
+        ArrayList<Model> backwardKnowledgeHistory = new ArrayList<>(); // serves as backward knowledge history container
+        backwardKnowledgeHistory.add(new M(graph.getQuery()));
+
+        ArrayList<DeductionGraphNode> leaves = graph.getNodes();
         ArrayList<ArrayList<String>> optimalPaths;
         int depth = 3;
-        while (true) {
-            Map<String, ArrayList<String>> inferenceMap = new HashMap<>();
-            Map<String, ArrayList<String>> equivalencyMap = new HashMap<>();
-            for (DeductionGraphNode leaf : leafs) {
-                inferenceMap = inferences.checkInferenceLaws(knowledgeHistory);
-                equivalencyMap = equivalencies.checkEquivalencyLaws(new Proposition(leaf.getExpression()));
+        for (int searchVersion = 1; searchVersion <= 2; searchVersion++) {
+            while (true) {
+                ArrayList<Map<String, ArrayList<String>>> inferenceMaps = new ArrayList<>();
+                Map<String, ArrayList<String>> equivalencyMap = new HashMap<>();
+                forwardKnowledgeHistory.add()
+                ArrayList<Argument<M>> knowledgeCombinations = combineKBExpressions(forwardKnowledgeHistory);
+                if (searchVersion == 1) {
+                    for (DeductionGraphNode leaf : leaves) {
+                        if (!graph.isQueryNode(leaf)) {
+                            for (int i = 0; i < knowledgeCombinations.size(); i++) {
+                                inferenceMaps.add(inferences.checkInferenceLaws(knowledgeCombinations.get(i)));
+                                DeductionGraphNode parent1 = new DeductionGraphNode(knowledgeCombinations.get(i).getKnowledgeBaseExpression(0));
+                                DeductionGraphNode parent2 = new DeductionGraphNode(knowledgeCombinations.get(i).getKnowledgeBaseExpression(1));
 
-                for (String law : equivalencyMap.keySet()) {
-                    if (equivalencyMap.get(law) == null) {
-                        break;
-                    } else {
-                        String[] premises = equivalencyMap.get(law)
-                        String conversion = equivalencyMap.get(law)
+
+                            }
+
+
+
+                        } else{
+
+                        }
+                        for (int i = 0; i < knowledgeCombinations.size(); i++) {
+                            
+                            inferenceMap = inferences.checkInferenceLaws(knowledgeCombinations.get(i));
+                        }
+                        equivalencyMap = equivalencies.checkEquivalencyLaws(new Proposition(leaf.getExpression()));
+        
+                        for (String law : equivalencyMap.keySet()) {
+                            if (equivalencyMap.get(law) == null) {
+                                break;
+                            } else {
+                                String[] premises = equivalencyMap.get(law)
+                                String conversion = equivalencyMap.get(law)
+                            }
+                        }
+                    }
+                } else {
+                    for (DeductionGraphNode leaf : leafs) {
+
                     }
                 }
+
+                for (DeductionGraphNode node : graph.getNodes()) {
+                    if (knowledgeHistory)
+                }
+                leaves = graph.getLeafNodes();
+                System.gc();
             }
-            for (DeductionGraphNode node : graph.getNodes()) {
-                if (knowledgeHistory)
-            }
-            leafs = graph.getLeafNodes();
-            System.gc();
         }
+
         /**
          * 
             1. Initialize the `DeductionGraph` with root nodes from the knowledge base and a detached node for the query.
@@ -364,14 +400,17 @@ public class Argument<M extends Model> {
         return type;
     }
 
-    private ArrayList<Argument<M>> combineKBExpressions() {
+    private ArrayList<Argument<M>> combineKBExpressions(ArrayList<M> knowledgeBase) {
         ArrayList<Argument<M>> kbCombinations = new ArrayList<>();
-        for (int i = 0; i < this.knowledgeBase.length; i++) {
-            for (int j  = this.knowledgeBase.length-1; j )
+        for (int i = 0; i < knowledgeBase.size(); i++) {
+            for (int j  = i+1; j < knowledgeBase.size(); j++) {
+                M[] newCombination;
+                newCombination = new M[] {knowledgeBase.get(i), knowledgeBase.get(j)};
+                kbCombinations.add(new Argument<M>(new M[] {knowledgeBase[i], knowledgeBase[j]}));
+            }
         }
 
-
-        return null;
+        return kbCombinations;
     }
 
     public void setKnowledgeBase(M[] knowledgeBase)
@@ -430,8 +469,16 @@ public class Argument<M extends Model> {
         }
     }
 
+    public M getKnowledgeBaseModel(int index) {
+        return this.knowledgeBase[index];
+    }
+
     public M[] getKnowledgeBaseModels() {
         return this.knowledgeBase;
+    }
+
+    public String getKnowledgeBaseExpression(int index) {
+        return this.knowledgeBase[index].getExpression();
     }
 
     public String[] getKnowledgeBaseExpressions() {
@@ -440,6 +487,10 @@ public class Argument<M extends Model> {
             expressions[i] = this.knowledgeBase[i].getExpression();
         }
         return expressions;
+    }
+
+    public Proposition getKnowledgeBaseProposition(int index) {
+        return this.knowledgeBase[index].getProposition();
     }
 
     public Proposition[] getKnowledgeBasePropositions() {
@@ -464,7 +515,7 @@ public class Argument<M extends Model> {
     }
 
     /* Used for constructing argumentative inference */
-    static class InferenceLaws {
+    static class InferenceLaws<M extends Model> {
 
         private static final Map<String, ArrayList<String>> answerTemplate = new HashMap<>() {
             {
@@ -486,7 +537,7 @@ public class Argument<M extends Model> {
          * @return Maps inference law to list of strings, with each string containing
          *         [applied premises] and resulting {conclusion}.
          */
-        public Map<String, ArrayList<String>> checkInferenceLaws(Argument<Model> a) {
+        public Map<String, ArrayList<String>> checkInferenceLaws(Argument<M> a) {
             Proposition[] kbPropositions = a.getKnowledgeBasePropositions();
             String[] kbConversions = new String[kbPropositions.length];
             for (int i = 0; i < kbPropositions.length; i++) {
