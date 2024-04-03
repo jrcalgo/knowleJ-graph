@@ -94,12 +94,12 @@ public class DirectedDeductionGraph {
         return false;
     }
 
-    public boolean contains(DeductionGraphNode vertex) {
-        return this.nodes.contains(vertex);
+    public String[] getKnowledgeBase() {
+        return this.knowledgeBase;
     }
 
-    public boolean containsQuery(DeductionGraphNode vertex) {
-        return vertex.getExpression().equals(this.query.getExpression());
+    public String getQuery() {
+        return this.query.getExpression();
     }
 
     public ArrayList<DeductionGraphNode> getNodes() {
@@ -109,7 +109,7 @@ public class DirectedDeductionGraph {
     public ArrayList<DeductionGraphNode> getLeafNodes() throws Exception {
         ArrayList<DeductionGraphNode> leafs = new ArrayList<>();
         for (DeductionGraphNode node : this.nodes) {
-            if (node.getOutNodes().size() == 0 && !this.containsQuery(node)) {
+            if (node.getOutNodes().size() == 0 && !this.isQueryNode(node)) {
                 leafs.add(node);
             }
         }
@@ -129,7 +129,7 @@ public class DirectedDeductionGraph {
     }
 
     public boolean isLeafNode(DeductionGraphNode vertex) throws Exception {
-        return vertex.getOutNodes().size() == 0 && !this.containsQuery(vertex);
+        return vertex.getOutNodes().size() == 0 && !this.isQueryNode(vertex);
     }
 
     public boolean isPremiseNode(DeductionGraphNode vertex) {
