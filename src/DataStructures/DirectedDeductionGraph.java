@@ -6,8 +6,9 @@ import java.util.LinkedList;
 import src.LogicType.PropositionalLogic.Logic.Proposition;
 
 public class DirectedDeductionGraph {
-    private ArrayList<DeductionGraphNode> givenNodes; // initial expression(s) / root(s)
-    private ArrayList<DeductionGraphNode> nodes;
+    private ArrayList<DeductionGraphNode> nodes; // all graph nodes
+    private ArrayList<DeductionGraphNode> premiseNodes; // initial expression(s) / root(s)
+    private DeductionGraphNode queryNode; // query node
     private int nodeCount = -1;
 
     private String[] knowledgeBase;
@@ -19,8 +20,8 @@ public class DirectedDeductionGraph {
 
         // store knowledge base expressions as given nodes and as root nodes for subgraphs in this.nodes
         for (int i = 0; i < knowledgeBase.length; i++) {
-            this.givenNodes.add(new DeductionGraphNode(knowledgeBase[i]));
-            this.nodes.add(this.givenNodes.get(i));
+            this.premiseNodes.add(new DeductionGraphNode(knowledgeBase[i]));
+            this.nodes.add(this.premiseNodes.get(i));
             this.nodeCount++;
         }
         // points knowledge base expressions to each other (signifies mutual relationship/traversal)
@@ -28,7 +29,7 @@ public class DirectedDeductionGraph {
             for (int i = 0; i < knowledgeBase.length; i++) {
                 for (int j = knowledgeBase.length-1; j > 0; j--) {
                     if (i != j) {
-                        this.mutuallyPoint(this.givenNodes.get(i), this.givenNodes.get(j));
+                        this.mutuallyPoint(this.premiseNodes.get(i), this.premiseNodes.get(j));
                     } else
                         break;
                 }
@@ -36,8 +37,8 @@ public class DirectedDeductionGraph {
         }
 
         // adds a detached query node to the graph
-        this.givenNodes.add(new DeductionGraphNode(query.getExpression()));
-        this.nodes.add(this.givenNodes.get(this.nodeCount+1));
+        this.queryNode = new DeductionGraphNode(query.getExpression());
+        this.nodes.add(this.queryNode);
         this.nodeCount++;
     }
 
@@ -115,4 +116,27 @@ public class DirectedDeductionGraph {
         return leafs;
     }
 
+    public ArrayList<DeductionGraphNode> getPremiseNodes() {
+        return this.premiseNodes;
+    }
+
+    public DeductionGraphNode getQueryNode() {
+        return this.queryNode;
+    }
+
+    public boolean isNode(DeductionGraphNode vertex) {
+        return this.nodes.contains(vertex);
+    }
+
+    public boolean isLeafNode(DeductionGraphNode vertex) throws Exception {
+        return vertex.getOutNodes().size() == 0 && !this.containsQuery(vertex);
+    }
+
+    public boolean isPremiseNode(DeductionGraphNode vertex) {
+        return this.premiseNodes.contains(vertex);
+    }
+
+    public boolean isQueryNode(DeductionGraphNode vertex) {
+        return vertex.getExpression().equals(this.query.getExpression());
+    }
 }
