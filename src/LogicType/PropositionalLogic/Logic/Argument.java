@@ -288,39 +288,33 @@ public class Argument<M extends Model> {
         InferenceLaws<Model> inferences = new InferenceLaws<>();
         EquivalencyLaws equivalencies = new EquivalencyLaws();
 
-        ArrayList<M> forwardKnowledgeHistory = new ArrayList<>(); // serves as forward knowledge history container
+        ArrayList<String> forwardKnowledgeHistory = new ArrayList<>(); // serves as forward knowledge history container
         for (DeductionGraphNode node : graph.getPremiseNodes()) {
-            forwardKnowledgeHistory.add(new Model(node.getExpression()));   
+            forwardKnowledgeHistory.add(node.getExpression()); // initial node(s)
         }
 
-        ArrayList<Model> backwardKnowledgeHistory = new ArrayList<>(); // serves as backward knowledge history container
-        backwardKnowledgeHistory.add(new M(graph.getQuery()));
+        ArrayList<String> backwardKnowledgeHistory = new ArrayList<>(); // serves as backward knowledge history container
+        backwardKnowledgeHistory.add(graph.getQuery()); // initial node
 
-        ArrayList<DeductionGraphNode> leaves = graph.getNodes();
+        ArrayList<DeductionGraphNode> leaves = graph.getNodes(); // initialized with all initially given nodes
         ArrayList<ArrayList<String>> optimalPaths;
         int depth = 3;
         for (int searchVersion = 1; searchVersion <= 2; searchVersion++) {
+            int firstIteration = 1;
             while (true) {
                 ArrayList<Map<String, ArrayList<String>>> inferenceMaps = new ArrayList<>();
                 Map<String, ArrayList<String>> equivalencyMap = new HashMap<>();
-                forwardKnowledgeHistory.add()
                 ArrayList<Argument<M>> knowledgeCombinations = combineKBExpressions(forwardKnowledgeHistory);
-                if (searchVersion == 1) {
-                    for (DeductionGraphNode leaf : leaves) {
-                        if (!graph.isQueryNode(leaf)) {
-                            for (int i = 0; i < knowledgeCombinations.size(); i++) {
-                                inferenceMaps.add(inferences.checkInferenceLaws(knowledgeCombinations.get(i)));
-                                DeductionGraphNode parent1 = new DeductionGraphNode(knowledgeCombinations.get(i).getKnowledgeBaseExpression(0));
-                                DeductionGraphNode parent2 = new DeductionGraphNode(knowledgeCombinations.get(i).getKnowledgeBaseExpression(1));
+                if (searchVersion == 1) { 
+                    // forward search
+                    for (int i = 0; i < knowledgeCombinations.size(); i++) {
+                        inferenceMaps.add(inferences.checkInferenceLaws(knowledgeCombinations.get(i)));
+                        DeductionGraphNode parent1 = new DeductionGraphNode(knowledgeCombinations.get(i).getKnowledgeBaseExpression(0));
+                        DeductionGraphNode parent2 = new DeductionGraphNode(knowledgeCombinations.get(i).getKnowledgeBaseExpression(1));
 
 
-                            }
+                    }
 
-
-
-                        } else{
-
-                        }
                         for (int i = 0; i < knowledgeCombinations.size(); i++) {
                             
                             inferenceMap = inferences.checkInferenceLaws(knowledgeCombinations.get(i));
@@ -335,8 +329,22 @@ public class Argument<M extends Model> {
                                 String conversion = equivalencyMap.get(law)
                             }
                         }
+                    
+                     // backward search
+                    if (firstIteration != 1) {
+                        inferenceMaps = 
+                        equivalencyMap = inferences.checkEquivalencyLaws(new Proposition(leaf.getExpression()));
+                    } else {
+                        equivalencyMap = equivalencies.checkEquivalencyLaws(new Proposition(backwardKnowledgeHistory.get(0))); // query
+                        for (String law : equivalencyMap.keySet()) {
+                            for (String equivalency : equivalencyMap.get(law)) 
+                            graph.point(graph.add(equivalency), graph.getQueryNode());
+                        }
+                        firstIteration--;
                     }
-                } else {
+
+                    System.gc();
+                } else { // version 2 should version 1 fail
                     for (DeductionGraphNode leaf : leafs) {
 
                     }
@@ -346,8 +354,11 @@ public class Argument<M extends Model> {
                     if (knowledgeHistory)
                 }
                 leaves = graph.getLeafNodes();
-                System.gc();
+                break;
             }
+            inferenceMaps.clear();
+            equivalencyMap.clear();
+            System.gc();
         }
 
         /**
@@ -400,12 +411,12 @@ public class Argument<M extends Model> {
         return type;
     }
 
-    private ArrayList<Argument<M>> combineKBExpressions(ArrayList<M> knowledgeBase) {
+    private ArrayList<Argument<M>> combineKBExpressions(ArrayList<String> kb) {
         ArrayList<Argument<M>> kbCombinations = new ArrayList<>();
-        for (int i = 0; i < knowledgeBase.size(); i++) {
-            for (int j  = i+1; j < knowledgeBase.size(); j++) {
-                M[] newCombination;
-                newCombination = new M[] {knowledgeBase.get(i), knowledgeBase.get(j)};
+        for (int i = 0; i < kb.size(); i++) {
+            for (int j  = i+1; j < kb.size(); j++) {
+                Argument<M> newCombination = new Argument<M>();
+                newCombination.setKnowledgeBase(new M[] {knowledgeBase[i], knowledgeBase[j]});
                 kbCombinations.add(new Argument<M>(new M[] {knowledgeBase[i], knowledgeBase[j]}));
             }
         }
@@ -546,6 +557,8 @@ public class Argument<M extends Model> {
 
             Map<String, ArrayList<String>> answerSet = answerTemplate;
             Map<String, ArrayList<Map<Character, String>>> answerEncodings = argumentEncoder(kbConversions);
+            if (answerEncodings == null)
+                return null;
             String[] encoded_kb = kbConversions;
             for (String law : answerEncodings.keySet()) {
                 for (Map<Character, String> encoding : answerEncodings.get(law)) {
@@ -748,6 +761,8 @@ public class Argument<M extends Model> {
                 if (encodedLawMap.get(law) == null)
                     encodedLawMap.remove(law);
             }
+            if (encodedLawMap.isEmpty())
+                return null;
 
             return encodedLawMap;
         }
