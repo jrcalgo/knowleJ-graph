@@ -10,6 +10,7 @@ public class DirectedDeductionGraph {
     private ArrayList<DeductionGraphNode> premiseNodes; // initial expression(s) / root(s)
     private DeductionGraphNode queryNode; // query node
     private int nodeCount = -1;
+    private int premiseCount = -1;
 
     private String[] knowledgeBase;
     private Proposition query;
@@ -23,6 +24,7 @@ public class DirectedDeductionGraph {
             this.premiseNodes.add(new DeductionGraphNode(knowledgeBase[i]));
             this.nodes.add(this.premiseNodes.get(i));
             this.nodeCount++;
+            this.premiseCount++;
         }
         // points knowledge base expressions to each other (signifies mutual relationship/traversal)
         if (knowledgeBase.length > 1) {
@@ -57,9 +59,11 @@ public class DirectedDeductionGraph {
         inVertex.addOutNode(outVertex);
     }
 
-    public void add(String expression) {
+    public DeductionGraphNode add(String expression) {
         this.nodes.add(new DeductionGraphNode(expression));
         this.nodeCount++;
+
+        return this.nodes.get(this.nodeCount);
     }
 
     public void delete(String expression) {
