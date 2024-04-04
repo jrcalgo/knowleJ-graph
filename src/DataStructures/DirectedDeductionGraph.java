@@ -98,6 +98,21 @@ public class DirectedDeductionGraph {
         return false;
     }
 
+    public int findNodeIndex(String expression) throws Exception {
+        try {
+            Proposition prop = new Proposition(expression);
+        } catch (Exception e) {
+            throw new Exception("Invalid expression");
+        }
+        
+        for (int i = 0; i < this.nodes.size(); i++) {
+            if (this.nodes.get(i).getExpression().equals(expression)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public String[] getKnowledgeBase() {
         return this.knowledgeBase;
     }
