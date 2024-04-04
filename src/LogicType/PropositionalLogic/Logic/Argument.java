@@ -1,5 +1,6 @@
 package src.LogicType.PropositionalLogic.Logic;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -296,7 +297,9 @@ public class Argument<M extends Model> {
         ArrayList<String> backwardKnowledgeHistory = new ArrayList<>(); // serves as backward knowledge history container
         backwardKnowledgeHistory.add(graph.getQuery()); // initial node
 
-        ArrayList<DeductionGraphNode> leaves = graph.getNodes(); // initialized with all initially given nodes
+        ArrayList<DeductionGraphNode> forwardLeaves = graph.getPremiseNodes(); // initialized with all initially given nodes
+        ArrayList<DeductionGraphNode> backwardLeaves = new ArrayList<>() {{ add(graph.getQueryNode()); } };
+
         ArrayList<ArrayList<String>> optimalPaths;
         int depth = 3;
         for (int searchVersion = 1; searchVersion <= 2; searchVersion++) {
@@ -316,7 +319,6 @@ public class Argument<M extends Model> {
                     }
 
                         for (int i = 0; i < knowledgeCombinations.size(); i++) {
-                            
                             inferenceMap = inferences.checkInferenceLaws(knowledgeCombinations.get(i));
                         }
                         equivalencyMap = equivalencies.checkEquivalencyLaws(new Proposition(leaf.getExpression()));
@@ -332,8 +334,10 @@ public class Argument<M extends Model> {
                     
                      // backward search
                     if (firstIteration != 1) {
-                        inferenceMaps = 
-                        equivalencyMap = inferences.checkEquivalencyLaws(new Proposition(leaf.getExpression()));
+                        for (int i = 0; i < knowledgeCombinations.size(); i++) {
+
+                        }
+                        equivalencyMap = equivalencies.checkEquivalencyLaws(new Proposition(leaf.getExpression()));
                     } else {
                         equivalencyMap = equivalencies.checkEquivalencyLaws(new Proposition(backwardKnowledgeHistory.get(0))); // query
                         for (String law : equivalencyMap.keySet()) {
@@ -411,18 +415,20 @@ public class Argument<M extends Model> {
         return type;
     }
 
-    private ArrayList<Argument<M>> combineKBExpressions(ArrayList<String> kb) {
+    private ArrayList<Argument<M>> combineKBExpressions(ArrayList<M> kb) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         ArrayList<Argument<M>> kbCombinations = new ArrayList<>();
         for (int i = 0; i < kb.size(); i++) {
-            for (int j  = i+1; j < kb.size(); j++) {
-                Argument<M> newCombination = new Argument<M>();
-                newCombination.setKnowledgeBase(new M[] {knowledgeBase[i], knowledgeBase[j]});
-                kbCombinations.add(new Argument<M>(new M[] {knowledgeBase[i], knowledgeBase[j]}));
+            for (int j = i + 1; j < kb.size(); j++) {
+                @SuppressWarnings("unchecked")
+                M[] combination = (M[]) Array.newInstance(kb.get(i).getClass(), 2);
+                combination[0] = kb.get(i);
+                combination[1] = kb.get(j);
+                kbCombinations.add(new Argument<M>(combination));
             }
         }
-
         return kbCombinations;
     }
+    
 
     public void setKnowledgeBase(M[] knowledgeBase)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
