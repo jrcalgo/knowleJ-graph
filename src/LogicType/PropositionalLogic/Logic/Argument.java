@@ -311,20 +311,22 @@ public class Argument<M extends Model> {
                 if (searchVersion == 1) { 
                     // forward chaining
                     for (int i = 0; i < knowledgeCombinations.size(); i++) {
+                        String argSentence1 = knowledgeCombinations.get(i).getKnowledgeBaseExpression(0);
+                        String argSentence2 = knowledgeCombinations.get(i).getKnowledgeBaseExpression(1);
                         inferenceMaps.add(inferenceLaws.checkInferenceLaws(knowledgeCombinations.get(i)));
                         for (String law : inferenceMaps.get(i).keySet()) {
                             for (ArrayList<String> inferences : inferenceMaps.get(i).get(law)) {
                                 for (String inference : inferences) {
                                     if (graph.contains(inference) ) {
-                                        if (!graph.isPointing(graph.getNode(knowledgeCombinations.get(i).getKnowledgeBaseExpression(0)), graph.getNode(inference)))
-                                            graph.point(graph.getNode(knowledgeCombinations.get(i).getKnowledgeBaseExpression(0)), graph.getNode(inference));
-                                        if (!graph.isPointing(graph.getNode(knowledgeCombinations.get(i).getKnowledgeBaseExpression(1)), graph.getNode(inference)))
-                                            graph.point(graph.getNode(knowledgeCombinations.get(i).getKnowledgeBaseExpression(1)), graph.getNode(inference));
+                                        if (!graph.isPointing(graph.getNode(argSentence1), graph.getNode(inference)))
+                                            graph.point(graph.getNode(argSentence1), graph.getNode(inference));
+                                        if (!graph.isPointing(graph.getNode(argSentence2), graph.getNode(inference)))
+                                            graph.point(graph.getNode(argSentence2), graph.getNode(inference));
                                     } else {
                                         DeductionGraphNode newInferenceNode = new DeductionGraphNode(inference);
                                         graph.add(newNode);
-                                        graph.point(graph.getNode(knowledgeCombinations.get(i).getKnowledgeBaseExpression(0)), newNode);
-                                        graph.point(graph.getNode(knowledgeCombinations.get(i).getKnowledgeBaseExpression(1)), newNode);   
+                                        graph.point(graph.getNode(argSentence1), newNode);
+                                        graph.point(graph.getNode(argSentence2), newNode);   
                                     }
                                 }
                             }
