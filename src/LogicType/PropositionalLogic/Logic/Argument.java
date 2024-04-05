@@ -282,12 +282,12 @@ public class Argument<M extends Model> {
 
         DirectedDeductionGraph dg = new DirectedDeductionGraph(this.getKnowledgeBaseExpressions(), query);
 
-        return bidirectionalIterativeDeepeningKBSearch(dg, returnType);
+        return bidirectionalIterativeDeepeningKBChaining(dg, returnType);
     }
 
-    private <G> G bidirectionalIterativeDeepeningKBSearch(DirectedDeductionGraph graph, G returnType) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
-        InferenceLaws<Model> inferences = new InferenceLaws<>();
-        EquivalencyLaws equivalencies = new EquivalencyLaws();
+    private <G> G bidirectionalIterativeDeepeningKBChaining(DirectedDeductionGraph graph, G returnType) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+        InferenceLaws<Model> inferenceLaws = new InferenceLaws<>();
+        EquivalencyLaws equivalencyLaws = new EquivalencyLaws();
 
         ArrayList<String> forwardKnowledgeHistory = new ArrayList<>(); // serves as forward knowledge history container
         for (DeductionGraphNode node : graph.getPremiseNodes()) {
@@ -309,14 +309,28 @@ public class Argument<M extends Model> {
                 Map<String, ArrayList<String>> equivalencyMap = new HashMap<>();
                 ArrayList<Argument<M>> knowledgeCombinations = combineKBExpressions(forwardKnowledgeHistory);
                 if (searchVersion == 1) { 
-                    // forward search
+                    // forward chaining
                     for (int i = 0; i < knowledgeCombinations.size(); i++) {
-                        inferenceMaps.add(inferences.checkInferenceLaws(knowledgeCombinations.get(i)));
-                        DeductionGraphNode parent1 = new DeductionGraphNode(knowledgeCombinations.get(i).getKnowledgeBaseExpression(0));
-                        DeductionGraphNode parent2 = new DeductionGraphNode(knowledgeCombinations.get(i).getKnowledgeBaseExpression(1));
-
-
+                        inferenceMaps.add(inferenceLaws.checkInferenceLaws(knowledgeCombinations.get(i)));
+                        for (String law : inferenceMaps.get(i).keySet()) {
+                            for (ArrayList<String> inferences : inferenceMaps.get(i).get(law)) {
+                                for (String inference : inferences) {
+                                    if (graph.contains(inference) ) {
+                                        if (!graph.isPointing(graph.getNode(knowledgeCombinations.get(i).getKnowledgeBaseExpression(0)), graph.getNode(inference)))
+                                            graph.point(graph.getNode(knowledgeCombinations.get(i).getKnowledgeBaseExpression(0)), graph.getNode(inference));
+                                        if (!graph.isPointing(graph.getNode(knowledgeCombinations.get(i).getKnowledgeBaseExpression(1)), graph.getNode(inference)))
+                                            graph.point(graph.getNode(knowledgeCombinations.get(i).getKnowledgeBaseExpression(1)), graph.getNode(inference));
+                                    } else {
+                                        DeductionGraphNode newInferenceNode = new DeductionGraphNode(inference);
+                                        graph.add(newNode);
+                                        graph.point(graph.getNode(knowledgeCombinations.get(i).getKnowledgeBaseExpression(0)), newNode);
+                                        graph.point(graph.getNode(knowledgeCombinations.get(i).getKnowledgeBaseExpression(1)), newNode);   
+                                    }
+                                }
+                            }
+                        }
                     }
+                    for ()
 
                         for (int i = 0; i < knowledgeCombinations.size(); i++) {
                             inferenceMap = inferences.checkInferenceLaws(knowledgeCombinations.get(i));
@@ -332,7 +346,7 @@ public class Argument<M extends Model> {
                             }
                         }
                     
-                     // backward search
+                     // backward chaining
                     if (firstIteration != 1) {
                         for (int i = 0; i < knowledgeCombinations.size(); i++) {
 
