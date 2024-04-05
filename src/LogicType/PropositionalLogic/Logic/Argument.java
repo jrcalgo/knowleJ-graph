@@ -305,7 +305,6 @@ public class Argument<M extends Model> {
         for (int searchVersion = 1; searchVersion <= 2; searchVersion++) {
             int firstIteration = 1;
             while (true) {
-                ArrayList<Map<String, ArrayList<String>>> inferenceMaps = new ArrayList<>();
                 Map<String, ArrayList<String>> equivalencyMap = new HashMap<>();
                 ArrayList<Argument<M>> knowledgeCombinations = combineKBExpressions(forwardKnowledgeHistory);
                 if (searchVersion == 1) { 
@@ -313,9 +312,9 @@ public class Argument<M extends Model> {
                     for (int i = 0; i < knowledgeCombinations.size(); i++) {
                         String argSentence1 = knowledgeCombinations.get(i).getKnowledgeBaseExpression(0);
                         String argSentence2 = knowledgeCombinations.get(i).getKnowledgeBaseExpression(1);
-                        inferenceMaps.add(inferenceLaws.checkInferenceLaws(knowledgeCombinations.get(i)));
-                        for (String law : inferenceMaps.get(i).keySet()) {
-                            for (ArrayList<String> inferences : inferenceMaps.get(i).get(law)) {
+                        Map<String, ArrayList<String>> inferenceMap = inferenceLaws.checkInferenceLaws(knowledgeCombinations.get(i));
+                        for (String law : inferenceMap.keySet()) {
+                            for (ArrayList<String> inferences : inferenceMap.get(law)) {
                                 for (String inference : inferences) {
                                     if (graph.contains(inference) ) {
                                         if (!graph.isPointing(graph.getNode(argSentence1), graph.getNode(inference)))
