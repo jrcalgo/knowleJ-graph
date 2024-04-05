@@ -4,8 +4,8 @@ import java.util.LinkedList;
 
 public class DeductionGraphNode {
     private String expression;
-    private LinkedList<String> inLawEdges;
     private LinkedList<DeductionGraphNode> outNodes;
+    private LinkedList<String> outEdgeLaws;
 
     public DeductionGraphNode(String expression) {
         this.expression = expression;
