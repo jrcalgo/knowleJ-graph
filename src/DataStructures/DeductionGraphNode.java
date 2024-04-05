@@ -4,6 +4,7 @@ import java.util.LinkedList;
 
 public class DeductionGraphNode {
     private String expression;
+    private LinkedList<String> inLawEdges;
     private LinkedList<DeductionGraphNode> outNodes;
 
     public DeductionGraphNode(String expression) {
@@ -35,6 +36,14 @@ public class DeductionGraphNode {
 
     public void setExpression(String expression) {
         this.expression = expression;
+    }
+
+    pubulic String getLaw() {
+        return this.law;
+    }
+
+    public void setLaw(String law) {
+        this.law = law;
     }
 
     public LinkedList<DeductionGraphNode> getOutNodes() throws Exception {
@@ -82,5 +91,7 @@ public class DeductionGraphNode {
                 
     }
 
-
+    public boolean isPointing(DeductionGraphNode outVertex, DeductionGraphNode inVertex) {
+        return outVertex.getOutNodes().contains(inVertex);
+    }
 }

@@ -98,6 +98,15 @@ public class DirectedDeductionGraph {
         return false;
     }
 
+    public DeductionGraphNode getNode(String expression) throws Exception {
+        for (DeductionGraphNode node : this.nodes) {
+            if (node.getExpression().equals(expression)) {
+                return node;
+            }
+        }
+        throw new Exception("Node not found");
+    }
+
     public int findNodeIndex(String expression) throws Exception {
         try {
             Proposition prop = new Proposition(expression);
