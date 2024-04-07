@@ -304,63 +304,70 @@ public class Argument<M extends Model> {
         int depth = 3;
         for (int searchVersion = 1; searchVersion <= 2; searchVersion++) {
             int firstIteration = 1;
+            Map<String, ArrayList<String>> inferenceMap;
+            Map<String, ArrayList<String>> equivalencyMap;
             while (true) {
-                Map<String, ArrayList<String>> equivalencyMap = new HashMap<>();
+                equivalencyMap = new HashMap<>();
                 ArrayList<Argument<M>> knowledgeCombinations = combineKBExpressions(forwardKnowledgeHistory);
                 if (searchVersion == 1) { 
                     // forward chaining
+                    // inference/argument evaluations
                     for (int i = 0; i < knowledgeCombinations.size(); i++) {
                         String argSentence1 = knowledgeCombinations.get(i).getKnowledgeBaseExpression(0);
                         String argSentence2 = knowledgeCombinations.get(i).getKnowledgeBaseExpression(1);
-                        Map<String, ArrayList<String>> inferenceMap = inferenceLaws.checkInferenceLaws(knowledgeCombinations.get(i));
+                        inferenceMap = inferenceLaws.checkInferenceLaws(knowledgeCombinations.get(i));
                         for (String law : inferenceMap.keySet()) {
                             for (ArrayList<String> inferences : inferenceMap.get(law)) {
                                 for (String inference : inferences) {
-                                    if (graph.contains(inference) ) {
+                                    if (graph.contains(inference)) {
                                         if (!graph.isPointing(graph.getNode(argSentence1), graph.getNode(inference)))
                                             graph.point(graph.getNode(argSentence1), graph.getNode(inference));
                                         if (!graph.isPointing(graph.getNode(argSentence2), graph.getNode(inference)))
                                             graph.point(graph.getNode(argSentence2), graph.getNode(inference));
                                     } else {
                                         DeductionGraphNode newInferenceNode = new DeductionGraphNode(inference);
-                                        graph.add(newNode);
-                                        graph.point(graph.getNode(argSentence1), newNode);
-                                        graph.point(graph.getNode(argSentence2), newNode);   
+                                        graph.add(newInferenceNode);
+                                        graph.point(graph.getNode(argSentence1), newInferenceNode);
+                                        graph.point(graph.getNode(argSentence2), newInferenceNode);   
                                     }
                                 }
                             }
                         }
                     }
-                    for ()
-
-                        for (int i = 0; i < knowledgeCombinations.size(); i++) {
-                            inferenceMap = inferences.checkInferenceLaws(knowledgeCombinations.get(i));
-                        }
-                        equivalencyMap = equivalencies.checkEquivalencyLaws(new Proposition(leaf.getExpression()));
-        
+                    // equivalency/proposition evaluations
+                    ArrayList<DeductionGraphNode> currentNodes = graph.getNodes();
+                    for (DeductionGraphNode node : currentNodes) {
+                        equivalencyMap = equivalencies.checkEquivalencyLaws(new Proposition(node.getExpression()));
                         for (String law : equivalencyMap.keySet()) {
-                            if (equivalencyMap.get(law) == null) {
-                                break;
-                            } else {
-                                String[] premises = equivalencyMap.get(law)
-                                String conversion = equivalencyMap.get(law)
+                            for (ArrayList<String> equivalencies : equivalencyMap.get(law)) {
+                                for (String equivalence : equivalencies) {
+                                    if (graph.contains(equivalence)) {
+                                        if (!graph.isPointing(graph.getNode(node), graph.getNode(equivalence)))
+                                            graph.point(graph.getNode(node), graph.getNode(equivalence));
+                                    } else {
+                                        DeductionGraphNode newEquivalenceNode = new DeductionGraphNode(equivalence);
+                                        graph.add(newEquivalenceNode);
+                                        graph.point(graph.getNode(node), newEquivalenceNode);
+                                    }
+                                }
                             }
                         }
-                    
-                     // backward chaining
-                    if (firstIteration != 1) {
-                        for (int i = 0; i < knowledgeCombinations.size(); i++) {
-
-                        }
-                        equivalencyMap = equivalencies.checkEquivalencyLaws(new Proposition(leaf.getExpression()));
-                    } else {
-                        equivalencyMap = equivalencies.checkEquivalencyLaws(new Proposition(backwardKnowledgeHistory.get(0))); // query
-                        for (String law : equivalencyMap.keySet()) {
-                            for (String equivalency : equivalencyMap.get(law)) 
-                            graph.point(graph.add(equivalency), graph.getQueryNode());
-                        }
-                        firstIteration--;
                     }
+                    
+                // backward chaining
+                if (firstIteration != 1) {
+                    for (int i = 0; i < knowledgeCombinations.size(); i++) {
+
+                    }
+                    equivalencyMap = equivalencies.checkEquivalencyLaws(new Proposition(leaf.getExpression()));
+                } else {
+                    equivalencyMap = equivalencies.checkEquivalencyLaws(new Proposition(backwardKnowledgeHistory.get(0))); // query
+                    for (String law : equivalencyMap.keySet()) {
+                        for (String equivalency : equivalencyMap.get(law)) 
+                        graph.point(graph.add(equivalency), graph.getQueryNode());
+                    }
+                    firstIteration--;
+                }
 
                     System.gc();
                 } else { // version 2 should version 1 fail
