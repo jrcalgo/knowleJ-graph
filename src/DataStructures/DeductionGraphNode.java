@@ -90,8 +90,4 @@ public class DeductionGraphNode {
                 return;
                 
     }
-
-    public boolean isPointing(DeductionGraphNode outVertex, DeductionGraphNode inVertex) {
-        return outVertex.getOutNodes().contains(inVertex);
-    }
 }

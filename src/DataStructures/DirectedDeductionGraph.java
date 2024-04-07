@@ -59,11 +59,11 @@ public class DirectedDeductionGraph {
         inVertex.addOutNode(outVertex);
     }
 
-    public DeductionGraphNode add(String expression) {
+    public DeductionGraphNode add(String expression) throws Exception {
         this.nodes.add(new DeductionGraphNode(expression));
         this.nodeCount++;
 
-        return this.nodes.get(this.nodeCount);
+        return this.getNode(expression);
     }
 
     public void delete(String expression) {
@@ -166,5 +166,9 @@ public class DirectedDeductionGraph {
 
     public boolean isQueryNode(DeductionGraphNode vertex) {
         return vertex.getExpression().equals(this.query.getExpression());
+    }
+
+    public boolean isPointing(DeductionGraphNode outVertex, DeductionGraphNode inVertex) throws Exception {
+        return outVertex.getOutNodes().contains(inVertex);
     }
 }
