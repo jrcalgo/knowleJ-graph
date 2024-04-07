@@ -98,6 +98,10 @@ public class DirectedDeductionGraph {
         return false;
     }
 
+    public boolean containsPathToQuery() throws Exception {
+        
+    }
+
     public DeductionGraphNode getNode(String expression) throws Exception {
         for (DeductionGraphNode node : this.nodes) {
             if (node.getExpression().equals(expression)) {
@@ -142,6 +146,14 @@ public class DirectedDeductionGraph {
             }
         }
         return leafs;
+    }
+
+    public ArrayList<DeductionGraphNode> getPremiseConnectedNodes() {
+
+    }
+
+    public ArrayList<DeductionGraphNode> getQueryConnectedNodes() {
+
     }
 
     public ArrayList<DeductionGraphNode> getPremiseNodes() {
