@@ -98,8 +98,15 @@ public class DirectedDeductionGraph {
         return false;
     }
 
-    public boolean containsPathToQuery() throws Exception {
+    public boolean pathExists(DeductionGraphNode node) {
+
+    }
+
+    public ArrayList<ArrayList<DeductionGraphNode>> astarToQuery() {
+        ArrayList<ArrayList<DeductionGraphNode>> paths = null;
+
         
+        return paths;
     }
 
     public DeductionGraphNode getNode(String expression) throws Exception {
@@ -148,11 +155,11 @@ public class DirectedDeductionGraph {
         return leafs;
     }
 
-    public ArrayList<DeductionGraphNode> getPremiseConnectedNodes() {
+    public ArrayList<DeductionGraphNode> getForwardNodes() {
 
     }
 
-    public ArrayList<DeductionGraphNode> getQueryConnectedNodes() {
+    public ArrayList<DeductionGraphNode> getBackwardNodes() {
 
     }
 
