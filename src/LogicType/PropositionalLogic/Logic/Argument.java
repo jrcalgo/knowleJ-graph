@@ -219,7 +219,7 @@ public class Argument<M extends Model> {
      * @throws InvalidOperandException
      * @throws InvalidLogicOperatorException
      */
-    public boolean isValidArgument(String kbQuery)
+    public boolean containsValidArgument(String kbQuery)
             throws Exception, InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (kbQuery == null || kbQuery.length() == 0)
             throw new IllegalArgumentException("String query cannot be null or empty.");
@@ -237,25 +237,24 @@ public class Argument<M extends Model> {
             throw new IllegalArgumentException("Query not found within current knowledge base.");
 
         DirectedDeductionGraph dg = new DirectedDeductionGraph(kbExpressions, new Proposition(kbQuery));
-        return bidirectionalIterativeKBChaining(dg, false);
+        return validateCurrentArgument(kbQuery);
     }
 
-    public <G> G deduce(String query, G returnType)
-            throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+    private boolean validateCurrentArgument(String kbQuery) {
+        InferenceLaws<Model> inferenceLaws = new InferenceLaws<>();
+        EquivalencyLaws equivalencyLaws = new EquivalencyLaws();
+    }
+
+    public ArrayList<DeductionGraphNode> deduce(String query)
+            throws Exception, InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (query == null || query.length() == 0)
             throw new IllegalArgumentException("String query cannot be null or empty.");
-        if (query.contains(",") && !query.startsWith(",") && !query.endsWith(",")) {
-            String[] queries = query.split(",");
-            ArrayList<ArrayList<String>> answer = new ArrayList<>();
-            for (String q : queries) {
-                answer.addAll(this.deduce(new Proposition(q), returnType));
-            }
-            return answer;
-        }
-        return this.deduce(new Proposition(query), returnType);
+        if (query.contains(","))
+            throw new IllegalArgumentException("String query cannot contain commas.");
+        return this.deduce(new Proposition(query));
     }
 
-    public <G> G deduce(Proposition query, G returnType) throws Exception, InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+    public ArrayList<DeductionGraphNode> deduce(Proposition query) throws Exception, InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (query == null)
             throw new IllegalArgumentException("Proposition query cannot be null or empty.");
 
@@ -282,10 +281,10 @@ public class Argument<M extends Model> {
 
         DirectedDeductionGraph dg = new DirectedDeductionGraph(this.getKnowledgeBaseExpressions(), query);
 
-        return bidirectionalIterativeKBChaining(dg, returnType);
+        return bidirectionalIterativeKBChaining(dg);
     }
 
-    private <G> G bidirectionalIterativeKBChaining(DirectedDeductionGraph graph, G returnType) throws Exception, InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+    private ArrayList<DeductionGraphNode> bidirectionalIterativeKBChaining(DirectedDeductionGraph graph) throws Exception, InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         /**
          * 
             1. Initialize the `DeductionGraph` with root nodes from the knowledge base and a detached node for the query.
@@ -313,9 +312,9 @@ public class Argument<M extends Model> {
         ArrayList<String> backwardKnowledgeHistory = new ArrayList<>(); // serves as backward knowledge history container
         backwardKnowledgeHistory.add(graph.getQuery()); // initial node
 
-        ArrayList<DeductionGraphNode> foundPath;
         int chainOperations = 1;
         boolean firstIteration = true;
+        final int MAX_LOOPS = 50;
         int whileLoopCount = 0;
 
         final int MAX_ITERATIONS = 2;
@@ -578,50 +577,19 @@ public class Argument<M extends Model> {
                     break;
                 }
                 case 3: {
-                    foundPath = graph.astarToQuery();
+                    ArrayList<DeductionGraphNode> foundPath = graph.astarToQuery();
                     chainOperations++;
-
+                    System.gc();
+                    return foundPath;
                 }
             }
             whileLoopCount++;
+            if (whileLoopCount >= MAX_LOOPS)
+                break;
             inferenceMap.clear();
             equivalencyMap.clear();
-            System.gc();
-            if (chainOperations > 3) {
-                break;
-            }
         }
-        return validateDeductionReturnType(returnType);
-    }
-
-    private <G> G validateDeductionReturnType(G type) {
-        if (type == null)
-            throw new IllegalArgumentException("Type cannot be null.");
-        else if (!(type instanceof DirectedDeductionGraph) || !(type instanceof ArrayList))
-            throw new IllegalArgumentException(
-                    "Type must be a DirectedDeductionGraph or an ArrayList<ArrayList<String>>.");
-        else if (type instanceof ArrayList) {
-            ArrayList<?> list = (ArrayList<?>) type;
-            if (!list.isEmpty()) {
-                Object item = list.get(0);
-                if (item instanceof ArrayList) {
-                    ArrayList<?> innerList = (ArrayList<?>) item;
-                    if (!innerList.isEmpty()) {
-                        Object innerItem = innerList.get(0);
-                        if (!(innerItem instanceof String)) {
-                            throw new IllegalArgumentException(
-                                    "Type must be a DirectedDeductionGraph or an ArrayList<ArrayList<String>>.");
-                        } else {
-                            System.gc();
-                        }
-                    }
-                } else {
-                    throw new IllegalArgumentException(
-                            "Type must be a DirectedDeductionGraph or an ArrayList<ArrayList<String>>.");
-                }
-            }
-        }
-        return type;
+        return null;
     }
 
     private ArrayList<String[]> combineKBExpressions(ArrayList<String> kb) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
