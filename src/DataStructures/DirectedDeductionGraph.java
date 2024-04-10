@@ -9,6 +9,8 @@ public class DirectedDeductionGraph {
     private ArrayList<DeductionGraphNode> nodes; // all graph nodes
     private ArrayList<DeductionGraphNode> premiseNodes; // initial expression(s) / root(s)
     private DeductionGraphNode queryNode; // query node
+    private ArrayList<DeductionGraphNode> forwardNodes; // nodes from premise(s) to query
+    private ArrayList<DeductionGraphNode> backwardNodes; // nodes from query to premise(s)
     private int nodeCount = -1;
     private int premiseCount = -1;
 
@@ -98,12 +100,8 @@ public class DirectedDeductionGraph {
         return false;
     }
 
-    public boolean pathExists(DeductionGraphNode node) {
-
-    }
-
-    public ArrayList<ArrayList<DeductionGraphNode>> astarToQuery() {
-        ArrayList<ArrayList<DeductionGraphNode>> paths = null;
+    public ArrayList<DeductionGraphNode> astarToQuery() {
+        ArrayList<DeductionGraphNode> paths = null;
 
         
         return paths;
