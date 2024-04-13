@@ -22,6 +22,8 @@ public class DirectedDeductionGraph {
         this.query = query;
 
         // store knowledge base expressions as given nodes and as root nodes for subgraphs in this.nodes
+        nodes = new ArrayList<DeductionGraphNode>();
+        premiseNodes = new ArrayList<DeductionGraphNode>();
         for (int i = 0; i < knowledgeBase.length; i++) {
             this.premiseNodes.add(new DeductionGraphNode(knowledgeBase[i]));
             this.nodes.add(this.premiseNodes.get(i));

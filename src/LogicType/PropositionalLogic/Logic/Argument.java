@@ -33,19 +33,40 @@ public class Argument<M extends Model> {
         setTruthTable();
     }
 
-    private void validateKnowledgeBase(M[] kb) {
+    private void validateKnowledgeBase(M[] kb) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (kb == null || kb.length == 0)
             throw new IllegalArgumentException("Knowledge base cannot be null or empty.");
 
-        StringBuilder operandString = new StringBuilder();
-        for (M m : kb) {
-            char[] modelOperands = m.getOperands();
-            for (int j = 0; j < modelOperands.length; j++) {
-                if (operandString.indexOf(String.valueOf(modelOperands[j])) == -1) {
-                    operandString.append(modelOperands[j]);
+            StringBuilder operandString = new StringBuilder();
+        try {
+            for (M m : kb) {
+                char[] modelOperands = m.getOperands();
+                for (int j = 0; j < modelOperands.length; j++) {
+                    if (operandString.indexOf(String.valueOf(modelOperands[j])) == -1) {
+                        operandString.append(modelOperands[j]);
+                    }
                 }
             }
+        } catch (Exception e) {
+            Proposition[] modelPropositions = new Proposition[kb.length];
+            for (int j = 0; j < modelPropositions.length; j++) {
+                modelPropositions[j] = new Proposition(kb[j].getExpression());
+            }
+            for (int j = 0; j < modelPropositions.length; j++) {
+                char[] modelOperands = new char[modelPropositions.length];
+                for (int i = 0; i < modelOperands.length; i++) {
+                    DeterministicModel dm = new DeterministicModel("dm", modelPropositions[i]);
+                    modelOperands[i] = dm.getOperands()[i];
+                    if (operandString.indexOf(String.valueOf(modelOperands[i])) == -1) {
+                        operandString.append(modelOperands[i]);
+                    }
+                }
+            }
+        } finally {
+            if (operandString.length() == 0) 
+                throw new IllegalArgumentException("Knowledge base cannot be empty.");
         }
+
         if (operandString.length() > 15)
             throw new IllegalArgumentException("Too many total operands in knowledge base; only 15 total allowed.");
 
@@ -89,7 +110,7 @@ public class Argument<M extends Model> {
                 Proposition p = new Proposition(this.knowledgeBase[i].getExpression());
                 this.allTruthValues[rows][operandCount + i] = p.evaluateExpression(valueMap);
                 this.allTruthTable[rows + 1][operandCount + i] = this.allTruthValues[rows][operandCount + i] ? "T"
-                        : "F";
+                : "F";
             }
             valueMap.clear();
 
@@ -776,7 +797,8 @@ public class Argument<M extends Model> {
                             break;
                         }
                         case "Simplification": {
-                            answerDecodings.add(argumentDecoder(simplification(encoded_kb), encoding));
+                            if (encoded_kb.length == 1)
+                                answerDecodings.add(argumentDecoder(simplification(encoded_kb), encoding));
                             break;
                         }
                         case "Conjunction": {
@@ -840,10 +862,12 @@ public class Argument<M extends Model> {
 
             for (String law : encodedLawMap.keySet()) {
                 ArrayList<Map<Character, String>> encodings = new ArrayList<>();
-                if (kb.length == 2) {
+                if (kb.length == 2 && law != "Addition" && law != "Simplification") {
                     switch (law) {
                         case "Modus Ponens": {
                             final String[] premise2Substrings = subdivideExpressionCharacters(kb[1], modusPonens[1]);
+                            if (premise2Substrings == null)
+                                break;
                             if (kb[0].equals(premise2Substrings[0]) && !kb[0].equals(premise2Substrings[1])) {
                                 encodings.add(new HashMap<Character, String>() {
                                     {
@@ -856,6 +880,8 @@ public class Argument<M extends Model> {
                         }
                         case "Modus Tollens": {
                             final String[] premise2Substrings = subdivideExpressionCharacters(kb[1], modusTollens[1]);
+                            if (premise2Substrings == null)
+                                break;
                             if (kb[0].equals(premise2Substrings[1]) && !kb[0].equals(premise2Substrings[0])) {
                                 encodings.add(new HashMap<Character, String>() {
                                     {
@@ -870,6 +896,8 @@ public class Argument<M extends Model> {
                             for (int premise = 0; premise < kb.length; premise++) {
                                 final String[] premise1Substrings = subdivideExpressionCharacters(kb[premise],
                                         simplification);
+                                if (premise1Substrings == null)
+                                    break;
                                 if (!premise1Substrings[0].equals(premise1Substrings[1])) {
                                     encodings.add(new HashMap<Character, String>() {
                                         {
@@ -897,6 +925,8 @@ public class Argument<M extends Model> {
                                     hypotheticalSyllogism[0]);
                             final String[] premise2Substrings = subdivideExpressionCharacters(kb[1],
                                     hypotheticalSyllogism[1]);
+                            if (premise1Substrings == null || premise2Substrings == null) 
+                                break;
                             if (!premise1Substrings[0].equals(premise1Substrings[1])
                                     && !premise1Substrings[0].equals(premise2Substrings[1])
                                     && !premise2Substrings[0].equals(premise2Substrings[1])
@@ -916,6 +946,8 @@ public class Argument<M extends Model> {
                                     disjunctiveSyllogism[0]);
                             final String[] premise2Substrings = subdivideExpressionCharacters(kb[1],
                                     disjunctiveSyllogism[1]);
+                            if (premise1Substrings == null || premise2Substrings == null)
+                                break;
                             if (!premise1Substrings[0].equals(premise1Substrings[1])
                                     && premise1Substrings[0].equals(premise2Substrings[0])) {
                                 encodings.add(new HashMap<Character, String>() {
@@ -930,6 +962,8 @@ public class Argument<M extends Model> {
                         case "Resolution": {
                             final String[] premise1Substrings = subdivideExpressionCharacters(kb[0], resolution[0]);
                             final String[] premise2Substrings = subdivideExpressionCharacters(kb[1], resolution[1]);
+                            if (premise1Substrings == null || premise2Substrings == null)
+                                break;
                             if (!premise1Substrings[0].equals(premise1Substrings[1])
                                     && !premise1Substrings[0].equals(premise2Substrings[1])
                                     && !premise1Substrings[1].equals(premise2Substrings[1])
@@ -945,8 +979,15 @@ public class Argument<M extends Model> {
                             break;
                         }
                     }
-                } else if (kb.length == 1) { // addition law
+                } else if (kb.length == 1 && (law == "Addition" || law == "Simplification")) { // addition law
+                    switch(law) {
+                        case "Addition": {
 
+                        }
+                        case "Simplification": {
+
+                        }
+                    }
                 } else
                     continue;
 
@@ -1001,6 +1042,8 @@ public class Argument<M extends Model> {
                     kbExpressionSubstrings.add(matcher.group(i));
                 }
             }
+            if (kbExpressionSubstrings.isEmpty())
+                return null;
 
             return kbExpressionSubstrings.toArray(new String[kbExpressionSubstrings.size()]);
         }

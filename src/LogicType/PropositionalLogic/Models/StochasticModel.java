@@ -37,6 +37,7 @@ public class StochasticModel extends Model {
 
         this.modelName = modelName;
         this.expression = new Proposition(expression);
+        setOperands();
     }
 
     public StochasticModel(String modelName, Proposition expression) {
@@ -45,6 +46,7 @@ public class StochasticModel extends Model {
 
         this.modelName = modelName;
         this.expression = expression;
+        setOperands();
     }
 
     public StochasticModel(String modelName, String expression, Map<Character, String> operandSymbolicRepresentation) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
@@ -53,6 +55,7 @@ public class StochasticModel extends Model {
 
         this.modelName = modelName;
         this.expression = new Proposition(expression);
+        setOperands();
 
         this.operandSymbolicRepresentation = operandSymbolicRepresentation;
         setSymbolicString(this.operandSymbolicRepresentation);
@@ -64,6 +67,7 @@ public class StochasticModel extends Model {
 
         this.modelName = modelName;
         this.expression = expression;
+        setOperands();
 
         this.operandSymbolicRepresentation = operandSymbolicRepresentation;
         setSymbolicString(this.operandSymbolicRepresentation);
@@ -75,11 +79,11 @@ public class StochasticModel extends Model {
 
         this.modelName = modelName;
         this.expression = new Proposition(expression);
+        setOperands(defaultTruthThreshold, defaultOperandProbabilityValues, null);
 
         this.operandSymbolicRepresentation = operandSymbolicRepresentation;
         setSymbolicString(this.operandSymbolicRepresentation);
 
-        setOperands(defaultTruthThreshold, defaultOperandProbabilityValues, null);
         this.defaultOperandProbabilityValues = defaultOperandProbabilityValues;
         this.defaultTruthThreshold = defaultTruthThreshold;
 
@@ -96,11 +100,11 @@ public class StochasticModel extends Model {
 
         this.modelName = modelName;
         this.expression = expression;
+        setOperands(defaultTruthThreshold, defaultOperandProbabilityValues, null);
 
         this.operandSymbolicRepresentation = operandSymbolicRepresentation;
         setSymbolicString(this.operandSymbolicRepresentation);
 
-        setOperands(defaultTruthThreshold, defaultOperandProbabilityValues, null);
         this.defaultOperandProbabilityValues = defaultOperandProbabilityValues;
         this.defaultTruthThreshold = defaultTruthThreshold;
 
@@ -117,11 +121,11 @@ public class StochasticModel extends Model {
 
         this.modelName = modelName;
         this.expression = new Proposition(expression);
+        setOperands(defaultTruthThreshold, defaultOperandProbabilityValues, individualOperandTruthThresholds);
 
         this.operandSymbolicRepresentation = operandSymbolicRepresentation;
         setSymbolicString(this.operandSymbolicRepresentation);
 
-        setOperands(defaultTruthThreshold, defaultOperandProbabilityValues, individualOperandTruthThresholds);
         this.defaultOperandProbabilityValues = defaultOperandProbabilityValues;
         this.defaultTruthThreshold = defaultTruthThreshold;
 
@@ -138,11 +142,11 @@ public class StochasticModel extends Model {
 
         this.modelName = modelName;
         this.expression = expression;
+        setOperands(defaultTruthThreshold, defaultOperandProbabilityValues, individualOperandTruthThresholds);
 
         this.operandSymbolicRepresentation = operandSymbolicRepresentation;
         setSymbolicString(this.operandSymbolicRepresentation);
 
-        setOperands(defaultTruthThreshold, defaultOperandProbabilityValues, individualOperandTruthThresholds);
         this.defaultOperandProbabilityValues = defaultOperandProbabilityValues;
         this.defaultTruthThreshold = defaultTruthThreshold;
 
@@ -153,15 +157,21 @@ public class StochasticModel extends Model {
         setValidityEvaluation();
     }
 
-    private void setOperands(Double defaultTruthThreshold, Map<Character, Double> defaultOperandProbabilityValues, Map<Character, Double> individualOperandTruthThresholds) {
+    private void setOperands() {
         this.operands = new char[this.expression.getOperandCount()];
         for (int i = 0; i < this.expression.getOperandCount(); i++) {
             String operand = this.expression.getSentence(i);
             this.operands[i] = operand.charAt(0);
         }
-        for (int i = 0; i < operands.length; i++) {
-            if (!defaultOperandProbabilityValues.containsKey(operands[i]))
-                throw new IllegalArgumentException(operands[i] + " not in expression.");
+    }
+
+    private void setOperands(Double defaultTruthThreshold, Map<Character, Double> defaultOperandProbabilityValues, Map<Character, Double> individualOperandTruthThresholds) {
+        setOperands();
+        if (defaultOperandProbabilityValues != null) {
+            for (int i = 0; i < operands.length; i++) {
+                if (!defaultOperandProbabilityValues.containsKey(operands[i]))
+                    throw new IllegalArgumentException(operands[i] + " not in expression.");
+            }
         }
 
         if (individualOperandTruthThresholds == null && defaultTruthThreshold == null)

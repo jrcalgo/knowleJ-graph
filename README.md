@@ -1,4 +1,1 @@
-Discrete Logic Calculator
-============================
-
-
+# knowleJ, a propositional logic knowledge graph library

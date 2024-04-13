@@ -31,14 +31,16 @@ public class DeterministicModel extends Model {
 
         this.modelName = modelName;
         this.expression = new Proposition(expression);
+        setOperands(null);
     }
 
-    public DeterministicModel(String modelName, Proposition expression) {
+    public DeterministicModel(String modelName, Proposition expression) throws InvalidOperandException {
         if (expression == null)
             throw new IllegalArgumentException("Expression cannot be null or empty.");
             
         this.modelName = modelName;
         this.expression = expression;
+        setOperands(null);
     }
 
     public DeterministicModel(String modelName, String expression, Map<Character, Character> defaultOperandCharValues)
@@ -121,12 +123,14 @@ public class DeterministicModel extends Model {
         operands = new char[this.expression.getOperandCount()];
         for (int i = 0; i < this.expression.getOperandCount(); i++) {
             String operand = this.expression.getSentence(i);
-            operands[i] = operand.charAt(0);
+            this.operands[i] = operand.charAt(0);
         }
         // check if map contains all and only all expression operands
-        for (int i = 0; i < operands.length; i++) {
-            if (!defaultOperandCharValues.containsKey(operands[i]))
-                throw new InvalidOperandException(operands[i] + " not in expression.");
+        if (defaultOperandCharValues != null) {
+            for (int i = 0; i < operands.length; i++) {
+                if (!defaultOperandCharValues.containsKey(operands[i]))
+                    throw new InvalidOperandException(operands[i] + " not in expression.");
+            }
         }
     }
 
@@ -284,5 +288,11 @@ public class DeterministicModel extends Model {
 
     public Boolean getPredicateEvaluation() {
         return this.predicateEvaluation;
+    }
+
+    @Override
+    public char[] getAllPredicateCharValues() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAllPredicateCharValues'");
     }
 }

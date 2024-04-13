@@ -38,12 +38,12 @@ public class DeductionGraphNode {
         this.expression = expression;
     }
 
-    pubulic String getLaw() {
-        return this.law;
+    public String getLaw() {
+        return "";
     }
 
     public void setLaw(String law) {
-        this.law = law;
+        
     }
 
     public LinkedList<DeductionGraphNode> getOutNodes() throws Exception {
@@ -63,6 +63,8 @@ public class DeductionGraphNode {
     }
 
     public void addOutNode(DeductionGraphNode outNode) {
+        if (this.outNodes == null)
+            this.outNodes = new LinkedList<DeductionGraphNode>();
         boolean outNodeContains = this.outNodes.contains(outNode);
         if (this.outNodes == null && outNodeContains == false)
             this.outNodes = new LinkedList<DeductionGraphNode>();
