@@ -156,11 +156,11 @@ public class DirectedDeductionGraph {
     }
 
     public ArrayList<DeductionGraphNode> getForwardNodes() {
-
+        return this.forwardNodes;
     }
 
     public ArrayList<DeductionGraphNode> getBackwardNodes() {
-
+        return this.backwardNodes;
     }
 
     public ArrayList<DeductionGraphNode> getPremiseNodes() {
