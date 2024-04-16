@@ -1,4 +1,4 @@
-package src.LogicType.PropositionalLogic.Logic;
+package lib.src.main.java.knowlej.PropositionalLogic.Logic;
 
 import java.io.FileWriter;
 import java.nio.file.Files;
@@ -15,7 +15,7 @@ import java.util.OptionalInt;
 import java.util.Stack;
 import java.util.function.Function;
 
-import src.Exceptions.*;
+import lib.src.main.java.knowlej.Exceptions.*;
 
 /**
  * 
@@ -317,7 +317,7 @@ public class Proposition {
                     implicationSubstring = cE.substring(cE.indexOf(m), cE.lastIndexOf(m) + Integer.toString(m).length());
                     if (implicationSubstring.contains("m")) {
                         implicationSwaps[0] = implicationSubstring.substring(0, implicationSubstring.indexOf("m")-1);
-                        implicationSwaps[1] = implicationSubstring.substring(implicationSubstring.indexOf("m")+1, implicationSubstring.length()-1);\
+                        implicationSwaps[1] = implicationSubstring.substring(implicationSubstring.indexOf("m")+1, implicationSubstring.length()-1);
                         if (inversion) {
                             implicationSwaps = implicationSubstringInversion(implicationSwaps);
                         }

@@ -1,4 +1,4 @@
-package targets;
+package demoApplications;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,10 +6,10 @@ import java.util.Random;
 import java.io.File;
 import java.io.IOException;
 
-import src.LogicType.PropositionalLogic.Logic.*;
-import src.LogicType.PropositionalLogic.Models.StochasticModel;
-import src.LogicType.PropositionalLogic.Models.DeterministicModel;
-import src.LogicType.PropositionalLogic.Models.Model;
+import lib.src.main.java.knowlej.PropositionalLogic.Logic.*;
+import lib.src.main.java.knowlej.PropositionalLogic.Models.StochasticModel;
+import lib.src.main.java.knowlej.PropositionalLogic.Models.DeterministicModel;
+import lib.src.main.java.knowlej.PropositionalLogic.Models.Model;
 
 public class demo {
     public static void main(String[] args) throws Exception {

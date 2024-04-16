@@ -1,4 +1,4 @@
-package src.Exceptions;
+package lib.src.main.java.knowlej.Exceptions;
 
 public class InvalidExpressionException extends Exception {
     

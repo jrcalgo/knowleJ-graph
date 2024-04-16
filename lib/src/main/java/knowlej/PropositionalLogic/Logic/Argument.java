@@ -1,18 +1,19 @@
-package src.LogicType.PropositionalLogic.Logic;
+package lib.src.main.java.knowlej.PropositionalLogic.Logic;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import lib.src.main.java.knowlej.Exceptions.InvalidExpressionException;
+import lib.src.main.java.knowlej.Exceptions.InvalidLogicOperatorException;
+import lib.src.main.java.knowlej.Exceptions.InvalidOperandException;
+
 import java.util.regex.Matcher;
 
-import src.DataStructures.DirectedDeductionGraph;
-import src.DataStructures.DeductionGraphNode;
-
-import src.Exceptions.InvalidExpressionException;
-import src.Exceptions.InvalidLogicOperatorException;
-import src.Exceptions.InvalidOperandException;
-import src.LogicType.PropositionalLogic.Models.*;
+import lib.src.main.java.knowlej.DataStructures.*;
+import lib.src.main.java.knowlej.Exceptions.InvalidOperandException;
+import lib.src.main.java.knowlej.LogicType.PropositionalLogic.Models.*;
 
 public class Argument<M extends Model> {
     private M[] knowledgeBase;
@@ -258,6 +259,7 @@ public class Argument<M extends Model> {
         return validateCurrentArgument(kbQuery);
     }
 
+    // TODO: implement this method
     private boolean validateCurrentArgument(String kbQuery) {
         InferenceLaws<Model> inferenceLaws = new InferenceLaws<>();
         EquivalencyLaws equivalencyLaws = new EquivalencyLaws();

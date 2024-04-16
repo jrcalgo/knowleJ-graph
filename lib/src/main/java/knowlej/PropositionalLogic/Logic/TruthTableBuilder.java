@@ -1,4 +1,4 @@
-package src.LogicType.PropositionalLogic.Logic;
+package lib.src.main.java.knowlej.PropositionalLogic.Logic;
 
 import java.util.ArrayList;
 

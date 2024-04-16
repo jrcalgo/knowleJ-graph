@@ -1,13 +1,14 @@
-package src.LogicType.PropositionalLogic.Models;
+package lib.src.main.java.knowlej.PropositionalLogic.Models;
 
-import src.Exceptions.InvalidExpressionException;
-import src.Exceptions.InvalidLogicOperatorException;
-import src.Exceptions.InvalidOperandException;
-import src.LogicType.PropositionalLogic.Logic.Proposition;
-import src.LogicType.PropositionalLogic.Logic.Validity;
+import lib.src.main.java.knowlej.PropositionalLogic.Logic.Proposition;
+import lib.src.main.java.knowlej.PropositionalLogic.Logic.Validity;
 
 import java.util.Map;
 import java.util.Stack;
+
+import lib.src.main.java.knowlej.Exceptions.InvalidExpressionException;
+import lib.src.main.java.knowlej.Exceptions.InvalidLogicOperatorException;
+import lib.src.main.java.knowlej.Exceptions.InvalidOperandException;
 
 public class DeterministicModel extends Model {
     private String modelName;

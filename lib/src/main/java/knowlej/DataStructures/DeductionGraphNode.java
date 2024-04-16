@@ -1,4 +1,4 @@
-package src.DataStructures;
+package lib.src.main.java.knowlej.DataStructures;
 
 import java.util.LinkedList;
 
