@@ -1,4 +1,4 @@
-package lib.src.main.java.knowlej.PropositionalLogic.Logic;
+package knowleJ.PropositionalLogic.Logic;
 
 public class Validity {
 

@@ -1,4 +1,4 @@
-package lib.src.main.java.knowlej.DataStructures;
+package knowleJ.DataStructures;
 
 import java.util.LinkedList;
 
@@ -89,7 +89,6 @@ public class DeductionGraphNode {
             if (this.outNodes.containsAll(outNodes))
                 this.outNodes.removeAll(outNodes);
             else
-                return;
-                
+                return;            
     }
 }

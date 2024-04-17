@@ -1,14 +1,14 @@
-package lib.src.main.java.knowlej.PropositionalLogic.Models;
+package knowleJ.PropositionalLogic.Models;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-import lib.src.main.java.knowlej.Exceptions.InvalidExpressionException;
-import lib.src.main.java.knowlej.Exceptions.InvalidLogicOperatorException;
-import lib.src.main.java.knowlej.Exceptions.InvalidOperandException;
-import lib.src.main.java.knowlej.PropositionalLogic.Logic.Proposition;
-import lib.src.main.java.knowlej.PropositionalLogic.Logic.Validity;
+import knowleJ.Exceptions.InvalidExpressionException;
+import knowleJ.Exceptions.InvalidLogicOperatorException;
+import knowleJ.Exceptions.InvalidOperandException;
+import knowleJ.PropositionalLogic.Logic.Proposition;
+import knowleJ.PropositionalLogic.Logic.Validity;
 
 public class StochasticModel extends Model {
     private String modelName;

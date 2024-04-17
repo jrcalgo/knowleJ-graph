@@ -1,9 +1,9 @@
-package lib.src.main.java.knowlej.DataStructures;
+package knowleJ.DataStructures;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import lib.src.main.java.knowlej.PropositionalLogic.Logic.Proposition;
+import knowleJ.PropositionalLogic.Logic.Proposition;
 
 public class DirectedDeductionGraph {
     private ArrayList<DeductionGraphNode> nodes; // all graph nodes

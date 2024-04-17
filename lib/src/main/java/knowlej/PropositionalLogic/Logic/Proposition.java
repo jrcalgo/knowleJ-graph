@@ -1,4 +1,4 @@
-package lib.src.main.java.knowlej.PropositionalLogic.Logic;
+package knowleJ.PropositionalLogic.Logic;
 
 import java.io.FileWriter;
 import java.nio.file.Files;
@@ -15,9 +15,10 @@ import java.util.OptionalInt;
 import java.util.Stack;
 import java.util.function.Function;
 
-import lib.src.main.java.knowlej.Exceptions.*;
+import knowleJ.Exceptions.*;
 
 /**
+ * 
  * 
  */
 public class Proposition {

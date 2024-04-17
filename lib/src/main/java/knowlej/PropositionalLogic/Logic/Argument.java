@@ -1,19 +1,18 @@
-package lib.src.main.java.knowlej.PropositionalLogic.Logic;
+package knowleJ.PropositionalLogic.Logic;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import lib.src.main.java.knowlej.Exceptions.InvalidExpressionException;
-import lib.src.main.java.knowlej.Exceptions.InvalidLogicOperatorException;
-import lib.src.main.java.knowlej.Exceptions.InvalidOperandException;
+import knowleJ.Exceptions.InvalidExpressionException;
+import knowleJ.Exceptions.InvalidLogicOperatorException;
+import knowleJ.Exceptions.InvalidOperandException;
 
 import java.util.regex.Matcher;
 
-import lib.src.main.java.knowlej.DataStructures.*;
-import lib.src.main.java.knowlej.Exceptions.InvalidOperandException;
-import lib.src.main.java.knowlej.LogicType.PropositionalLogic.Models.*;
+import knowleJ.DataStructures.*;
+import knowleJ.PropositionalLogic.Models.*;
 
 public class Argument<M extends Model> {
     private M[] knowledgeBase;
