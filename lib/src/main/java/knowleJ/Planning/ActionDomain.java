@@ -36,14 +36,14 @@ public class ActionDomain {
         public ActionSchema(String[] preconditions, String[] effects) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             for (String statement : preconditions) {
                 try {
-                    Proposition prop = new Proposition(statement);
+                    Proposition propTest = new Proposition(statement);
                 } catch (InvalidExpressionException e){
                     throw new InvalidExpressionException("Invalid statement included in preconditions");
                 }
             }
             for (String statement : effects) {
                 try {
-                    Proposition prop = new Proposition(statement);
+                    Proposition propTest = new Proposition(statement);
                 } catch (InvalidExpressionException e) {
                     throw new InvalidExpressionException("Invalid statement included in effects");
                 }
@@ -64,7 +64,7 @@ public class ActionDomain {
         public void setPreconditions(String[] preconditions) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             for (String statement : preconditions) {
                 try {
-                    Proposition prop = new Proposition(statement);
+                    Proposition propTest = new Proposition(statement);
                 } catch (InvalidExpressionException e) {
                     throw new InvalidExpressionException("Invalid statement included in preconditions");
                 }
@@ -75,7 +75,7 @@ public class ActionDomain {
         public void setEffects(String[] effects) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
             for (String statement : effects) {
                 try {
-                    Proposition prop = new Proposition(statement);
+                    Proposition propTest = new Proposition(statement);
                 } catch (InvalidExpressionException e) {
                     throw new InvalidExpressionException("Invalid statement included in preconditions");
                 }
