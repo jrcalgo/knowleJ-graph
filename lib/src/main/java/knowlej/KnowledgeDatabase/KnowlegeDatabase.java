@@ -1,5 +1,4 @@
-package src.KnowledgeDatabase;
-
+package knowleJ.KnowledgeDatabase;
 
 public class KnowlegeDatabase {
     
