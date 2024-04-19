@@ -10,24 +10,32 @@ import knowleJ.PropositionalLogic.Logic.Argument;
 import knowleJ.PropositionalLogic.Models.Model;
 
 public class Planner extends ActionDomain {
+    String[] initialState; // initial propositional arrangement/parameters of task/environment
+    String[] state; // current propositional arrangement/parameters of task/environment
     HashMap<Instant, Proposition> sentenceTimestamps; // propositions bound by timestamp
     String[] groundTruths; // axioms that are always true
     Model[] fluents; // Propositions that change over time
 
     public Planner() {
         super();
+        this.intialState = null;
+        this.state = null;
         this.groundTruths = null;
         this.fluents = null;
     }
 
     public Planner(ActionSchema[] actions) {
         super(actions);
+        this.initialState = null;
+        this.state = null;
         this.groundTruths = null;
         this.fluents = null;
     }
 
     public Planner(ActionDomain domain) {
         super(domain.getActions());
+        this.initialState = null;
+        this.state = null;
         this.groundTruths = null;
         this.fluents = null;
     }
