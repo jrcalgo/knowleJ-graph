@@ -6,10 +6,9 @@ import java.util.Random;
 import java.io.File;
 import java.io.IOException;
 
-import lib.src.main.java.knowlej.PropositionalLogic.Logic.*;
-import lib.src.main.java.knowlej.PropositionalLogic.Models.StochasticModel;
-import lib.src.main.java.knowlej.PropositionalLogic.Models.DeterministicModel;
-import lib.src.main.java.knowlej.PropositionalLogic.Models.Model;
+import src.main.java.knowlej.PropositionalLogic.Logic.*;
+import src.main.java.knowlej.PropositionalLogic.Models.DeterministicModel;
+import src.main.java.knowlej.PropositionalLogic.Models.Model;
 
 public class demo {
     public static void main(String[] args) throws Exception {
