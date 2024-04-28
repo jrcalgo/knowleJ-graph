@@ -5,48 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b4ca88bb-5ec3-478b-a857-c98fa7083706" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/knowlej/DataStructures/DeductionGraphNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/knowlej/DataStructures/DirectedDeductionGraph.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/knowlej/Exceptions/InvalidExpressionException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/knowlej/Exceptions/InvalidLogicOperatorException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/knowlej/Exceptions/InvalidOperandException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/knowlej/KnowledgeDatabase/KnowlegeDatabase.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/knowlej/PropositionalLogic/Logic/Argument.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/knowlej/PropositionalLogic/Logic/Proposition.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/knowlej/PropositionalLogic/Logic/TruthTableBuilder.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/knowlej/PropositionalLogic/Logic/Validity.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/knowlej/PropositionalLogic/Models/DeterministicModel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/knowlej/PropositionalLogic/Models/Model.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/knowlej/PropositionalLogic/Models/StochasticModel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/demoApplications/demo.java" beforeDir="false" afterPath="$PROJECT_DIR$/demoApplications/demo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradlew" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradlew.bat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/build.gradle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/main/java/knowlej/DataStructures/DeductionGraphNode.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/main/java/knowlej/DataStructures/DirectedDeductionGraph.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/main/java/knowlej/Exceptions/InvalidExpressionException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/main/java/knowlej/Exceptions/InvalidLogicOperatorException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/main/java/knowlej/Exceptions/InvalidOperandException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/main/java/knowlej/KnowledgeDatabase/KnowlegeDatabase.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/main/java/knowlej/Planning/ActionDomain.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/main/java/knowlej/Planning/ClassicPlanner.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/main/java/knowlej/PropositionalLogic/Logic/Argument.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/main/java/knowlej/PropositionalLogic/Logic/Proposition.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/main/java/knowlej/PropositionalLogic/Logic/TruthTableBuilder.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/main/java/knowlej/PropositionalLogic/Logic/Validity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/main/java/knowlej/PropositionalLogic/Models/DeterministicModel.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/main/java/knowlej/PropositionalLogic/Models/Model.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/main/java/knowlej/PropositionalLogic/Models/StochasticModel.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/test/java/knowlej/PropositionalLogic/ArgumentTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/test/java/knowlej/PropositionalLogic/ModelTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/test/java/knowlej/PropositionalLogic/PropositionTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/settings.gradle" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/knowlej/KnowledgeDatabase/KnowledgeDatabase.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/knowlej/DataStructures/DeductionGraphNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/knowlej/DataStructures/DeductionGraphNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/knowlej/KnowledgeDatabase/KnowlegeDatabase.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -205,7 +168,7 @@
       <workItem from="1713530721845" duration="7133000" />
       <workItem from="1714101164574" duration="1056000" />
       <workItem from="1714102259731" duration="266000" />
-      <workItem from="1714102549963" duration="1982000" />
+      <workItem from="1714102549963" duration="6594000" />
     </task>
     <servers />
   </component>

@@ -11,10 +11,11 @@ public class DeductionGraphNode {
         this.expression = expression;
         this.outNodes = null;
     }
+
     // leaf node constructor
     public DeductionGraphNode(String expression, DeductionGraphNode outNode) {
         this.expression = expression;
-        
+
         if (outNode != null) {
             this.outNodes = new LinkedList<DeductionGraphNode>() {
                 {
@@ -43,7 +44,7 @@ public class DeductionGraphNode {
     }
 
     public void setLaw(String law) {
-        
+
     }
 
     public LinkedList<DeductionGraphNode> getOutNodes() throws Exception {
@@ -77,18 +78,16 @@ public class DeductionGraphNode {
     public void removeOutNode(DeductionGraphNode outNode) {
         if (this.outNodes == null)
             return;
-        else
-            if (this.outNodes.contains(outNode)) 
-                this.outNodes.remove(outNode);
+        else if (this.outNodes.contains(outNode))
+            this.outNodes.remove(outNode);
     }
 
     public void removeOutNodes(LinkedList<DeductionGraphNode> outNodes) {
         if (this.outNodes == null)
             return;
+        else if (this.outNodes.containsAll(outNodes))
+            this.outNodes.removeAll(outNodes);
         else
-            if (this.outNodes.containsAll(outNodes))
-                this.outNodes.removeAll(outNodes);
-            else
-                return;            
+            return;
     }
 }
