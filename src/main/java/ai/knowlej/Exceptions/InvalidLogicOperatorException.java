@@ -1,4 +1,4 @@
-package knowlej.Exceptions;
+package ai.knowlej.Exceptions;
 
 public class InvalidLogicOperatorException extends Exception {
     

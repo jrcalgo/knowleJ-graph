@@ -1,4 +1,4 @@
-package knowlej.PropositionalLogic.Logic;
+package ai.knowlej.PropositionalLogic.Logic;
 
 import java.io.FileWriter;
 import java.nio.file.Files;
@@ -15,7 +15,7 @@ import java.util.OptionalInt;
 import java.util.Stack;
 import java.util.function.Function;
 
-import knowleJ.Exceptions.*;
+import ai.knowlej.Exceptions.*;
 
 /**
  * 

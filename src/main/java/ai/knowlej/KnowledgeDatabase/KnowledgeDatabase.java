@@ -1,7 +1,9 @@
-package knowlej.KnowledgeDatabase;
+package ai.knowlej.KnowledgeDatabase;
 
-import knowlej.PropositionalLogic.Logic.Argument;
-import knowlej.PropositionalLogic.Models.*;
+import java.util.ArrayList;
+
+import ai.knowlej.PropositionalLogic.Logic.Argument;
+import ai.knowlej.PropositionalLogic.Models.*;
 
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.GraphDatabase;
@@ -11,16 +13,16 @@ public class KnowledgeDatabase {
     private boolean activeSession = false;
     private ArrayList<String> sessions;
 
-    public knowledgeDatabase() {
-        Super();
+    public KnowledgeDatabase() {
+        super();
     }
 
-    public knowledgeDatabase(String dbUri, String dbUser, String dbPassword) {
+    public KnowledgeDatabase(String dbUri, String dbUser, String dbPassword) {
         establishConnection(dbUri, dbUser, dbPassword);
         this.sessions = null;
     }
 
-    public knowledgeDatabase(String dbUri, String dbUser, String dbPassword, String newSessionName)  {
+    public KnowledgeDatabase(String dbUri, String dbUser, String dbPassword, String newSessionName)  {
         if (establishConnection(dbUri, dbUser, dbPassword)) {
             if (addSession(newSessionName)) {
                 this.sessions = new ArrayList<String>();

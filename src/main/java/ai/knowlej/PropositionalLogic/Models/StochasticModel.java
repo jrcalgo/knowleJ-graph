@@ -4,11 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-import knowlej.Exceptions.InvalidExpressionException;
-import knowlej.Exceptions.InvalidLogicOperatorException;
-import knowlej.Exceptions.InvalidOperandException;
-import knowlej.PropositionalLogic.Logic.Proposition;
-import knowlej.PropositionalLogic.Logic.Validity;
+import ai.knowlej.Exceptions.InvalidExpressionException;
+import ai.knowlej.Exceptions.InvalidLogicOperatorException;
+import ai.knowlej.Exceptions.InvalidOperandException;
+import ai.knowlej.PropositionalLogic.Logic.Proposition;
+import ai.knowlej.PropositionalLogic.Logic.Validity;
 
 public class StochasticModel extends Model {
     private String modelName;

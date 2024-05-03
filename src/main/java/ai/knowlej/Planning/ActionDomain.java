@@ -1,8 +1,8 @@
-package knowlej.Planning;
+package ai.knowlej.Planning;
 
-import knowleJ.Exceptions.*;
+import ai.knowlej.Exceptions.*;
 
-import knowleJ.PropositionalLogic.Logic.Proposition;
+import ai.knowlej.PropositionalLogic.Logic.Proposition;
 
 public class ActionDomain {
     ActionSchema[] actions;

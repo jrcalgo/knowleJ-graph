@@ -1,18 +1,18 @@
-package knowlej.PropositionalLogic.Logic;
+package ai.knowlej.PropositionalLogic.Logic;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import knowlej.Exceptions.InvalidExpressionException;
-import knowlej.Exceptions.InvalidLogicOperatorException;
-import knowlej.Exceptions.InvalidOperandException;
+import ai.knowlej.Exceptions.InvalidExpressionException;
+import ai.knowlej.Exceptions.InvalidLogicOperatorException;
+import ai.knowlej.Exceptions.InvalidOperandException;
 
 import java.util.regex.Matcher;
 
-import knowlej.DataStructures.*;
-import knowlej.PropositionalLogic.Models.*;
+import ai.knowlej.DataStructures.*;
+import ai.knowlej.PropositionalLogic.Models.*;
 
 public class Argument<M extends Model> {
     private M[] knowledgeBase;
@@ -37,7 +37,7 @@ public class Argument<M extends Model> {
         if (kb == null || kb.length == 0)
             throw new IllegalArgumentException("Knowledge base cannot be null or empty.");
 
-            StringBuilder operandString = new StringBuilder();
+        StringBuilder operandString = new StringBuilder();
         try {
             for (M m : kb) {
                 char[] modelOperands = m.getOperands();
@@ -473,7 +473,7 @@ public class Argument<M extends Model> {
                                     new Proposition[] { new Proposition(argSentence1), new Proposition(argSentence2) });
                             for (String law : inferenceMap.keySet()) {
                                 for (String inference : inferenceMap.get(law)) {
-                                    if (!law.equals("Addition") || !law.equals("Simplification")) {
+                                    if (!law.equals("Addition") && !law.equals("Simplification")) {
                                         if (graph.contains(inference)) {
                                             DeductionGraphNode inferenceNode = graph.getNode(inference);
                                             if (!graph.isPointing(graph.getNode(argSentence1), inferenceNode))
@@ -760,7 +760,7 @@ public class Argument<M extends Model> {
 
         /**
          * 
-         * @param arg an Argument object containing given knowledge base and each
+         * @param kbPropositions an Argument object containing given knowledge base and each
          *            successive deduction; knowledge history
          * @return Maps inference law to list of strings, with each string containing
          *         [applied premises] and resulting {conclusion}.
@@ -1054,7 +1054,7 @@ public class Argument<M extends Model> {
         /**
          * Rule: [P], [P->Q] entails {Q}
          * 
-         * @param cE
+         * @param premises
          * @return Rule string
          */
         private String modusPonens(String[] premises) {
@@ -1072,7 +1072,7 @@ public class Argument<M extends Model> {
         /**
          * Rule: [~Q], [P->Q] entails {~P}
          * 
-         * @param cE
+         * @param premises
          * @return Rule string
          */
         private String modusTollens(String[] premises) {
@@ -1091,7 +1091,7 @@ public class Argument<M extends Model> {
         /**
          * Rule: [P] entails {P|Q}
          * 
-         * @param cE
+         * @param premise
          * @return Rule string
          */
         private String addition(String premise) {
@@ -1107,7 +1107,7 @@ public class Argument<M extends Model> {
         /**
          * Rule: [P&Q] entails {P}
          * 
-         * @param cE
+         * @param premises
          * @return Rule string
          */
         private String simplification(String[] premises) {
@@ -1123,7 +1123,7 @@ public class Argument<M extends Model> {
         /**
          * Rule: [P], [Q] entails {P&Q}
          * 
-         * @param cE
+         * @param premises
          * @return Rule string
          */
         private String conjunction(String[] premises) {
@@ -1139,7 +1139,7 @@ public class Argument<M extends Model> {
         /**
          * Rule: [P->Q], [Q->R] entails {P->R}
          * 
-         * @param cE
+         * @param premises
          * @return Rule string
          */
         private String hypotheticalSyllogism(String[] premises) {
@@ -1160,7 +1160,7 @@ public class Argument<M extends Model> {
         /**
          * Rule: [P|Q], [~P] entails {Q}
          * 
-         * @param cE
+         * @param premises
          * @return Rule string
          */
         private String disjunctiveSyllogism(String[] premises) {
@@ -1180,7 +1180,7 @@ public class Argument<M extends Model> {
          * Rule: [P|Q], [~P|R] entails {Q|R}
          * this one is powerful
          * 
-         * @param cE
+         * @param premises
          * @return Rule string
          */
         private String resolution(String[] premises) {

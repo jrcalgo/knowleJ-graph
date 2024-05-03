@@ -1,13 +1,13 @@
-package knowlej.Planning;
+package ai.knowlej.Planning;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.time.Instant;
 
-import knowleJ.Exceptions.*;
-import knowleJ.PropositionalLogic.Logic.Proposition;
-import knowleJ.PropositionalLogic.Logic.Argument;
-import knowleJ.PropositionalLogic.Models.Model;
+import ai.knowlej.Exceptions.*;
+import ai.knowlej.PropositionalLogic.Logic.Proposition;
+import ai.knowlej.PropositionalLogic.Logic.Argument;
+import ai.knowlej.PropositionalLogic.Models.Model;
 
 public class Planner extends ActionDomain {
     String[] initialState; // initial propositional arrangement/parameters of task/environment

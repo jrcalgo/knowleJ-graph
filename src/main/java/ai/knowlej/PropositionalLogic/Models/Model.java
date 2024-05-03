@@ -1,9 +1,9 @@
-package knowlej.PropositionalLogic.Models;
+package ai.knowlej.PropositionalLogic.Models;
 
 import java.util.Map;
 
-import knowleJ.Exceptions.InvalidExpressionException;
-import knowleJ.PropositionalLogic.Logic.Proposition;
+import ai.knowlej.Exceptions.InvalidExpressionException;
+import ai.knowlej.PropositionalLogic.Logic.Proposition;
 
 public abstract class Model {
     public abstract String getModelName();

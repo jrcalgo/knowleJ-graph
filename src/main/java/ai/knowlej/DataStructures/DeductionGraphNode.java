@@ -1,4 +1,4 @@
-package knowlej.DataStructures;
+package ai.knowlej.DataStructures;
 
 import java.util.LinkedList;
 
