@@ -5,14 +5,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import knowleJ.Exceptions.InvalidExpressionException;
-import knowleJ.Exceptions.InvalidLogicOperatorException;
-import knowleJ.Exceptions.InvalidOperandException;
+import knowlej.Exceptions.InvalidExpressionException;
+import knowlej.Exceptions.InvalidLogicOperatorException;
+import knowlej.Exceptions.InvalidOperandException;
 
 import java.util.regex.Matcher;
 
-import knowleJ.DataStructures.*;
-import knowleJ.PropositionalLogic.Models.*;
+import knowlej.DataStructures.*;
+import knowlej.PropositionalLogic.Models.*;
 
 public class Argument<M extends Model> {
     private M[] knowledgeBase;

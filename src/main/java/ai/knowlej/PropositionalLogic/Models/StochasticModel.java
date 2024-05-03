@@ -1,4 +1,4 @@
-package knowlej.PropositionalLogic.Models;
+package ai.knowlej.PropositionalLogic.Models;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +18,7 @@ public class StochasticModel extends Model {
     private Map<Character, Double> defaultOperandProbabilityValues;
     private Map<Character, Character> defaultOperandCharValues;
     private Double defaultTruthThreshold;
-    private Map<Character, Double> individualOperandTruthThresholds;
+    private Map<Character, Double> individualOperandTrumvnthThresholds;
 
     private String predicateProbabilityModel;
     private String predicateBooleanModel;

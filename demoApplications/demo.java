@@ -1,14 +1,10 @@
-package demoApplications;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import java.io.File;
 import java.io.IOException;
 
-import src.main.java.knowlej.PropositionalLogic.Logic.*;
-import src.main.java.knowlej.PropositionalLogic.Models.DeterministicModel;
-import src.main.java.knowlej.PropositionalLogic.Models.Model;
+import src.main.java.knowlej.*;
 
 public class demo {
     public static void main(String[] args) throws Exception {
