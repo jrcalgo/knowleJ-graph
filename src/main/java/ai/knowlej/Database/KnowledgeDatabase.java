@@ -1,12 +1,8 @@
-package ai.knowlej.KnowledgeDatabase;
+package ai.knowlej.Database;
 
 import java.util.ArrayList;
 
-import ai.knowlej.PropositionalLogic.Logic.Argument;
-import ai.knowlej.PropositionalLogic.Models.*;
-
 import org.neo4j.driver.AuthTokens;
-import org.neo4j.driver.GraphDatabase;
 
 public class KnowledgeDatabase {
     private boolean activeConnection = false;

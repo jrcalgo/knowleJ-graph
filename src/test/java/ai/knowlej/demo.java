@@ -1,10 +1,9 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
-import java.io.File;
-import java.io.IOException;
+package ai.knowlej;
 
-import src.main.java.knowlej.*;
+import java.util.HashMap;
+
+import ai.knowlej.PropositionalLogic.Logic.*;
+import ai.knowlej.PropositionalLogic.Models.*;
 
 public class demo {
     public static void main(String[] args) throws Exception {
