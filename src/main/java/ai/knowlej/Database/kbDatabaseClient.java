@@ -4,21 +4,21 @@ import java.util.ArrayList;
 
 import org.neo4j.driver.AuthTokens;
 
-public class KnowledgeDatabase {
+public class kbDatabaseClient {
     private boolean activeConnection = false;
     private boolean activeSession = false;
     private ArrayList<String> sessions;
 
-    public KnowledgeDatabase() {
+    public kbDatabaseClient() {
         super();
     }
 
-    public KnowledgeDatabase(String dbUri, String dbUser, String dbPassword) {
+    public kbDatabaseClient(String dbUri, String dbUser, String dbPassword) {
         establishConnection(dbUri, dbUser, dbPassword);
         this.sessions = null;
     }
 
-    public KnowledgeDatabase(String dbUri, String dbUser, String dbPassword, String newSessionName)  {
+    public kbDatabaseClient(String dbUri, String dbUser, String dbPassword, String newSessionName)  {
         if (establishConnection(dbUri, dbUser, dbPassword)) {
             if (addSession(newSessionName)) {
                 this.sessions = new ArrayList<String>();
@@ -43,6 +43,7 @@ public class KnowledgeDatabase {
             System.out.println("Connection failed");
             return false;
         }
+        return false;
     }
 
     public boolean addSession(String name) {
@@ -78,6 +79,7 @@ public class KnowledgeDatabase {
                 return false;
             }
         }
+        return false;
     }
 
     public void addNewDomain() {
