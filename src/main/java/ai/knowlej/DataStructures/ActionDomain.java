@@ -1,4 +1,4 @@
-package ai.knowlej.Planning;
+package ai.knowlej.DataStructures;
 
 import ai.knowlej.Exceptions.*;
 
