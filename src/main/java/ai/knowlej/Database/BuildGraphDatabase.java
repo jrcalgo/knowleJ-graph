@@ -1,7 +1,10 @@
 package ai.knowlej.Database;
 
 import org.neo4j.driver.*;
-
+/*
+ * provides methods to connnect to neo4j database(s) and write new nodes/pointers to nodes. Useful in tandum with
+ * automated graph population modules in this same project.
+ */
 public class BuildGraphDatabase {
     static private Driver driver;
     static private AuthToken authenticationToken;
