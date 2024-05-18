@@ -63,7 +63,7 @@ public class Argument<M extends Model> {
                 }
             }
         } finally {
-            if (operandString.length() == 0) 
+            if (operandString.isEmpty())
                 throw new IllegalArgumentException("Knowledge base cannot be empty.");
         }
 
@@ -143,7 +143,7 @@ public class Argument<M extends Model> {
 
     public String checkAllTTModels(String query)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
-        if (query == null || query.length() == 0)
+        if (query == null || query.isEmpty())
             throw new IllegalArgumentException("String query cannot be null or empty.");
         if (query.contains(",") && !query.startsWith(",") && !query.endsWith(",")) {
             String[] queries = query.split(",");
@@ -1893,7 +1893,7 @@ public class Argument<M extends Model> {
                     if (cE.equals("F")) {
                         equivalencies = new String[1];
                         equivalencies[0] = "PaF";
-                    } else if (cE == "T") {
+                    } else if (cE.equals("T")) {
                         equivalencies = new String[1];
                         equivalencies[0] = "PoT";
                     }
