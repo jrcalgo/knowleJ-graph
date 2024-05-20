@@ -87,7 +87,10 @@ open class BuildNeo4jDatabase {
             var domainExistence: Boolean = false
             try {
                 openSession('r').use { _ ->
-
+                    val result = session!!.run("MATCH (d:Domain) WHERE d.name = \$domainName RETURN d", mapOf("domainName" to domainName))
+                    if (result.hasNext()) {
+                        domainExistence = true
+                    }
                 }
             } catch (e: Exception) {
 
@@ -186,12 +189,21 @@ open class BuildNeo4jDatabase {
             if (!checkForSubdomain(domainName, subdomainName)) {
                 return
             }
-            // check if knowledge base already exists in subdomain
-            openSession('r').use { _ ->
-                if (nodes == null) {
-                } else {
+            // check if domain already exists
+            var subDomainExistence: Boolean = false
+            try {
+                openSession('r').use { _ ->
+                    val result = session!!.run("MATCH (d:Domain) WHERE d.name = \$domainName RETURN d", mapOf("domainName" to domainName))
+                    if (result.hasNext()) {
+                        domainExistence = true
+                    }
                 }
+            } catch (e: Exception) {
+
+            } finally {
+                closeSession()
             }
+            return domainExistence
         }
 
         fun createLogicalKB(domainName: String?, subdomainName: String?, premiseNodes: ArrayList<String?>) {
