@@ -1,101 +1,124 @@
 package ai.knowlej.Database
 
+import ai.knowlej.PropositionalLogic.Logic.Proposition
+
 import ai.knowlej.DataStructures.DeductionGraphNode
 import ai.knowlej.DataStructures.DirectedDeductionGraph
 import ai.knowlej.Database.Models.*
 
 import org.neo4j.driver.*
+import kotlin.run
 
 /*
 * provides methods to connect to neo4j knowledge database(s) and write new nodes/pointers to nodes. Useful in tandem with
 * algorithmic graph population.
 */
 open class BuildNeo4jDatabase {
-    fun initDriver(database: String?, dbUri: String?, dbUser: String?, dbPassword: String?): Driver? {
+    fun initDriver(databaseName: String?, dbUri: String?, dbUser: String?, dbPassword: String?): Driver? {
         authenticationToken = AuthTokens.basic(dbUser, dbPassword)
-        try {
-            driver = GraphDatabase.driver(dbUri, authenticationToken)
-            driver!!.verifyConnectivity()
+        if (driver == null) {
+            try {
+                driver = GraphDatabase.driver(dbUri, authenticationToken)
+                driver!!.verifyConnectivity()
+            }
+            catch (e: Exception) {
+                return null
+            }
+            dbName = databaseName
         }
-        catch (e: Exception) {
-            return null
-        }
-        dbName = database
         return driver
     }
 
-    fun closeDriver() {
-        driver!!.close()
-    }
-
     fun openSession(readOrWrite: Char): Session? {
-        if (!activeSession) {
-            var sessionConfig: SessionConfig? = null
-            if (readOrWrite != 'r'.lowercaseChar() && readOrWrite != 'w'.lowercaseChar()) {
+        if (session == null) {
+            try {
+                var sessionConfig: SessionConfig? = null
+                if (readOrWrite != 'r'.lowercaseChar() && readOrWrite != 'w'.lowercaseChar()) {
+                    return null
+                } else if (readOrWrite == 'r') {
+                    sessionConfig = SessionConfig.builder()
+                        .withDefaultAccessMode(AccessMode.READ)
+                        .withDatabase(dbName)
+                        .build()
+                } else if (readOrWrite == 'w') {
+                    sessionConfig = SessionConfig.builder()
+                        .withDefaultAccessMode(AccessMode.WRITE)
+                        .withDatabase(dbName)
+                        .build()
+                }
+                session = driver!!.session(sessionConfig)
+            } catch (e: Exception) {
                 return null
-            } else if (readOrWrite == 'r') {
-                sessionConfig = SessionConfig.builder()
-                    .withDefaultAccessMode(AccessMode.READ)
-                    .withDatabase(dbName)
-                    .build()
-            } else if (readOrWrite == 'w') {
-                sessionConfig = SessionConfig.builder()
-                    .withDefaultAccessMode(AccessMode.WRITE)
-                    .withDatabase(dbName)
-                    .build()
             }
-            session = driver!!.session(sessionConfig)
-            activeSession = true
         }
         return session
     }
 
-    fun closeSession() {
-        if (activeSession) {
+    fun closeSession(): Session? {
+        if (session != null) {
             session!!.close()
             session = null
-            activeSession = false
         }
+        return session
     }
 
-    fun createNewDatabase(newDatabaseName: String?) {
+    fun closeDriver() {
+        if (session != null)
+            closeSession()
+        driver!!.close()
+        driver = null
+    }
+
+    fun createNewDatabase(newDatabaseName: String?): Boolean {
         // check if database already exists
+        var databaseExistence: Boolean = false
         try {
             openSession('r').use { _ ->
-
+                val result = session!!.run("SHOW DATABASES")
+                while (result.hasNext()) {
+                    val databases = result.next()
+                    if (databases["name"].asString() == newDatabaseName)
+                        databaseExistence = true
+                }
             }
         } catch (e: Exception) {
-
+            throw Exception("Check for existing database failed!")
         } finally {
             closeSession()
         }
-        // create new database
-        try {
-            openSession('w').use { _ ->
 
+        var databaseCreated: Boolean = false
+        if (!databaseExistence) {
+            // create new database
+            try {
+                openSession('w').use { _ ->
+                    session!!.run("CREATE DATABASE \$newDatabaseName", mapOf("newDatabaseName" to newDatabaseName))
+                    databaseCreated = true
+                }
+            } catch (e: Exception) {
+                throw Exception("New database creation failed!")
+            } finally {
+                closeSession()
             }
-        } catch (e: Exception) {
-
-        } finally {
-            closeSession()
         }
+        return databaseCreated
     }
 
     open inner class BuildDomainNodes : BuildNeo4jDatabase() {
-        fun checkForDomain(domainName: String?): Boolean {
+        fun checkForDomain(domainName: String?, continueReadSession: Boolean = false): Boolean {
             // check if domain already exists
             var domainExistence: Boolean = false
             try {
-                openSession('r').use { _ ->
-                    val result = session!!.run("MATCH (d:Domain) WHERE d.name = \$domainName RETURN d", mapOf("domainName" to domainName))
-                    if (result.hasNext()) {
-                        domainExistence = true
-                    }
-                }
+                if (session == null) 
+                    openSession('r')
+                val result = session!!.run("MATCH (d:Domain) WHERE d.name = \$domainName RETURN d", mapOf("domainName" to domainName))
+                if (result.hasNext()) 
+                    domainExistence = true      
             } catch (e: Exception) {
-
+                throw Exception("checkForDomain failed!")
             } finally {
-                closeSession()
+                if (!continueReadSession && session != null)
+                    closeSession()
             }
             return domainExistence
         }
@@ -118,12 +141,12 @@ open class BuildNeo4jDatabase {
         }
 
         fun createDomainRelationship(domainName1: String?, domainName2: String?) {
-            if (!checkForDomain(domainName1) || !checkForDomain(domainName2)) {
+            if (!checkForDomain(domainName1, true) || !checkForDomain(domainName2, false)) {
                 return
             }
             // check if relationship already exists
             try {
-                openSession('r').use { _ ->
+                openSession('w').use { _ ->
 
                 }
             } catch (e: Exception) {
@@ -136,13 +159,21 @@ open class BuildNeo4jDatabase {
     }
 
      open inner class BuildSubdomainNodes : BuildDomainNodes() {
-         fun checkForSubdomain(domainName: String?, subdomainName: String?): Boolean {
-             // first, check if domain exists
-             if (!checkForDomain(domainName)) {
-                 return false
-             }
-             // then check if subdomain already exists
-             openSession('r').use { _ -> }
+         fun checkForSubdomain(domainName: String?, subdomainName: String?, continueReadSession: Boolean = false): Boolean {
+            //  check if subdomain and parent domain already exists
+            var subdomainExistence: Boolean = false
+            try {
+                if (checkForDomain(domainName, true))
+                    val result = session!!.run("MATCH (d:Domain)-[:DOMAIN_OF]->(s:Subdomain) WHERE d.name = \$domainName AND s.name = \$subdomainName RETURN s", mapOf("domainName" to domainName, "subdomainName" to subdomainName))
+                    if (result.hasNext())
+                        subdomainExistence = true
+            } catch (e: Exception) {
+                throw Exception("checkForSubdomain failed!")
+            } finally {
+                if (!continueReadSession && session != null)
+                    closeSession()
+            }
+            return subdomainExistence
          }
 
         fun createSubdomainNode(domainName: String?, subdomainName: String?, subdomainLabels: Array<String?>?, subdomainProperties: Map<String, String>?) {
@@ -150,7 +181,7 @@ open class BuildNeo4jDatabase {
             if (!checkForSubdomain(domainName, subdomainName)) {
                 return
             }
-            // create new subdomain node
+            // check and create new subdomain node
             val subdomainNode = SubdomainNode(subdomainName, subdomainLabels, subdomainProperties)
             try {
                 openSession('w').use { _ ->
@@ -164,74 +195,82 @@ open class BuildNeo4jDatabase {
         }
 
         fun createSubdomainRelationship(domainFromName: String?, subdomainFromName: String?, domainToName: String?, subdomainToName: String?) {
-            if (!checkForSubdomain(domainFromName, subdomainFromName) || !checkForSubdomain(domainToName, subdomainToName)) {
+            if (!checkForSubdomain(domainFromName, subdomainFromName, true) || !checkForSubdomain(domainToName, subdomainToName, false)) {
                 return
             }
-            // check if relationship already exists
+            // check and create new subdomain relationship
             try {
-                openSession('r').use { _ ->
-
+                openSession('w').use { _ ->
+                
                 }
             } catch (e: Exception) {
 
             } finally {
                 closeSession()
-            }
-
-            try {
-                openSession('w', )
             }
         }
     }
 
     open inner class BuildKnowledgeBaseNodes : BuildSubdomainNodes() {
-        fun createConceptualKB(domainName: String?, subdomainName: String?, nodes: ArrayList<String?>) {
+        fun createAbstractKB(domainName: String?, subdomainName: String?, nodes: ArrayList<String?>) {
             if (!checkForSubdomain(domainName, subdomainName)) {
                 return
             }
-            // check if domain already exists
-            var subDomainExistence: Boolean = false
+            // check and create knowledge base nodes
             try {
-                openSession('r').use { _ ->
-                    val result = session!!.run("MATCH (d:Domain) WHERE d.name = \$domainName RETURN d", mapOf("domainName" to domainName))
-                    if (result.hasNext()) {
-                        domainExistence = true
-                    }
+                openSession('w').use { _ ->
+                    
                 }
             } catch (e: Exception) {
 
             } finally {
                 closeSession()
             }
-            return domainExistence
         }
 
         fun createLogicalKB(domainName: String?, subdomainName: String?, premiseNodes: ArrayList<String?>) {
-            if (!checkForSubdomain(domainName, subdomainName)) {
+            if (!checkForSubdomain(domainName, subdomainName, true)) {
                 return
             }
             for (premise in premiseNodes) {
                 try {
-                    openSession('w').use { _ ->
-
-                    }
+                    val propositionTest = Proposition(premise)
                 } catch (e: Exception) {
-
-                } finally {
-                    closeSession()
-                }
+                    throw Exception()
+                } 
             }
+
+            try {
+                openSession('w').use { _ ->
+
+                }
+            } catch (e: Exception) {
+
+            } finally {
+                closeSession()
+            }
+            
         }
 
         private fun createKBNode(domainName: String?, subdomainName: String?) {
+            if (!checkForSubdomain(domainName, subdomainName)) {
+                return
+            }
+            // check and create knowledge base node
+            try {
+                openSession('w').use { _ ->
+
+                }
+            } catch (e: Exception) {
+
+            } finally {
+                closeSession()
+            }
         }
 
-        fun createKBNodeRelationship(
-            fromNode: String?,
-            toNode: String?,
-            connectionLabels: Array<String?>?,
-            connectionProperties: HashMap<String?, String?>?
+        fun createKBNodeRelationship(fromNode: String?, toNode: String?, relationshipLabels: Array<String?>?, relationshipProperties: HashMap<String?, String?>?
         ) {
+            
         }
 
         fun mergeInferenceChain(
@@ -247,6 +286,5 @@ open class BuildNeo4jDatabase {
         private var driver: Driver? = null
         private var authenticationToken: AuthToken? = null
         private var session: Session? = null
-        private var activeSession = false
     }
 }
