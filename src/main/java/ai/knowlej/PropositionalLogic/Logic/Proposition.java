@@ -57,21 +57,11 @@ public class Proposition {
         setSentences();
     }
 
-    private void parseOperands() throws InvalidExpressionException {
-        operands = new ArrayList<String>();
-        for (Character c : this.expression.getConvertedExpression().toCharArray()) {
-            if (syntax.isOperand(c) && !c.equals('T') && !c.equals('F')) {
-                if (!operands.contains(c.toString())) {
-                    operands.add(c.toString());
-                    operandCount++;
-                    if (operandCount > 15) {
-                        this.expression = null;
-                        throw new InvalidExpressionException(
-                                "Too many unique operands; only 15 allowed; there are " + operandCount + " operands.");
-                    }
-                }
-            }
-        }
+    public void setExpression(String e)
+    throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+        this.expression.setExpression(e);
+        setSentences();
+        setTruthTable();
     }
 
     /**
@@ -91,6 +81,122 @@ public class Proposition {
         sentences.add(this.expression.getExpression());
 
         sentenceCount = (byte) ((int) operandCount + 1);
+    }
+
+    public String getExpression() {
+        return this.expression.getExpression();
+    }
+
+    public String getConvertedExpression() {
+        return this.expression.getConvertedExpression();
+    }
+
+    public ArrayList<String> getSentences() {
+        return this.sentences;
+    }
+
+    public String getSentence(int index) {
+        if (index >= 0 && index < sentences.size()) {
+            return sentences.get(index);
+        } else {
+            throw new IndexOutOfBoundsException("Index " + index + " is out of bounds");
+        }
+    }
+
+    public ArrayList<String> getSentences(int from, int to) throws IndexOutOfBoundsException {
+        if ((from < 0) || (to > sentences.size()))
+            throw new IndexOutOfBoundsException("either 'from' or 'to' is out of bounds.");
+
+        ArrayList<String> subPropositions = new ArrayList<>();
+        for (; from <= to; from++) {
+            subPropositions.add(this.sentences.get(from));
+        }
+
+        return subPropositions;
+    }
+
+    public byte getOperandCount() {
+        return this.operandCount;
+    }
+
+    public byte getSentenceCount() {
+        return this.sentenceCount;
+    }
+
+    public String[][] getTruthTable() throws InvalidExpressionException {
+        if (this.tableValues == null || this.truthTable == null) {
+            setTruthTable();
+        }
+        return this.truthTable;
+    }
+
+    public String[] getStringTableRow(int row) throws InvalidExpressionException {
+        if (this.tableValues == null || this.truthTable == null) {
+            setTruthTable();
+        }
+        if (row > truthTable.length) {
+            throw new IndexOutOfBoundsException();
+        }
+        return this.truthTable[row];
+    }
+
+    public String[] getStringTableColumn(int col) throws InvalidExpressionException {
+        if (this.tableValues == null || this.truthTable == null) {
+            setTruthTable();
+        }
+        if (col > truthTable[0].length) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        String[] column = new String[truthTable.length];
+        for (int i = 0; i < truthTable.length; i++)
+            column[i] = truthTable[i][col];
+
+        return column;
+    }
+
+    public Boolean[][] getBooleanTable() throws InvalidExpressionException {
+        if (this.tableValues == null || this.truthTable == null) {
+            setTruthTable();
+        }
+        return this.tableValues;
+    }
+
+    public Boolean[] getBooleanTableRow(int row) throws InvalidExpressionException {
+        if (this.tableValues == null || this.truthTable == null) {
+            setTruthTable();
+        }
+        return this.tableValues[row];
+    }
+
+    public Boolean[] getBooleanTableColumn(int col) throws InvalidExpressionException {
+        if (this.tableValues == null || this.truthTable == null) {
+            setTruthTable();
+        }
+        Boolean[] column = new Boolean[valueCount];
+        int columnElements = valueCount / boolColsCount;
+
+        for (int i = 0; i < columnElements; i++)
+            column[i] = tableValues[i][col];
+
+        return column;
+    }
+
+    private void parseOperands() throws InvalidExpressionException {
+        operands = new ArrayList<String>();
+        for (Character c : this.expression.getConvertedExpression().toCharArray()) {
+            if (syntax.isOperand(c) && !c.equals('T') && !c.equals('F')) {
+                if (!operands.contains(c.toString())) {
+                    operands.add(c.toString());
+                    operandCount++;
+                    if (operandCount > 15) {
+                        this.expression = null;
+                        throw new InvalidExpressionException(
+                                "Too many unique operands; only 15 allowed; there are " + operandCount + " operands.");
+                    }
+                }
+            }
+        }
     }
 
     private void setTruthTable() throws InvalidExpressionException {
@@ -113,6 +219,50 @@ public class Proposition {
             truthTable[rows + 1][boolColsCount - 1] = evaluateExpression(valueMap) ? "T" : "F";
             tableValues[rows][boolColsCount - 1] = truthTable[rows + 1][boolColsCount - 1].equals("T") ? true : false;
             valueMap.clear();
+        }
+    }
+
+    public void printTruthTable() throws InvalidExpressionException {
+        if (this.tableValues == null || this.truthTable == null) {
+            setTruthTable();
+        }
+        System.out.print("\s\s\s\s\s");
+        for (int i = 0; i < truthTable[i].length; i++) {
+            System.out.print(i + "\s\s\s");
+        }
+        System.out.println();
+        for (int i = 0; i < truthTable[i].length; i++) {
+            System.out.print("\s\s\s\s\s");
+            System.out.print(truthTable[0][i]);
+        }
+        System.out.println();
+        for (int i = 1; i < truthTable.length; i++) {
+            for (int j = 0; j < truthTable[i].length; j++) {
+                System.out.print(i + "." + j + ".\s");
+                System.out.print(truthTable[i][j] + "\s\s\s");
+            }
+            System.out.println();
+        }
+    }
+
+    public void printTruthTable(int fromCol, int toCol) throws IndexOutOfBoundsException, InvalidExpressionException {
+        if (this.tableValues == null || this.truthTable == null) {
+            setTruthTable();
+        }
+        if (fromCol > toCol)
+            throw new IndexOutOfBoundsException(fromCol + " is out of bounds.");
+
+        for (int i = 0; i < truthTable[i].length; i++) {
+            System.out.print(i + ".\s");
+            System.out.print(truthTable[0][i] + "\s\s\s");
+        }
+
+        for (int i = 1; i < truthTable.length; i++) {
+            for (int j = fromCol; j < toCol; j++) {
+                System.out.print(i + "." + j + ".\s");
+                System.out.print(truthTable[i][j] + "\s\s\s");
+            }
+            System.out.println();
         }
     }
 
@@ -333,156 +483,6 @@ public class Proposition {
         return null;
     }
 
-    public String getExpression() {
-        return this.expression.getExpression();
-    }
-
-    public String getConvertedExpression() {
-        return this.expression.getConvertedExpression();
-    }
-
-    public void setExpression(String e)
-            throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
-        this.expression.setExpression(e);
-        setSentences();
-        setTruthTable();
-    }
-
-    public ArrayList<String> getSentences() {
-        return this.sentences;
-    }
-
-    public String getSentence(int index) {
-        if (index >= 0 && index < sentences.size()) {
-            return sentences.get(index);
-        } else {
-            throw new IndexOutOfBoundsException("Index " + index + " is out of bounds");
-        }
-    }
-
-    public ArrayList<String> getSentences(int from, int to) throws IndexOutOfBoundsException {
-        if ((from < 0) || (to > sentences.size()))
-            throw new IndexOutOfBoundsException("either 'from' or 'to' is out of bounds.");
-
-        ArrayList<String> subPropositions = new ArrayList<>();
-        for (; from <= to; from++) {
-            subPropositions.add(this.sentences.get(from));
-        }
-
-        return subPropositions;
-    }
-
-    public byte getOperandCount() {
-        return this.operandCount;
-    }
-
-    public byte getSentenceCount() {
-        return this.sentenceCount;
-    }
-
-    public String[][] getTruthTable() throws InvalidExpressionException {
-        if (this.tableValues == null || this.truthTable == null) {
-            setTruthTable();
-        }
-        return this.truthTable;
-    }
-
-    public String[] getStringTableRow(int row) throws InvalidExpressionException {
-        if (this.tableValues == null || this.truthTable == null) {
-            setTruthTable();
-        }
-        if (row > truthTable.length) {
-            throw new IndexOutOfBoundsException();
-        }
-        return this.truthTable[row];
-    }
-
-    public String[] getStringTableColumn(int col) throws InvalidExpressionException {
-        if (this.tableValues == null || this.truthTable == null) {
-            setTruthTable();
-        }
-        if (col > truthTable[0].length) {
-            throw new IndexOutOfBoundsException();
-        }
-
-        String[] column = new String[truthTable.length];
-        for (int i = 0; i < truthTable.length; i++)
-            column[i] = truthTable[i][col];
-
-        return column;
-    }
-
-    public Boolean[][] getBooleanTable() throws InvalidExpressionException {
-        if (this.tableValues == null || this.truthTable == null) {
-            setTruthTable();
-        }
-        return this.tableValues;
-    }
-
-    public Boolean[] getBooleanTableRow(int row) throws InvalidExpressionException {
-        if (this.tableValues == null || this.truthTable == null) {
-            setTruthTable();
-        }
-        return this.tableValues[row];
-    }
-
-    public Boolean[] getBooleanTableColumn(int col) throws InvalidExpressionException {
-        if (this.tableValues == null || this.truthTable == null) {
-            setTruthTable();
-        }
-        Boolean[] column = new Boolean[valueCount];
-        int columnElements = valueCount / boolColsCount;
-
-        for (int i = 0; i < columnElements; i++)
-            column[i] = tableValues[i][col];
-
-        return column;
-    }
-
-    public void printTruthTable() throws InvalidExpressionException {
-        if (this.tableValues == null || this.truthTable == null) {
-            setTruthTable();
-        }
-        System.out.print("\s\s\s\s\s");
-        for (int i = 0; i < truthTable[i].length; i++) {
-            System.out.print(i + "\s\s\s");
-        }
-        System.out.println();
-        for (int i = 0; i < truthTable[i].length; i++) {
-            System.out.print("\s\s\s\s\s");
-            System.out.print(truthTable[0][i]);
-        }
-        System.out.println();
-        for (int i = 1; i < truthTable.length; i++) {
-            for (int j = 0; j < truthTable[i].length; j++) {
-                System.out.print(i + "." + j + ".\s");
-                System.out.print(truthTable[i][j] + "\s\s\s");
-            }
-            System.out.println();
-        }
-    }
-
-    public void printTruthTable(int fromCol, int toCol) throws IndexOutOfBoundsException, InvalidExpressionException {
-        if (this.tableValues == null || this.truthTable == null) {
-            setTruthTable();
-        }
-        if (fromCol > toCol)
-            throw new IndexOutOfBoundsException(fromCol + " is out of bounds.");
-
-        for (int i = 0; i < truthTable[i].length; i++) {
-            System.out.print(i + ".\s");
-            System.out.print(truthTable[0][i] + "\s\s\s");
-        }
-
-        for (int i = 1; i < truthTable.length; i++) {
-            for (int j = fromCol; j < toCol; j++) {
-                System.out.print(i + "." + j + ".\s");
-                System.out.print(truthTable[i][j] + "\s\s\s");
-            }
-            System.out.println();
-        }
-    }
-
     public void csvTable(String name, int createNew) throws IOException {
         if (createNew < 0 || createNew > 1)
             throw new IOException("new must be 0 or 1");
@@ -533,11 +533,6 @@ public class Proposition {
     }
 
     private class PropositionOperators {
-
-        public PropositionOperators() {
-            super();
-        }
-
         // boolean methods
         public boolean not(boolean operand) {
             return (operand == true ? false : true);
@@ -669,6 +664,19 @@ public class Proposition {
             loadExpression(e);
         }
 
+        public void setExpression(String e)
+        throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
+            loadExpression(e);
+        }
+
+        public String getExpression() {
+            return this.expression;
+        }
+
+        public String getConvertedExpression() {
+            return this.convertedExpression;
+        }
+
         /**
          * Checks syntax of expression argument and assigns it to expression field if
          * valid
@@ -764,19 +772,6 @@ public class Proposition {
 
             }
             return cE;
-        }
-
-        public void setExpression(String e)
-                throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
-            loadExpression(e);
-        }
-
-        public String getExpression() {
-            return this.expression;
-        }
-
-        public String getConvertedExpression() {
-            return this.convertedExpression;
         }
     }
 
@@ -938,13 +933,6 @@ public class Proposition {
             }
         };
 
-        /**
-         * default constructor calls super()/Object constructor
-         */
-        public LogicalSyntax() {
-            super();
-        }
-
         public ArrayList<Character> getOperandList() {
             return this.OPERAND_LIST;
         }
@@ -957,7 +945,118 @@ public class Proposition {
             return this.INVALID_OPERATOR_PAIRS;
         }
 
-        // ~~~~~~~~OPERAND METHODS~~~~~~~~
+                /**
+         * Used to get the operator/key from a given value
+         * 
+         * @param value
+         * @return
+         */
+        public String getOperatorKeyFromValue(String value) {
+            for (String key : OPERATOR_MAPS.keySet()) {
+                if (OPERATOR_MAPS.get(key).contains(value)) {
+                    return key;
+                }
+            }
+            return null;
+        }
+
+        /**
+         * Used to get the converted value from a given operator/key
+         * 
+         * @param operator
+         * @return
+         */
+        public String getConversionValueFromOperatorKey(String operator) {
+            return OPERATOR_MAPS.get(operator).get(OPERATOR_CONVERSION_INDEX);
+        }
+
+        /**
+         * Used to get the converted value from a given name value
+         * 
+         * @param name
+         * @return
+         */
+        public String getConversionValueFromNameValue(String name) {
+            for (String key : OPERATOR_MAPS.keySet()) {
+                if (OPERATOR_MAPS.get(key).contains(name)) {
+                    return OPERATOR_MAPS.get(key).get(OPERATOR_CONVERSION_INDEX);
+                }
+            }
+            return null;
+        }
+
+        /**
+         * Used to get the name of the operator/key from a given operator/key
+         * 
+         * @param operator
+         * @return
+         */
+        public String getNameValueFromOperatorKey(String operator) {
+            return OPERATOR_MAPS.get(operator).get(OPERATOR_NAME_INDEX);
+        }
+
+        /**
+         * Used to get the name valueof the operator/key from a given conversion value
+         * 
+         * @param conversion
+         * @return
+         */
+        public String getNameValueFromConversionValue(String conversion) {
+            for (String key : OPERATOR_MAPS.keySet()) {
+                if (OPERATOR_MAPS.get(key).contains(conversion)) {
+                    return OPERATOR_MAPS.get(key).get(OPERATOR_NAME_INDEX);
+                }
+            }
+            return null;
+        }
+
+        /**
+         * 
+         * @return
+         */
+        public String getStringOperatorKeys() {
+            return OPERATOR_MAPS.keySet().toString();
+        }
+
+        /**
+         * 
+         * @return
+         */
+        public String getStringOperatorConversion() {
+            ArrayList<String> conversions = new ArrayList<String>();
+            for (String key : OPERATOR_MAPS.keySet()) {
+                conversions.add(OPERATOR_MAPS.get(key).get(OPERATOR_CONVERSION_INDEX));
+            }
+            return conversions.toString();
+        }
+
+        /**
+         * 
+         * @return
+         */
+        public String getStringOperatorName() {
+            ArrayList<String> names = new ArrayList<String>();
+            for (String key : OPERATOR_MAPS.keySet()) {
+                names.add(OPERATOR_MAPS.get(key).get(OPERATOR_NAME_INDEX));
+            }
+            return names.toString();
+        }
+
+        public ArrayList<Character> getValidOperators() {
+            return OPERAND_LIST;
+        }
+
+        // ~~~~~~~~LOGICAL METHODS~~~~~~~~
+
+        public int getInvalidOperatorPairsSize() {
+            return INVALID_OPERATOR_PAIRS.size();
+        }
+
+        public String getInvalidOperatorPairsSet(int i) {
+            return INVALID_OPERATOR_PAIRS.get(i);
+        }
+
+        // ~~~~~~~~ BOOLEAN METHODS~~~~~~~~
 
         /**
          * 
@@ -1072,118 +1171,5 @@ public class Proposition {
             }
             return false;
         }
-
-        /**
-         * Used to get the operator/key from a given value
-         * 
-         * @param value
-         * @return
-         */
-        public String getOperatorKeyFromValue(String value) {
-            for (String key : OPERATOR_MAPS.keySet()) {
-                if (OPERATOR_MAPS.get(key).contains(value)) {
-                    return key;
-                }
-            }
-            return null;
-        }
-
-        /**
-         * Used to get the converted value from a given operator/key
-         * 
-         * @param operator
-         * @return
-         */
-        public String getConversionValueFromOperatorKey(String operator) {
-            return OPERATOR_MAPS.get(operator).get(OPERATOR_CONVERSION_INDEX);
-        }
-
-        /**
-         * Used to get the converted value from a given name value
-         * 
-         * @param name
-         * @return
-         */
-        public String getConversionValueFromNameValue(String name) {
-            for (String key : OPERATOR_MAPS.keySet()) {
-                if (OPERATOR_MAPS.get(key).contains(name)) {
-                    return OPERATOR_MAPS.get(key).get(OPERATOR_CONVERSION_INDEX);
-                }
-            }
-            return null;
-        }
-
-        /**
-         * Used to get the name of the operator/key from a given operator/key
-         * 
-         * @param operator
-         * @return
-         */
-        public String getNameValueFromOperatorKey(String operator) {
-            return OPERATOR_MAPS.get(operator).get(OPERATOR_NAME_INDEX);
-        }
-
-        /**
-         * Used to get the name valueof the operator/key from a given conversion value
-         * 
-         * @param conversion
-         * @return
-         */
-        public String getNameValueFromConversionValue(String conversion) {
-            for (String key : OPERATOR_MAPS.keySet()) {
-                if (OPERATOR_MAPS.get(key).contains(conversion)) {
-                    return OPERATOR_MAPS.get(key).get(OPERATOR_NAME_INDEX);
-                }
-            }
-            return null;
-        }
-
-        /**
-         * 
-         * @return
-         */
-        public String getStringOperatorKeys() {
-            return OPERATOR_MAPS.keySet().toString();
-        }
-
-        /**
-         * 
-         * @return
-         */
-        public String getStringOperatorConversion() {
-            ArrayList<String> conversions = new ArrayList<String>();
-            for (String key : OPERATOR_MAPS.keySet()) {
-                conversions.add(OPERATOR_MAPS.get(key).get(OPERATOR_CONVERSION_INDEX));
-            }
-            return conversions.toString();
-        }
-
-        /**
-         * 
-         * @return
-         */
-        public String getStringOperatorName() {
-            ArrayList<String> names = new ArrayList<String>();
-            for (String key : OPERATOR_MAPS.keySet()) {
-                names.add(OPERATOR_MAPS.get(key).get(OPERATOR_NAME_INDEX));
-            }
-            return names.toString();
-        }
-
-        public ArrayList<Character> getValidOperators() {
-            return OPERAND_LIST;
-        }
-
-        // ~~~~~~~~LOGICAL METHODS~~~~~~~~
-
-        public int getInvalidOperatorPairsSize() {
-            return INVALID_OPERATOR_PAIRS.size();
-        }
-
-        public String getInvalidOperatorPairsSet(int i) {
-            return INVALID_OPERATOR_PAIRS.get(i);
-        }
-
     }
-
 }
