@@ -25,6 +25,14 @@ open class BuildNeo4jDatabase {
                 return null
             }
             dbName = databaseName
+            sessionReadConfig = SessionConfig.builder()
+                .withDefaultAccessMode(AccessMode.READ)
+                .withDatabase(dbName)
+                .build()
+            sessionWriteConfig = SessionConfig.builder()
+                .withDefaultAccessMode(AccessMode.WRITE)
+                .withDatabase(dbName)
+                .build()
         }
         return driver
     }
@@ -36,17 +44,10 @@ open class BuildNeo4jDatabase {
                 if (readOrWrite != 'r'.lowercaseChar() && readOrWrite != 'w'.lowercaseChar()) {
                     return null
                 } else if (readOrWrite == 'r') {
-                    sessionConfig = SessionConfig.builder()
-                        .withDefaultAccessMode(AccessMode.READ)
-                        .withDatabase(dbName)
-                        .build()
+                    session = driver!!.session(sessionReadConfig)
                 } else if (readOrWrite == 'w') {
-                    sessionConfig = SessionConfig.builder()
-                        .withDefaultAccessMode(AccessMode.WRITE)
-                        .withDatabase(dbName)
-                        .build()
+                    session = driver!!.session(sessionWriteConfig)
                 }
-                session = driver!!.session(sessionConfig)
             } catch (e: Exception) {
                 return null
             }
@@ -162,10 +163,14 @@ open class BuildNeo4jDatabase {
             //  check if subdomain and parent domain already exists
             var subdomainExistence: Boolean = false
             try {
-                if (checkForDomain(domainName, true))
-                    val result = session!!.run("MATCH (d:Domain)-[:DOMAIN_OF]-(s:Subdomain) WHERE d.name = \$domainName AND s.name = \$subdomainName RETURN s", mapOf("domainName" to domainName, "subdomainName" to subdomainName))
+                if (checkForDomain(domainName, true)) {
+                    val result = session!!.run(
+                        "MATCH (d:Domain)-[:DOMAIN_OF]-(s:Subdomain) WHERE d.name = \$domainName AND s.name = \$subdomainName RETURN s",
+                        mapOf("domainName" to domainName, "subdomainName" to subdomainName)
+                    )
                     if (result.hasNext())
                         subdomainExistence = true
+                }
             } catch (e: Exception) {
                 throw Exception("checkForSubdomain failed!")
             } finally {
@@ -175,17 +180,17 @@ open class BuildNeo4jDatabase {
             return subdomainExistence
          }
 
-        fun createSubdomainNode(domainName: String, sbdN: SubdomainNode): Boolean? {
+        fun createSubdomainNode(domainName: String, sbdNode: SubdomainNode): Boolean? {
             // check if subdomain already exists
-            if (!checkForSubdomain(domainName, sbdN.subdomainName)) {
+            if (!checkForSubdomain(domainName, sbdNode.subdomainName)) {
                 return null
             }
             // check and create new subdomain node
             var writeSuccessful = false
             try {
                 openSession('w').use { _ ->
-                    var parameters = mapOf("domainName" to domainName, "subdomainName" to sbdN.subdomainName, "subdomainLabels" to sbdN.subdomainLabels, "subdomainProperties" to sbdN.subdomainProperties)
-                    var cypher = "MERGE (d:Domain {name})-[:DOMAIN_OF]-(s:Subdomain: \$subdomainLabels {name: \$subdomainName} ON CREATE SET s += \$subdomainProperties)"
+                    val parameters = mapOf("domainName" to domainName, "subdomainName" to sbdNode.subdomainName, "subdomainLabels" to sbdNode.subdomainLabels, "subdomainProperties" to sbdNode.subdomainProperties)
+                    val cypher = "MERGE (d:Domain {name})-[:DOMAIN_OF]-(s:Subdomain: \$subdomainLabels {name: \$subdomainName} ON CREATE SET s += \$subdomainProperties)"
                     val result = session!!.run(cypher, parameters)
                     if (result.hasNext())
                         writeSuccessful = true
@@ -205,7 +210,8 @@ open class BuildNeo4jDatabase {
             // check and create new subdomain relationship
             try {
                 openSession('w').use { _ ->
-                
+                    val parameters = mapOf("domainFromName" to domainFromName, "subdomainFromName" to subdomainFromName, "domainToName" to domainToName, "subdomainToName" to subdomainToName)
+                    val cypher = "MERGE (d1:Domain {name: \$domainFromName})-[:DOMAIN_OF]->(s1:Subdomain {name: \$subdomainFromName})"
                 }
             } catch (e: Exception) {
 
@@ -216,7 +222,7 @@ open class BuildNeo4jDatabase {
     }
 
     open inner class BuildKnowledgeBaseNodes : BuildSubdomainNodes() {
-        fun createAbstractKB(domainName: String?, subdomainName: String?, abstractNodes: ArrayList<String?>) {
+        fun createAbstractKB(domainName: String, subdomainName: String, abstractNodes: ArrayList<String>) {
             if (!checkForSubdomain(domainName, subdomainName)) {
                 return
             }
@@ -265,8 +271,7 @@ open class BuildNeo4jDatabase {
             }
         }
 
-        fun createKBNodeRelationship(fromNode: String?, toNode: String?, relationshipLabels: Array<String?>?, relationshipProperties: HashMap<String?, String?>?
-        ) {
+        fun createKBNodeRelationship(fromNode: String, toNode: String, relationshipLabels: Array<String>?, relationshipProperties: HashMap<String, String>?) {
 
         }
 
@@ -283,5 +288,7 @@ open class BuildNeo4jDatabase {
         private var driver: Driver? = null
         private var authenticationToken: AuthToken? = null
         private var session: Session? = null
+        private var sessionReadConfig: SessionConfig? = null
+        private var sessionWriteConfig: SessionConfig? = null
     }
 }
