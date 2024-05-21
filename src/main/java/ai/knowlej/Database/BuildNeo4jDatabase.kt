@@ -123,7 +123,7 @@ open class BuildNeo4jDatabase {
             return domainExistence
         }
 
-        fun createDomainNode(domainName: String?, domainLabels: Array<String?>?, domainProperties: Map<String, String>?) {
+        fun createDomainNode(domainName: String, domainLabels: Array<String?>, domainProperties: Map<String, String>) {
             if (!checkForDomain(domainName)) {
                 return
             }
@@ -140,7 +140,7 @@ open class BuildNeo4jDatabase {
             }
         }
 
-        fun createDomainRelationship(domainName1: String?, domainName2: String?) {
+        fun createDomainRelationship(domainName1: String, domainName2: String) {
             if (!checkForDomain(domainName1, true) || !checkForDomain(domainName2, false)) {
                 return
             }
@@ -154,17 +154,16 @@ open class BuildNeo4jDatabase {
             } finally {
                 closeSession()
             }
-
         }
     }
 
      open inner class BuildSubdomainNodes : BuildDomainNodes() {
-         fun checkForSubdomain(domainName: String?, subdomainName: String?, continueReadSession: Boolean = false): Boolean {
+         fun checkForSubdomain(domainName: String, subdomainName: String, continueReadSession: Boolean = false): Boolean {
             //  check if subdomain and parent domain already exists
             var subdomainExistence: Boolean = false
             try {
                 if (checkForDomain(domainName, true))
-                    val result = session!!.run("MATCH (d:Domain)-[:DOMAIN_OF]->(s:Subdomain) WHERE d.name = \$domainName AND s.name = \$subdomainName RETURN s", mapOf("domainName" to domainName, "subdomainName" to subdomainName))
+                    val result = session!!.run("MATCH (d:Domain)-[:DOMAIN_OF]-(s:Subdomain) WHERE d.name = \$domainName AND s.name = \$subdomainName RETURN s", mapOf("domainName" to domainName, "subdomainName" to subdomainName))
                     if (result.hasNext())
                         subdomainExistence = true
             } catch (e: Exception) {
@@ -176,25 +175,30 @@ open class BuildNeo4jDatabase {
             return subdomainExistence
          }
 
-        fun createSubdomainNode(domainName: String?, subdomainName: String?, subdomainLabels: Array<String?>?, subdomainProperties: Map<String, String>?) {
+        fun createSubdomainNode(domainName: String, sbdN: SubdomainNode): Boolean? {
             // check if subdomain already exists
-            if (!checkForSubdomain(domainName, subdomainName)) {
-                return
+            if (!checkForSubdomain(domainName, sbdN.subdomainName)) {
+                return null
             }
             // check and create new subdomain node
-            val subdomainNode = SubdomainNode(subdomainName, subdomainLabels, subdomainProperties)
+            var writeSuccessful = false
             try {
                 openSession('w').use { _ ->
-
+                    var parameters = mapOf("domainName" to domainName, "subdomainName" to sbdN.subdomainName, "subdomainLabels" to sbdN.subdomainLabels, "subdomainProperties" to sbdN.subdomainProperties)
+                    var cypher = "MERGE (d:Domain {name})-[:DOMAIN_OF]-(s:Subdomain: \$subdomainLabels {name: \$subdomainName} ON CREATE SET s += \$subdomainProperties)"
+                    val result = session!!.run(cypher, parameters)
+                    if (result.hasNext())
+                        writeSuccessful = true
                 }
             } catch (e: Exception) {
-
+                throw Exception("createSubdomainNode failed!")
             } finally {
                 closeSession()
             }
+            return writeSuccessful
         }
 
-        fun createSubdomainRelationship(domainFromName: String?, subdomainFromName: String?, domainToName: String?, subdomainToName: String?) {
+        fun createSubdomainRelationship(domainFromName: String, subdomainFromName: String, domainToName: String, subdomainToName: String) {
             if (!checkForSubdomain(domainFromName, subdomainFromName, true) || !checkForSubdomain(domainToName, subdomainToName, false)) {
                 return
             }
@@ -212,7 +216,7 @@ open class BuildNeo4jDatabase {
     }
 
     open inner class BuildKnowledgeBaseNodes : BuildSubdomainNodes() {
-        fun createAbstractKB(domainName: String?, subdomainName: String?, nodes: ArrayList<String?>) {
+        fun createAbstractKB(domainName: String?, subdomainName: String?, abstractNodes: ArrayList<String?>) {
             if (!checkForSubdomain(domainName, subdomainName)) {
                 return
             }
@@ -228,16 +232,9 @@ open class BuildNeo4jDatabase {
             }
         }
 
-        fun createLogicalKB(domainName: String?, subdomainName: String?, premiseNodes: ArrayList<String?>) {
+        fun createLogicalKB(domainName: String, subdomainName: String, premiseNodes: Array<LogicNode>) {
             if (!checkForSubdomain(domainName, subdomainName, true)) {
                 return
-            }
-            for (premise in premiseNodes) {
-                try {
-                    val propositionTest = Proposition(premise)
-                } catch (e: Exception) {
-                    throw Exception()
-                } 
             }
 
             try {
@@ -252,9 +249,9 @@ open class BuildNeo4jDatabase {
             
         }
 
-        private fun createKBNode(domainName: String?, subdomainName: String?) {
+        private fun createKBNode(domainName: String, subdomainName: String, lN: LogicNode): Boolean? {
             if (!checkForSubdomain(domainName, subdomainName)) {
-                return
+                return null
             }
             // check and create knowledge base node
             try {
@@ -270,7 +267,7 @@ open class BuildNeo4jDatabase {
 
         fun createKBNodeRelationship(fromNode: String?, toNode: String?, relationshipLabels: Array<String?>?, relationshipProperties: HashMap<String?, String?>?
         ) {
-            
+
         }
 
         fun mergeInferenceChain(
