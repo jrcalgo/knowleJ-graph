@@ -40,7 +40,6 @@ open class BuildNeo4jDatabase {
     fun openSession(readOrWrite: Char): Session? {
         if (session == null) {
             try {
-                var sessionConfig: SessionConfig? = null
                 if (readOrWrite != 'r'.lowercaseChar() && readOrWrite != 'w'.lowercaseChar()) {
                     return null
                 } else if (readOrWrite == 'r') {
@@ -124,15 +123,19 @@ open class BuildNeo4jDatabase {
             return domainExistence
         }
 
-        fun createDomainNode(domainName: String, domainLabels: Array<String?>, domainProperties: Map<String, String>) {
-            if (!checkForDomain(domainName)) {
+        fun createDomainNode(domainNode: DomainNode) {
+            if (!checkForDomain(domainNode.domainName)) {
                 return
             }
             // create new domain node
-            val domainNode = DomainNode(domainName, domainLabels, domainProperties)
             try {
                 openSession('w').use { _ ->
+                    val parameters = mapOf("domainName" to domainNode.domainName, "domainLabels" to domainNode.domainLabels, "domainProperties" to domainNode.domainProperties)
+                    val cypher = "CREATE (d:Domain {name: \$domainName} )"
+                    val result = session!!.run(cypher, parameters)
+                    if (result.hasNext()) {
 
+                    }
                 }
             } catch (e: Exception) {
 
@@ -141,14 +144,15 @@ open class BuildNeo4jDatabase {
             }
         }
 
-        fun createDomainRelationship(domainName1: String, domainName2: String) {
-            if (!checkForDomain(domainName1, true) || !checkForDomain(domainName2, false)) {
+        fun createDomainRelationship(domainNode1: DomainNode, domainNode2: DomainNode) {
+            if (!checkForDomain(domainNode1.domainName, true) || !checkForDomain(domainNode2.domainName, false)) {
                 return
             }
             // check if relationship already exists
             try {
                 openSession('w').use { _ ->
-
+                    val parameters = mapOf("domainName1" to domainNode1.domainName, "domainName2" to domainNode2.domainName)
+                    val cypher = 
                 }
             } catch (e: Exception) {
 
@@ -190,7 +194,7 @@ open class BuildNeo4jDatabase {
             try {
                 openSession('w').use { _ ->
                     val parameters = mapOf("domainName" to domainName, "subdomainName" to sbdNode.subdomainName, "subdomainLabels" to sbdNode.subdomainLabels, "subdomainProperties" to sbdNode.subdomainProperties)
-                    val cypher = "MERGE (d:Domain {name})-[:DOMAIN_OF]-(s:Subdomain: \$subdomainLabels {name: \$subdomainName} ON CREATE SET s += \$subdomainProperties)"
+                    val cypher = "MERGE (d:Domain {name})-[:DOMAIN_OF]-(s:Subdomain: \$subdomainLabels {name: \$subdomainName} ON CREATE SET s += \$subdomainProperties) ON MATCH RETURN s"
                     val result = session!!.run(cypher, parameters)
                     if (result.hasNext())
                         writeSuccessful = true
@@ -203,21 +207,27 @@ open class BuildNeo4jDatabase {
             return writeSuccessful
         }
 
-        fun createSubdomainRelationship(domainFromName: String, subdomainFromName: String, domainToName: String, subdomainToName: String) {
+        fun createSubdomainRelationship(domainFromName: String, subdomainFromName: String, domainToName: String, subdomainToName: String, relationshipLabels: Array<String>?, relationshipProperties: HashMap<String, String>?): Boolean? {
             if (!checkForSubdomain(domainFromName, subdomainFromName, true) || !checkForSubdomain(domainToName, subdomainToName, false)) {
-                return
+                return null
             }
             // check and create new subdomain relationship
+            var relationshipExistence = false
             try {
                 openSession('w').use { _ ->
                     val parameters = mapOf("domainFromName" to domainFromName, "subdomainFromName" to subdomainFromName, "domainToName" to domainToName, "subdomainToName" to subdomainToName)
-                    val cypher = "MERGE (d1:Domain {name: \$domainFromName})-[:DOMAIN_OF]->(s1:Subdomain {name: \$subdomainFromName})"
+                    val cypher = "MERGE (d1:Domain {name: \$domainFromName})-[:DOMAIN_OF]->(s1:Subdomain {name: \$subdomainFromName})-(s2:Subdomain {name: \$subdomainToName})<-[:DOMAIN_OF]-(d2:Domain {name: \$domainToName})"
+                    val result = session!!.run(cypher, parameters)
+                    if (result.hasNext()) {
+                        relationshipExistence = true
+                    }
                 }
             } catch (e: Exception) {
 
             } finally {
                 closeSession()
             }
+            return relationshipExistence
         }
     }
 
