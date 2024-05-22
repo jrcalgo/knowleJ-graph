@@ -111,7 +111,6 @@ open class BuildNeo4jDatabase {
             try {
                 if (session == null) 
                     openSession('r')
-                
                 val parameters = mapOf("domainName" to domainNode.domainName, "labels" to domainNode.domainLabels.joinToString(":"), "domainProperties" to domainNode.domainProperties)
                 val cypher = "MATCH (d:Domain:\$labels {name: \$domainName, properties: \$domainProperties}) WHERE d.name = \$domainName RETURN d"
                 val result = session!!.run(cypher, parameters)
@@ -142,7 +141,7 @@ open class BuildNeo4jDatabase {
                     }
                 }
             } catch (e: Exception) {
-
+                throw Exception("createDomainNode failed!")
             } finally {
                 closeSession()
             }
@@ -154,16 +153,24 @@ open class BuildNeo4jDatabase {
                 return null
             }
             // check if relationship already exists
+            var createdRelationship: org.neo4j.driver.types.Relationship? = null
             try {
                 openSession('w').use { _ ->
-                    val parameters = mapOf("domainName1" to domainNode1.domainName, "domainName2" to domainNode2.domainName)
-                    val cypher = 
+                    val domain1Parameters = mapOf("domainName1" to domainNode1.domainName, "domainLabels1" to domainNode1.domainLabels.joinToString(":"), "domainProperties1" to domainNode1.domainProperties)
+                    val domain2Parameters = mapOf("domainName2" to domainNode2.domainName, "domainLabels2" to domainNode2.domainLabels.joinToString(":"), "domainProperties2" to domainNode2.domainProperties)
+                    val parameters = domain1Parameters+domain2Parameters
+                    val cypher = "MERGE (d1:Domain:\$domainLabels1 {name: \$domainName1, properties: \$domainProperties1})-[:RELATES_TO]-(d2:Domain:\$domainLabels2 {name: \$domainName2, properties: \$domainProperties2}) RETURN d1, d2"
+                    val result = session!!.run(cypher, parameters)
+                    if (result.hasNext()) {
+                        createdRelationship = result.next().get("d1").asRelationship()
+                    }
                 }
             } catch (e: Exception) {
-
+                throw Exception("createDomainRelationship failed!")
             } finally {
                 closeSession()
             }
+            return createdRelationship
         }
     }
 
@@ -214,12 +221,12 @@ open class BuildNeo4jDatabase {
             return createdNode
         }
 
-        fun createSubdomainRelationship(domainNode1: DomainGroupNode, subdomainNode1: SubdomainGroupNode, domainNode2: DomainGroupNode, subdomainNode2: SubdomainGroupNode, relationshipLabels: Array<String>?, relationshipProperties: HashMap<String, String>?): Boolean? {
+        fun createSubdomainRelationship(domainNode1: DomainGroupNode, subdomainNode1: SubdomainGroupNode, domainNode2: DomainGroupNode, subdomainNode2: SubdomainGroupNode, relationshipLabels: Array<String>?, relationshipProperties: HashMap<String, String>?): org.neo4j.driver.types.Relationship? {
             if (!checkForSubdomain(domainNode1, subdomainNode1, true) || !checkForSubdomain(domainNode2, subdomainNode2, false)) {
                 return null
             }
             // check and create new subdomain relationship
-            var relationshipExistence = false
+            var relationshipExistence: org.neo4j.driver.types.Relationship? = null
             try {
                 openSession('w').use { _ ->
                     val fromDomainParameters = mapOf("fromDomainName" to domainNode1.domainName, "fromDomainLabels" to domainNode1.domainLabels.joinToString(":"), "fromDomainProperties" to domainNode1.domainProperties)
@@ -227,14 +234,14 @@ open class BuildNeo4jDatabase {
                     val toDomainParameters = mapOf("toDomainName" to domainNode2.domainName, "toDomainLabels" to domainNode2.domainLabels.joinToString(":"), "toDomainProperties" to domainNode2.domainProperties)
                     val toSubdomainParameters = mapOf("toSubdomainName" to subdomainNode2.subdomainName, "toSubdomainLabels" to subdomainNode2.subdomainLabels.joinToString(":"), "toSubdomainProperties" to subdomainNode2.subdomainProperties)
                     val parameters = fromDomainParameters+fromSubdomainParameters+toDomainParameters+toSubdomainParameters
-                    val cypher = "MERGE (d1:Domain {name: \$domainFromName})-[:DOMAIN_OF]->(s1:Subdomain {name: \$subdomainFromName})-(s2:Subdomain {name: \$subdomainToName})<-[:DOMAIN_OF]-(d2:Domain {name: \$domainToName})"
+                    val cypher = "MERGE (d1:Domain:\$fromDomainLabels {name: \$fromDomainName, properties: \$fromDomainProperties})-[:DOMAIN_OF]->(s1:Subdomain:\$fromSubdomainLabels {name: \$fromSubdomainName, properties: \$fromSubdomainProperties})-(s2:Subdomain:\$toSubdomainLabels {name: \$toSubdomainName, properties: \$toSubdomainProperties})<-[:DOMAIN_OF]-(d2:Domain:\$toDomainLabels {name: \$toDomainName, properties: \$toDomainProperties}) return s1, s2"
                     val result = session!!.run(cypher, parameters)
                     if (result.hasNext()) {
-                        relationshipExistence = true
+                        relationshipExistence = result.next().get("d1").asRelationship()
                     }
                 }
             } catch (e: Exception) {
-
+                throw Exception("createSubdomainRelationship failed!")
             } finally {
                 closeSession()
             }
@@ -248,59 +255,127 @@ open class BuildNeo4jDatabase {
                 return null
             }
             // check and create knowledge base nodes
+            var createdKBNode: org.neo4j.driver.types.Node? = null
+            var createdChildNodes: Int = 0
+
+            val childNodeCount: Int = abstractKBNode.abstractKnowledgeNodes.size
             try {
                 openSession('w').use { _ ->
-                    val parameters = mapOf("")
-                    var cypher = 
+                    val domainParameters = mapOf("domainName" to domainNode.domainName, "domainLabels" to domainNode.domainLabels.joinToString(":"), "domainProperties" to domainNode.domainProperties)
+                    val subdomainParameters = mapOf("subdomainName" to subdomainNode.subdomainName, "subdomainLabels" to subdomainNode.subdomainLabels.joinToString(":"), "subdomainProperties" to subdomainNode.subdomainProperties)
+                    val abstractKBParameters = mapOf("abstractKBName" to abstractKBNode.abstractKBName, "abstractKBLabels" to abstractKBNode.abstractKBLabels.joinToString(":"), "abstractKBProperties" to abstractKBNode.abstractKBProperties)
+                    val parameters = domainParameters+subdomainParameters+abstractKBParameters
+                    var cypher = "MERGE (d:Domain:\$domainLabels {name: \$domainName, properties: \$domainProperties})-[:DOMAIN_OF]->(s:Subdomain:\$subdomainLabels {name: \$subdomainName, properties: \$subdomainProperties})-[:SUBDOMAIN_OF]->(a:AbstractKB:\$abstractKBLabels {name: \$abstractKBName, properties: \$abstractKBProperties}) ON CREATE RETURN a ON MATCH RETURN null"
+                    var result = session!!.run(cypher, parameters)
+                    if (result.hasNext()) {
+                        createdKBNode = result.next().get("a").asNode()
+                        for (node in abstractKBNode.abstractKnowledgeNodes) {
+                            val childParameters = mapOf("sentence" to node.concept, "sentenceLabels" to node.conceptLabels.joinToString(":"), "sentenceProperties" to node.conceptProperties)
+                            cypher = "MERGE (a:AbstractKB:\$abstractKBLabels {name: \$abstractKBName, properties: \$abstractKBProperties)-[:KB_OF]->(c:Concept:\$sentenceLabels {name: \$sentence, properties: \$sentenceProperties}) ON CREATE RETURN c ON MATCH RETURN null"
+                            result = session!!.run(cypher, childParameters)
+                            if (result.hasNext()) {
+                                createdChildNodes++
+                            }
+                        }
+                    }
                 }
             } catch (e: Exception) {
-
+                throw Exception("createAbstractKB failed!")
             } finally {
                 closeSession()
             }
+            return createdKBNode, (createdChildNodes/childNodeCount)
         }
 
         fun createLogicalKB(domainNode: DomainGroupNode, subdomainNode: SubdomainGroupNode, logicKBNode: LogicKBNode): org.neo4j.driver.types.Node? {
             if (!checkForSubdomain(domainNode, subdomainNode)) {
                 return null
             }
-            var createdKB: org.neo4j.driver.types.Node? = null
+            // check and create knowledge base nodes
+            var createdKBNode: org.neo4j.driver.types.Node? = null
+            var createdChildNodes: Int = 0
+
+            val childNodeCount: Int = logicKBNode.logicNodes.size
             try {
                 openSession('w').use { _ ->
-                    val parameters = mapOf("domainName" to domainName, "subdomainName" to subdomainName, "logicGroupName" to logicKBNode.logicGroupName, "logicGroupLabels" to logicKBNode.logicGroupLabels, "logicGroupProperties" to logicKBNode.logicGroupProperties)
-                    var cypher = "MERGE (d:Domain {name:})"
-                    for (node in logicKBNode.logicNodes) {
-                        val nodeParameters = mapOf("logicSentence" to node.logicSentence, "nodeLabels" to node.logicLabels, "nodeProperties" to node.logicProperties)
-                        cypher = 
-                        val result
-                        if (result.hasNext()) {
-
+                    val domainParameters = mapOf("domainName" to domainNode.domainName, "domainLabels" to domainNode.domainLabels.joinToString(":"), "domainProperties" to domainNode.domainProperties)
+                    val subdomainParameters = mapOf("subdomainName" to subdomainNode.subdomainName, "subdomainLabels" to subdomainNode.subdomainLabels.joinToString(":"), "subdomainProperties" to subdomainNode.subdomainProperties)
+                    val logicKBParameters = mapOf("logicKBName" to logicKBNode.logicKBName, "logicKBLabels" to logicKBNode.logicKBLabels.joinToString(":"), "logicKBProperties" to logicKBNode.logicKBProperties)
+                    val parameters = domainParameters+subdomainParameters+logicKBParameters
+                    var cypher = "MERGE (d:Domain:\$domainLabels {name: \$domainName, properties: \$domainProperties})-[:DOMAIN_OF]->(s:Subdomain:\$subdomainLabels {name: \$subdomainName, properties: \$subdomainProperties})-[:SUBDOMAIN_OF]->(a:logicKB:\$logicKBLabels {name: \$logicKBName, properties: \$logicKBProperties}) ON CREATE RETURN a ON MATCH RETURN null"
+                    var result = session!!.run(cypher, parameters)
+                    if (result.hasNext()) {
+                        createdKBNode = result.next().get("a").asNode()
+                        for (node in logicKBNode.logicNodes) {
+                            val childParameters = mapOf("sentence" to node.logicSentence, "sentenceLabels" to node.logicLabels.joinToString(":"), "sentenceProperties" to node.logicProperties)
+                            cypher = "MERGE (a:logicKB:\$logicKBLabels {name: \$logicKBName, properties: \$logicKBProperties)-[:KB_OF]->(c:Concept:\$sentenceLabels {name: \$sentence, properties: \$sentenceProperties}) ON CREATE RETURN c ON MATCH RETURN null"
+                            result = session!!.run(cypher, childParameters)
+                            if (result.hasNext()) {
+                                createdChildNodes++
+                            }
                         }
                     }
                 }
             } catch (e: Exception) {
-
+                throw Exception("createLogicKB failed!")
             } finally {
                 closeSession()
             }
-            return createdKB
+            return createdKBNode, (createdChildNodes/childNodeCount)
         }
 
-        private fun createAbstractNode(domainNode: DomainGroupNode, subdomainNode: SubdomainGroupNode,  abstractNode: AbstractKnowledgeNode): org.neo4j.driver.types.Node? {
+        fun createAbstractNode(domainNode: DomainGroupNode, subdomainNode: SubdomainGroupNode, abstractKBNode: AbstractKBNode, abstractNode: AbstractKnowledgeNode): org.neo4j.driver.types.Node? {
             if (!checkForSubdomain(domainNode, subdomainNode)) {
                 return null
             }
             // check and create knowledge base node
+            var createdNode: org.neo4j.driver.types.Node? = null
             try {
                 openSession('w').use { _ ->
-
+                    val domainParameters = mapOf("domainName" to domainNode.domainName, "domainLabels" to domainNode.domainLabels.joinToString(":"), "domainProperties" to domainNode.domainProperties)
+                    val subdomainParameters = mapOf("subdomainName" to subdomainNode.subdomainName, "subdomainLabels" to subdomainNode.subdomainLabels.joinToString(":"), "subdomainProperties" to subdomainNode.subdomainProperties)
+                    val abstractKBParameters = mapOf("abstractKBName" to abstractKBNode.abstractKBName, "abstractKBLabels" to abstractKBNode.abstractKBLabels.joinToString(":"), "abstractKBProperties" to abstractKBNode.abstractKBProperties)
+                    val abstractNodeParameters = mapOf("abstractNodeName" to abstractNode.concept, "abstractNodeLabels" to abstractNode.conceptLabels.joinToString(":"), "abstractNodeProperties" to abstractNode.conceptProperties)
+                    val parameters = domainParameters+subdomainParameters+abstractKBParameters+abstractNodeParameters
+                    val cypher = "MERGE (d:Domain:\$domainLabels {name: \$domainName, properties: \$domainProperties})-[:DOMAIN_OF]->(s:Subdomain:\$subdomainLabels {name: \$subdomainName, properties: \$subdomainProperties})-[:SUBDOMAIN_OF]->(a:AbstractKB:\$abstractKBLabels {name: \$abstractKBName, properties: \$abstractKBProperties})-[:KB_OF]->(c:Concept:\$abstractNodeLabels {name: \$abstractNodeName, properties: \$abstractNodeProperties}) ON CREATE RETURN c ON MATCH RETURN null"
+                    val result = session!!.run(cypher, parameters)
+                    if (result.hasNext()) {
+                        createdNode = result.next().get("c").asNode()
+                    }
                 }
             } catch (e: Exception) {
-
+                throw Exception("createAbstractNode failed!")
             } finally {
                 closeSession()
             }
-            return null
+            return createdNode
+        }
+
+        fun createLogicNode(domainNode: DomainGroupNode, subdomainNode: SubdomainGroupNode, logicKBNode: LogicKBNode, logicNode: LogicNode): org.neo4j.driver.types.Node? {
+            if (!checkForSubdomain(domainNode, subdomainNode)) {
+                return null
+            }
+            // check and create knowledge base node
+            var createdNode: org.neo4j.driver.types.Node? = null
+            try {
+                openSession('w').use { _ ->
+                    val domainParameters = mapOf("domainName" to domainNode.domainName, "domainLabels" to domainNode.domainLabels.joinToString(":"), "domainProperties" to domainNode.domainProperties)
+                    val subdomainParameters = mapOf("subdomainName" to subdomainNode.subdomainName, "subdomainLabels" to subdomainNode.subdomainLabels.joinToString(":"), "subdomainProperties" to subdomainNode.subdomainProperties)
+                    val logicKBParameters = mapOf("logicKBName" to logicKBNode.logicKBName, "logicKBLabels" to logicKBNode.logicKBLabels.joinToString(":"), "logicKBProperties" to logicKBNode.logicKBProperties)
+                    val logicNodeParameters = mapOf("logicNodeName" to logicNode.logicSentence, "logicNodeLabels" to logicNode.logicLabels.joinToString(":"), "logicNodeProperties" to logicNode.logicProperties)
+                    val parameters = domainParameters+subdomainParameters+logicKBParameters+logicNodeParameters
+                    val cypher = "MERGE (d:Domain:\$domainLabels {name: \$domainName, properties: \$domainProperties})-[:DOMAIN_OF]->(s:Subdomain:\$subdomainLabels {name: \$subdomainName, properties: \$subdomainProperties})-[:SUBDOMAIN_OF]->(a:logicKB:\$logicKBLabels {name: \$logicKBName, properties: \$logicKBProperties})-[:KB_OF]->(c:Concept:\$logicNodeLabels {name: \$logicNodeName, properties: \$logicNodeProperties}) ON CREATE RETURN c ON MATCH RETURN null"
+                    val result = session!!.run(cypher, parameters)
+                    if (result.hasNext()) {
+                        createdNode = result.next().get("c").asNode()
+                    }
+                }
+            } catch (e: Exception) {
+                throw Exception("createLogicNode failed!")
+            } finally {
+                closeSession()
+            }
+            return createdNode
         }
 
         fun createKBNodeRelationship(fromNode: Any, toNode: Any, relationshipLabels: Array<String>?, relationshipProperties: HashMap<String, String>?): org.neo4j.driver.types.Relationship? {
@@ -309,11 +384,42 @@ open class BuildNeo4jDatabase {
             } else if (!(toNode is LogicNode) && !(toNode is AbstractKnowledgeNode)) {
                 return null
             }
-
-            return null
+            // check if relationship already exists
+            var createdRelationship: org.neo4j.driver.types.Relationship? = null
+            try {
+                openSession('w').use { _ ->
+                    var fromNodeParameters = null
+                    var toNodeParameters = null
+                    var parameters = null
+                    var cypher = null
+                    if (fromNode is LogicNode) {
+                        fromNodeParameters = mapOf("logicNodeName" to fromNode.sentence, "logicNodeLabels" to fromNode.logicLabels.joinToString(":"), "logicNodeProperties" to fromNode.logicProperties)
+                    } else if (fromNode is AbstractKnowledgeNode) {
+                        
+                    }
+                    if (toNode is LogicNode) {
+                        toNodeParameters = mapOf()
+                    } else if (toNode is AbstractKnowledgeNode) {
+                        
+                    }
+                    domain1Parameters = mapOf("domainName1" to fromNode.domainName, "domainLabels1" to domainNode1.domainLabels.joinToString(":"), "domainProperties1" to domainNode1.domainProperties)
+                    domain2Parameters = mapOf("domainName2" to domainNode2.domainName, "domainLabels2" to domainNode2.domainLabels.joinToString(":"), "domainProperties2" to domainNode2.domainProperties)
+                    val parameters = domain1Parameters+domain2Parameters
+                    val cypher = "MERGE (d1:Domain:\$domainLabels1 {name: \$domainName1, properties: \$domainProperties1})-[:RELATES_TO]-(d2:Domain:\$domainLabels2 {name: \$domainName2, properties: \$domainProperties2}) RETURN d1, d2"
+                    val result = session!!.run(cypher, parameters)
+                    if (result.hasNext()) {
+                        createdRelationship = result.next().get("d1").asRelationship()
+                    }
+                }
+            } catch (e: Exception) {
+                throw Exception("createDomainRelationship failed!")
+            } finally {
+                closeSession()
+            }
+            return createdRelationship
         }
 
-        fun mergeInferenceChain(logicGroup: LogicGroupNode, graph: DirectedDeductionGraph?, inferenceChain: ArrayList<DeductionGraphNode?>?) {
+        fun mergeInferenceChain(logicGroup: LogicKBNode, graph: DirectedDeductionGraph?, inferenceChain: ArrayList<DeductionGraphNode>) {
 
         }
     }
