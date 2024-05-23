@@ -33,6 +33,66 @@ public class Argument<M extends Model> {
         setTruthTable();
     }
 
+    public void setKnowledgeBase(M[] knowledgeBase)
+            throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
+        validateKnowledgeBase(knowledgeBase);
+        setTruthTable();
+    }
+
+    public void addKnowledgeModel(M model) {
+        Object[] newKB = new Object[this.knowledgeBase.length + 1];
+        newKB = getKnowledgeBaseModels();
+        newKB[this.knowledgeBase.length + 1] = model;
+        this.knowledgeBase = (M[]) newKB;
+    }
+
+    public int getKnowledgeBaseSize() {
+        return this.knowledgeBase.length;
+    }
+
+    public String[][] getAllTruthTable() {
+        return this.allTruthTable;
+    }
+
+    public Boolean[][] getAllTableValues() {
+        return this.allTruthValues;
+    }
+    public M getKnowledgeBaseModel(int index) {
+        return this.knowledgeBase[index];
+    }
+
+    public M[] getKnowledgeBaseModels() {
+        return this.knowledgeBase;
+    }
+
+    public String getKnowledgeBaseExpression(int index) {
+        return this.knowledgeBase[index].getExpression();
+    }
+
+    public String[] getKnowledgeBaseExpressions() {
+        String[] expressions = new String[this.knowledgeBase.length];
+        for (int i = 0; i < this.knowledgeBase.length; i++) {
+            expressions[i] = this.knowledgeBase[i].getExpression();
+        }
+        return expressions;
+    }
+
+    public Proposition getKnowledgeBaseProposition(int index) {
+        return this.knowledgeBase[index].getProposition();
+    }
+
+    public Proposition[] getKnowledgeBasePropositions() {
+        Proposition[] propositions = new Proposition[this.knowledgeBase.length];
+        for (int i = 0; i < this.knowledgeBase.length; i++) {
+            propositions[i] = this.knowledgeBase[i].getProposition();
+        }
+        return propositions;
+    }
+
+    public ArrayList<ArrayList<String>> getAllTrueKBModels() {
+        return this.trueKBModels;
+    }
+
     private void validateKnowledgeBase(M[] kb) throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (kb == null || kb.length == 0)
             throw new IllegalArgumentException("Knowledge base cannot be null or empty.");
@@ -641,29 +701,13 @@ public class Argument<M extends Model> {
         return kbCombinations;
     }
 
-    public void setKnowledgeBase(M[] knowledgeBase)
-            throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
-        validateKnowledgeBase(knowledgeBase);
-        setTruthTable();
-    }
-
-    public void addKnowledgeModel(M model) {
-        Object[] newKB = new Object[this.knowledgeBase.length + 1];
-        newKB = getKnowledgeBaseModels();
-        newKB[this.knowledgeBase.length + 1] = model;
-        this.knowledgeBase = (M[]) newKB;
-    }
-
-    public int getKnowledgeBaseSize() {
-        return this.knowledgeBase.length;
-    }
-
-    public String[][] getAllTruthTable() {
-        return this.allTruthTable;
-    }
-
-    public Boolean[][] getAllTableValues() {
-        return this.allTruthValues;
+    public void printAllTrueKBModels() {
+        for (int i = 0; i < this.trueKBModels.size(); i++) {
+            for (int j = 0; j < this.trueKBModels.get(i).size(); j++) {
+                System.out.print(this.trueKBModels.get(i).get(j) + "\s");
+            }
+            System.out.println();
+        }
     }
 
     public void printTruthTable() {
@@ -692,51 +736,6 @@ public class Argument<M extends Model> {
         for (int i = 1; i < allTruthTable.length; i++) {
             for (int j = fromCol; j < toCol; j++) {
                 System.out.print(allTruthTable[i][j] + "\s\s\s\s\s");
-            }
-            System.out.println();
-        }
-    }
-
-    public M getKnowledgeBaseModel(int index) {
-        return this.knowledgeBase[index];
-    }
-
-    public M[] getKnowledgeBaseModels() {
-        return this.knowledgeBase;
-    }
-
-    public String getKnowledgeBaseExpression(int index) {
-        return this.knowledgeBase[index].getExpression();
-    }
-
-    public String[] getKnowledgeBaseExpressions() {
-        String[] expressions = new String[this.knowledgeBase.length];
-        for (int i = 0; i < this.knowledgeBase.length; i++) {
-            expressions[i] = this.knowledgeBase[i].getExpression();
-        }
-        return expressions;
-    }
-
-    public Proposition getKnowledgeBaseProposition(int index) {
-        return this.knowledgeBase[index].getProposition();
-    }
-
-    public Proposition[] getKnowledgeBasePropositions() {
-        Proposition[] propositions = new Proposition[this.knowledgeBase.length];
-        for (int i = 0; i < this.knowledgeBase.length; i++) {
-            propositions[i] = this.knowledgeBase[i].getProposition();
-        }
-        return propositions;
-    }
-
-    public ArrayList<ArrayList<String>> getAllTrueKBModels() {
-        return this.trueKBModels;
-    }
-
-    public void printAllTrueKBModels() {
-        for (int i = 0; i < this.trueKBModels.size(); i++) {
-            for (int j = 0; j < this.trueKBModels.get(i).size(); j++) {
-                System.out.print(this.trueKBModels.get(i).get(j) + "\s");
             }
             System.out.println();
         }
