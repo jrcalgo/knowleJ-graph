@@ -279,7 +279,6 @@ open class BuildNeo4jDatabase {
             subdomainNode1: SubdomainGroupNode,
             domainNode2: DomainGroupNode,
             subdomainNode2: SubdomainGroupNode,
-            relationshipLabels: Array<String>?,
             relationshipProperties: HashMap<String, String>?
         ): org.neo4j.driver.types.Relationship? {
             if (!checkForSubdomain(domainNode1, subdomainNode1, true) || !checkForSubdomain(
@@ -294,6 +293,9 @@ open class BuildNeo4jDatabase {
             var relationshipExistence: org.neo4j.driver.types.Relationship? = null
             try {
                 openSession('w').use { _ ->
+                    val relationshipParameters = mapOf(
+                        "relationshipProperties" to (relationshipProperties ?: "")
+                    )
                     val fromDomainParameters = mapOf(
                         "fromDomainName" to domainNode1.domainName,
                         "fromDomainLabels" to domainNode1.domainLabels.joinToString(":"),
@@ -315,12 +317,14 @@ open class BuildNeo4jDatabase {
                         "toSubdomainProperties" to subdomainNode2.subdomainProperties
                     )
                     val parameters =
-                        fromDomainParameters + fromSubdomainParameters + toDomainParameters + toSubdomainParameters
+                        relationshipParameters+fromDomainParameters + fromSubdomainParameters + toDomainParameters +
+                                toSubdomainParameters
                     val cypher =
                         "MERGE (d1:Domain:\$fromDomainLabels {name: \$fromDomainName, properties: " +
                                 "\$fromDomainProperties})-[:DOMAIN_OF]->(s1:Subdomain:\$fromSubdomainLabels {name: " +
-                                "\$fromSubdomainName, properties: \$fromSubdomainProperties})--(s2:Subdomain: " +
-                                "\$toSubdomainLabels {name: \$toSubdomainName, properties: \$toSubdomainProperties})" +
+                                "\$fromSubdomainName, properties: \$fromSubdomainProperties})-[r:RELATED_TO " +
+                                "{properties: \$relationshipProperties}]-(s2:Subdomain: \$toSubdomainLabels {name: " +
+                                "\$toSubdomainName, properties: \$toSubdomainProperties})" +
                                 "<-[:DOMAIN_OF]-(d2:Domain:\$toDomainLabels {name: \$toDomainName, properties: " +
                                 "\$toDomainProperties}) return s1, s2"
                     val result = session!!.run(cypher, parameters)
@@ -401,7 +405,8 @@ open class BuildNeo4jDatabase {
             } finally {
                 closeSession()
             }
-            return createdKBNode; (createdChildNodes / childNodeCount)
+            val buildNodeSuccessRate = (createdChildNodes / childNodeCount)
+            return createdKBNode; buildNodeSuccessRate
         }
 
         fun createLogicalKB(
@@ -467,7 +472,8 @@ open class BuildNeo4jDatabase {
             } finally {
                 closeSession()
             }
-            return createdKBNode; (createdChildNodes / childNodeCount)
+            val buildNodeSuccessRate = (createdChildNodes / childNodeCount).toFloat()
+            return createdKBNode; buildNodeSuccessRate
         }
 
         fun createAbstractNode(
