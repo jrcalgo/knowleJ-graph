@@ -159,7 +159,8 @@ open class BuildNeo4jDatabase {
 
         fun createDomainRelationship(
             domainNode1: DomainGroupNode,
-            domainNode2: DomainGroupNode
+            domainNode2: DomainGroupNode,
+            relationshipProperties: Map<String, String>
         ): org.neo4j.driver.types.Relationship? {
             if (!checkForDomain(domainNode1, true) || !checkForDomain(domainNode2)) {
                 return null
@@ -168,6 +169,9 @@ open class BuildNeo4jDatabase {
             var createdRelationship: org.neo4j.driver.types.Relationship? = null
             try {
                 openSession('w').use { _ ->
+                    val relationshipParameters = mapOf (
+                        "relationshipProperties" to relationshipProperties
+                    )
                     val domain1Parameters = mapOf(
                         "domainName1" to domainNode1.domainName,
                         "domainLabels1" to domainNode1.domainLabels.joinToString(":"),
@@ -178,14 +182,14 @@ open class BuildNeo4jDatabase {
                         "domainLabels2" to domainNode2.domainLabels.joinToString(":"),
                         "domainProperties2" to domainNode2.domainProperties
                     )
-                    val parameters = domain1Parameters + domain2Parameters
+                    val parameters = relationshipParameters+domain1Parameters + domain2Parameters
                     val cypher =
                         "MERGE (d1:Domain:\$domainLabels1 {name: \$domainName1, properties: \$domainProperties1})" +
-                                "-[:RELATES_TO]-(d2:Domain:\$domainLabels2 {name: \$domainName2, properties: " +
-                                "\$domainProperties2}) RETURN d1, d2"
+                                "-[:RELATES_TO {properties: \$relationshipProperties}]-(d2:Domain:\$domainLabels2 " +
+                                "{name: \$domainName2, properties: \$domainProperties2}) RETURN r"
                     val result = session!!.run(cypher, parameters)
                     if (result.hasNext()) {
-                        createdRelationship = result.next().get("d1").asRelationship()
+                        createdRelationship = result.next().get("r").asRelationship()
                     }
                 }
             } catch (e: Exception) {
@@ -326,10 +330,10 @@ open class BuildNeo4jDatabase {
                                 "{properties: \$relationshipProperties}]-(s2:Subdomain: \$toSubdomainLabels {name: " +
                                 "\$toSubdomainName, properties: \$toSubdomainProperties})" +
                                 "<-[:DOMAIN_OF]-(d2:Domain:\$toDomainLabels {name: \$toDomainName, properties: " +
-                                "\$toDomainProperties}) return s1, s2"
+                                "\$toDomainProperties}) return r"
                     val result = session!!.run(cypher, parameters)
                     if (result.hasNext()) {
-                        relationshipExistence = result.next().get("d1").asRelationship()
+                        relationshipExistence = result.next().get("r").asRelationship()
                     }
                 }
             } catch (e: Exception) {
