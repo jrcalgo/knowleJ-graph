@@ -5,16 +5,18 @@ import java.util.HashMap;
 import java.time.Instant;
 
 import ai.knowlej.DataStructures.ActionDomain;
+import ai.knowlej.DataStructures.ActionSchema;
 import ai.knowlej.Exceptions.*;
 import ai.knowlej.PropositionalLogic.Logic.Proposition;
 import ai.knowlej.PropositionalLogic.Models.Model;
 
-public class ClassicalPlanner extends ActionDomain {
-    String[] initialState; // initial propositional arrangement/parameters of task/environment
-    String[] state; // current propositional arrangement/parameters of task/environment
-    HashMap<Instant, Proposition> sentenceTimestamps; // propositions bound by timestamp
-    String[] groundTruths; // axioms that are always true
-    Model[] fluents; // Propositions that change over time
+public class ClassicalPlanner {
+    private String[] initialState; // initial propositional arrangement/parameters of task/environment
+    private String[] state; // current propositional arrangement/parameters of task/environment
+    private ActionDomain actions;
+    private HashMap<Instant, Proposition> sentenceTimestamps; // propositions bound by timestamp
+    private String[] groundTruths; // axioms that are always true
+    private Model[] fluents; // Propositions that change over time
 
     public ClassicalPlanner() {
         super();
@@ -25,7 +27,7 @@ public class ClassicalPlanner extends ActionDomain {
     }
 
     public ClassicalPlanner(ActionSchema[] actions) {
-        super(actions);
+        this.actions = new ActionDomain(actions);
         this.initialState = null;
         this.state = null;
         this.groundTruths = null;
@@ -33,7 +35,7 @@ public class ClassicalPlanner extends ActionDomain {
     }
 
     public ClassicalPlanner(ActionDomain domain) {
-        super(domain.getActions());
+        this.actions = domain;
         this.initialState = null;
         this.state = null;
         this.groundTruths = null;
@@ -41,25 +43,25 @@ public class ClassicalPlanner extends ActionDomain {
     }
 
     public ClassicalPlanner(String[] groundTruths, ActionSchema[] actions) throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
-        super(actions);
+        this.actions = new ActionDomain(actions);
         setGroundTruths(groundTruths);
         this.fluents = null;
     }
 
     public ClassicalPlanner(String[] groundTruths, ActionDomain domain) throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
-        super(domain.getActions());
+        this.actions = domain;
         setGroundTruths(groundTruths);
         this.fluents = null;
     }
 
     public ClassicalPlanner(Model[] fluents, String[] groundTruths, ActionSchema[] actions) throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
-        super(actions);
+        this.actions = new ActionDomain(actions);
         setGroundTruths(groundTruths);
         this.fluents = fluents;
     }
 
     public ClassicalPlanner(Model[] fluents, String[] groundTruths, ActionDomain domain) throws InvalidOperandException, InvalidLogicOperatorException, InvalidExpressionException {
-        super(domain.getActions());
+        this.actions = domain;
         setGroundTruths(groundTruths);
         this.fluents = fluents;
     }
