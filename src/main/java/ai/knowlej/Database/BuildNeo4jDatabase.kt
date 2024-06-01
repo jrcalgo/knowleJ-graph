@@ -350,7 +350,7 @@ open class BuildNeo4jDatabase {
             domainNode: DomainGroupNode,
             subdomainNode: SubdomainGroupNode,
             abstractKBNode: AbstractKBNode
-        ): org.neo4j.driver.types.Node? {
+        ): Pair<org.neo4j.driver.types.Node?, Float>? {
             if (!checkForSubdomain(domainNode, subdomainNode)) {
                 return null
             }
@@ -398,7 +398,7 @@ open class BuildNeo4jDatabase {
                                         "\$sentence, properties: \$sentenceProperties}) " +
                                         "ON CREATE RETURN c ON MATCH RETURN null"
                             result = session!!.run(cypher, childParameters)
-                            if (result.hasNext()) {
+                            if (result.hasNext() && result != null) {
                                 createdChildNodes++
                             }
                         }
@@ -409,15 +409,15 @@ open class BuildNeo4jDatabase {
             } finally {
                 closeSession()
             }
-            val buildNodeSuccessRate = (createdChildNodes / childNodeCount)
-            return createdKBNode; buildNodeSuccessRate
+            val buildNodeSuccessRate = (createdChildNodes / childNodeCount).toFloat()
+            return Pair(createdKBNode, buildNodeSuccessRate)
         }
 
         fun createLogicalKB(
             domainNode: DomainGroupNode,
             subdomainNode: SubdomainGroupNode,
             logicKBNode: LogicKBNode
-        ): org.neo4j.driver.types.Node? {
+        ): Pair<org.neo4j.driver.types.Node?, Float>? {
             if (!checkForSubdomain(domainNode, subdomainNode)) {
                 return null
             }
@@ -465,7 +465,7 @@ open class BuildNeo4jDatabase {
                                         "\$sentence, properties: \$sentenceProperties}) " +
                                         "ON CREATE RETURN c ON MATCH RETURN null"
                             result = session!!.run(cypher, childParameters)
-                            if (result.hasNext()) {
+                            if (result.hasNext() && result != null) {
                                 createdChildNodes++
                             }
                         }
@@ -477,7 +477,7 @@ open class BuildNeo4jDatabase {
                 closeSession()
             }
             val buildNodeSuccessRate = (createdChildNodes / childNodeCount).toFloat()
-            return createdKBNode; buildNodeSuccessRate
+            return Pair(createdKBNode, buildNodeSuccessRate)
         }
 
         fun createAbstractNode(
