@@ -6,8 +6,14 @@ import ai.knowlej.PropositionalLogic.Logic.Proposition;
 
 public record LogicNode(String logicSentence, String[] logicLabels, Map<String, String> logicProperties) {
     public LogicNode {
-        if (logicSentence == null) {
-            throw new IllegalArgumentException("Logic sentence cannot be null");
+        if (logicSentence == null || logicSentence.isBlank()) {
+            throw new IllegalArgumentException("Logic sentence cannot be null or empty");
+        }
+        if (logicLabels == null || logicLabels.length == 0) {
+            throw new IllegalArgumentException("Logic labels cannot be null or empty");
+        }
+        if (logicProperties == null || logicProperties.isEmpty()) {
+            throw new IllegalArgumentException("Logic properties cannot be null or empty");
         }
         // test logical Sentence validity
         try {
