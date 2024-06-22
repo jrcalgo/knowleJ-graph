@@ -217,7 +217,7 @@ public class Proposition {
                 valueMap.put(operands.get(i).charAt(0), truthTable[rows + 1][i].charAt(0));
 
             truthTable[rows + 1][boolColsCount - 1] = evaluateExpression(valueMap) ? "T" : "F";
-            tableValues[rows][boolColsCount - 1] = truthTable[rows + 1][boolColsCount - 1].equals("T") ? true : false;
+            tableValues[rows][boolColsCount - 1] = truthTable[rows + 1][boolColsCount - 1].equals("T");
             valueMap.clear();
         }
     }
@@ -388,99 +388,63 @@ public class Proposition {
             }
         } while (mE.length() > 1);
 
-        answer = mE.equals("T") ? true : false;
+        answer = mE.equals("T");
         return answer;
     }
 
     /**
      * Form: P->Q == ~P->~Q
-     * @return all possible inverses of current proposition.
+     * @return an inverse of the current converted expression from a specific 'm' operator starting point.
      */
-    public String[] inverse() throws InvalidExpressionException {
+    public String inverse(int fromConvertedImplicationIndex) throws InvalidExpressionException {
         if (!this.expression.getConvertedExpression().contains("m"))
             throw new InvalidExpressionException("Invalid proposition; must contain implication");
+        else if (this.expression.getExpression().charAt(fromConvertedImplicationIndex) != 'm')
+            throw new InvalidExpressionException("Invalid implication index for converted expression; must be 'm'");
 
-        return implicationSubstringInversion(null);
+        String[] pair = implicationSubstringInversion(implicationSubstrings(fromConvertedImplicationIndex));
+        return pair[0] + 'm' + pair[1];
     }
 
     /**
      * Form: P->Q == Q->P
-     * @return all possible converses of current proposition.
+     * @return a converse of the current converted expression from a specific 'm' operator starting point.
      */
-    public String[] converse() throws InvalidExpressionException {
+    public String converse(int fromConvertedImplicationIndex) throws InvalidExpressionException {
         if (!this.expression.getConvertedExpression().contains("m"))
             throw new InvalidExpressionException("Invalid proposition; must contain implication");
+        else if (this.expression.getConvertedExpression().charAt(fromConvertedImplicationIndex) != 'm')
+            throw new InvalidExpressionException("Invalid implication index for converted expression; must be 'm'");
 
-        return implicationSubstringSwap(Math.toIntExact(this.expression.getConvertedExpression().chars().filter(c -> c == 'm').count()), false);
+        String[] pair = implicationSubstrings(fromConvertedImplicationIndex);
+        return pair[1] + 'm' + pair[0];
     }
 
     /**
      * Form: P->Q == ~Q->~P
-     * @return all possible contrapositives of current proposition.
+     * @return a contrapositive from of the current converted expression from a specific 'm' operator starting point.
      */
-    public String[] contrapositive() throws InvalidExpressionException {
+    public String contrapositive(int fromConvertedImplicationIndex) throws InvalidExpressionException {
         if (!this.expression.getConvertedExpression().contains("m"))
             throw new InvalidExpressionException("Invalid proposition; must contain implication");
+        else if (this.expression.getConvertedExpression().charAt(fromConvertedImplicationIndex) != 'm')
+            throw new InvalidExpressionException("Invalid implication index for converted expression; must be 'm'");
 
-        String[] contrapositives = null;
-        String cE = this.expression.getConvertedExpression();
-        ArrayList<String[]> operandEncodings = new ArrayList<>();
-        int implicationCount = Math.toIntExact(cE.chars().filter(c -> c == 'm').count());
-        if (implicationCount > 0) {
-            do {
-                OptionalInt max = cE.chars().filter(Character::isDigit).map(Character::getNumericValue).max();
-                if (max.isPresent()) {
-                    for (int m = max.getAsInt(); m >= 0; m--) {
-
-                    }
-                }
-            } while (implicationCount > 0);
-        }
-
-        for (int i = 0; i < implicationCount; i++) {
-            if (this.expression.getConvertedExpression().charAt(i) == 'm') {
-                operandEncodings.add(new String[2]);
-                operandEncodings.getLast()[0] = cE.substring(0, i-1);
-                operandEncodings.getLast()[1] = cE.substring(i+1, cE.length());
-            }
-        }
-        for (int i = 0; i < operandEncodings.size(); i++) {
-
-        }
-        
-        return implicationSubstringSwap(Math.toIntExact(this.expression.getConvertedExpression().chars().filter(c -> c == 'm').count()), true);
+        String[] pair = implicationSubstringInversion(implicationSubstrings(fromConvertedImplicationIndex));
+        return pair[1] + 'm' + pair[0];
     }
 
     private String[] implicationSubstringInversion(String[] pairs) {
-        return null;
+        String[] invertedPairs = pairs;
+        // TODO: implement inversion of implication substrings
+        return invertedPairs;
     }
 
-    private String[] implicationSubstringSwap(int implicationCount, boolean inversion) {
-        if (implicationCount > 0) {
-            String[] implicationSwaps = new String[2];
-            String implicationSubstring;
-            String[] swappedExpressions = new String[implicationCount];
-            String cE = this.expression.getConvertedExpression();
-
-            do {
-                OptionalInt max = cE.chars().filter(Character::isDigit).map(Character::getNumericValue).max();
-                for (int m = max.getAsInt()  ; m >= 0; m--) {
-                    implicationSubstring = cE.substring(cE.indexOf(m), cE.lastIndexOf(m) + Integer.toString(m).length());
-                    if (implicationSubstring.contains("m")) {
-                        implicationSwaps[0] = implicationSubstring.substring(0, implicationSubstring.indexOf("m")-1);
-                        implicationSwaps[1] = implicationSubstring.substring(implicationSubstring.indexOf("m")+1, implicationSubstring.length()-1);
-                        if (inversion) {
-                            implicationSwaps = implicationSubstringInversion(implicationSwaps);
-                        }
-                        swappedExpressions[swappedExpressions.length] = implicationSwaps[1] + "m" + implicationSwaps[0];
-                    }
-                }
-            } while (implicationCount > 0);
-            
-            return implicationSwaps;
-        }
-
-        return null;
+    private String[] implicationSubstrings(int convertedImplicationIndex) {
+        String[] pair = new String[2];
+        String cE = this.expression.getConvertedExpression();
+        // TODO: implement substring extraction of implication substrings
+        return pair;
     }
 
     public void csvTable(String name, int createNew) throws IOException {
@@ -535,35 +499,32 @@ public class Proposition {
     private class PropositionOperators {
         // boolean methods
         public boolean not(boolean operand) {
-            return (operand == true ? false : true);
+            return !operand;
         }
 
         public boolean and(boolean left, boolean right) {
-            return (left && right);
+            return left && right;
         }
 
         public boolean or(boolean left, boolean right) {
-            return (left || right);
+            return left || right;
         }
 
         public boolean implies(boolean left, boolean right) {
-            if (right == false && left == true)
+            if (!right && left)
                 return false;
             else
                 return true;
         }
 
         public boolean iff(boolean left, boolean right) {
-            if (left == right)
-                return true;
-            else
-                return false;
+            return left == right;
         }
 
         public boolean xor(boolean left, boolean right) {
-            if (left == true && right == false)
+            if (left && !right)
                 return true;
-            else if (left == false && right == true)
+            else if (!left && right)
                 return true;
             else
                 return false;
@@ -683,7 +644,7 @@ public class Proposition {
          * 
          * @param e propositional logic expression String
          * @throws InvalidExpressionException
-         * @throws InvalidLogicOperatorExcept
+         * @throws InvalidLogicOperatorException
          * @throws InvalidOperandException
          */
         private void loadExpression(String e)
