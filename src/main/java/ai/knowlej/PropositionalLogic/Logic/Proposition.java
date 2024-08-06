@@ -299,13 +299,13 @@ public class Proposition {
                 if (!mE.contains("nT") && !mE.contains("nF")) {
                     if (mE.matches(".*n[0-9].*")) {
                         char[] mEChars = mE.toCharArray();
-                        Integer parenthesesValue = 0;
+                        int parenthesesValue = 0;
                         int index = mE.indexOf("n");
                         if (!(mE.charAt(index + 1) == 0))
                             parenthesesValue = Integer.parseInt(mE.charAt(index + 1) + "");
 
                         index += 2;
-                        while (index != mE.lastIndexOf(parenthesesValue.toString())) {
+                        while (index != mE.lastIndexOf(Integer.toString(parenthesesValue))) {
                             if (mE.charAt(index) == 'T')
                                 mEChars[index] = operator.not("T").charAt(0);
                             else if (mE.charAt(index) == 'F')
@@ -314,7 +314,7 @@ public class Proposition {
                             index++;
                         }
                         mE = new String(mEChars);
-                        mE = mE.replace("n" + parenthesesValue.toString(), parenthesesValue.toString());
+                        mE = mE.replace("n" + Integer.toString(parenthesesValue), Integer.toString(parenthesesValue));
                     }
                 }
             }
@@ -528,7 +528,7 @@ public class Proposition {
                 return true;
             else
                 return false;
-        }
+        }   
 
         // String methods
 
