@@ -5,6 +5,10 @@ import java.util.HashMap;
 import ai.knowlej.PropositionalLogic.Logic.*;
 import ai.knowlej.PropositionalLogic.Models.*;
 
+import ai.knowlej.Database.*;
+import ai.knowlej.Database.Models.*;
+
+
 public class demo {
     public static void main(String[] args) throws Exception {
         StochasticModel smTest = new StochasticModel("Test1", "A&B|C");
@@ -84,8 +88,13 @@ public class demo {
         stochasticModels[3] = smTest4;
         stochasticModels[4] = smTest5;
         
-        Argument<StochasticModel> argument1 = new Argument<>(stochasticModels);
-        System.out.println(argument1.deduce("A&~B")); 
+        BuildNeo4jDatabase db = new BuildNeo4jDatabase();
+        db.initDriver("state", "bolt://localhost:7687", "neo4j", "password");
+        DomainGroupNode dgn = new DomainGroupNode("TestGroup", new String[] {"test"}, new HashMap<>() {{
+            put("test1", "test");
+        }});
+        BuildNeo4jDatabase.BuildDomainNodes dgnBuilder = db.new BuildDomainNodes();
+        dgnBuilder.createDomainNode(dgn);
     }
 
 }
