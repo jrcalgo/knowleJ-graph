@@ -4,18 +4,18 @@ knowleJ is a Java library for managing knowledge graphs using Neo4J. It is desig
 
 ## Features
 ```
-	•	Propositional Inference and Deduction: Supports storing and manipulating chains of propositional inferences and equivalencies.
-	•	Neo4J Integration: Utilizes Neo4J as the backend for efficient storage and querying of knowledge graphs.
-	•	Proof Checking: Provides tools for verifying the validity of inference chains and logical equivalencies.
-	•	Flexible API: Offers methods for inputting and managing propositional logic representations.
+ •	Propositional Inference and Deduction: Supports storing and manipulating chains of propositional inferences and equivalencies.
+ •	Neo4J Integration: Utilizes Neo4J as the backend for efficient storage and querying of knowledge graphs.
+ •	Proof Checking: Provides tools for verifying the validity of inference chains and logical equivalencies.
+ •	Flexible API: Offers methods for inputting and managing propositional logic representations.
 ```
 
 ## Getting Started
 ### Prerequisites
 ```
-	•	Java 11 or later
-	•	Neo4J 4.x or later
-	•	Maven or Gradle (for dependency management)
+ •	Java 11 or later
+ •	Neo4J 4.x or later
+ •	Maven or Gradle (for dependency management)
 ```
  
 ### Installation
