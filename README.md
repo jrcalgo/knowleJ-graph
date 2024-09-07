@@ -53,6 +53,9 @@ For Gradle:
 implementation 'com.example:knowleJ:1.0.0'
 ```
 
+### Contributing
+Contributions are welcome! Please read the CONTRIBUTING.md file for details on how to contribute to this project.
+
 ### License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
