@@ -42,7 +42,7 @@ gradle build
 For Maven:
 ```
 <dependency>
-    <groupId>com.example</groupId>
+    <groupId>ai.knowlej</groupId>
     <artifactId>knowleJ</artifactId>
     <version>1.0.0</version>
 </dependency>
