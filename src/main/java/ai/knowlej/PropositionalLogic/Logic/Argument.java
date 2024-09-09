@@ -412,7 +412,7 @@ public class Argument<M extends Model> {
         boolean pathExistence = false;
 
         final int MAX_LOOPS = 50;
-        int whileLoopCount = 0;
+        int searchLoopCount = 0;
 
         final int MAX_ITERATIONS = 2;
         boolean firstIteration = true;
@@ -428,11 +428,12 @@ public class Argument<M extends Model> {
                 case 1: { // forward chaining
                     // inference/argument evaluations
                     kbCombinations = combineKBExpressions(forwardKnowledgeHistory);
-                    outerLoop: for (int i = 0; i < kbCombinations.size(); i++) {
-                        argSentence1 = kbCombinations.get(i)[0];
-                        argSentence2 = kbCombinations.get(i)[1];
+                    outerLoop:
+                    for (String[] kbCombination : kbCombinations) {
+                        argSentence1 = kbCombination[0];
+                        argSentence2 = kbCombination[1];
                         inferenceMap = inferenceLaws.checkInferenceLaws(
-                                new Proposition[] { new Proposition(argSentence1), new Proposition(argSentence2) });
+                                new Proposition[]{new Proposition(argSentence1), new Proposition(argSentence2)});
                         for (String law : inferenceMap.keySet()) {
                             for (String inference : inferenceMap.get(law)) {
                                 if (!law.equals("Addition") || !law.equals("Simplification")) {
@@ -461,17 +462,18 @@ public class Argument<M extends Model> {
                     if (pathExistence)
                         break;
                     currentNodes = graph.getForwardNodes();
-                    outerLoop: for (DeductionGraphNode node : currentNodes) {
+                    outerLoop: 
+                    for (DeductionGraphNode node : currentNodes) {
                         inferenceMap = inferenceLaws
                                 .checkInferenceLaws(new Proposition[] { new Proposition(node.getExpression()) });
-                        for (int i = 0; i < singleCharacterInferenceLaws.length; i++) {
-                            if (!inferenceMap.get(singleCharacterInferenceLaws[i]).isEmpty()) {
-                                for (String inference : inferenceMap.get(singleCharacterInferenceLaws[i])) {
+                        for (String singleCharacterInferenceLaw : singleCharacterInferenceLaws) {
+                            if (!inferenceMap.get(singleCharacterInferenceLaw).isEmpty()) {
+                                for (String inference : inferenceMap.get(singleCharacterInferenceLaw)) {
                                     if (graph.contains(inference)) {
                                         DeductionGraphNode inferenceNode = graph.getNode(inference);
-                                        if (!graph.isPointing(graph.getNode(singleCharacterInferenceLaws[i]),
+                                        if (!graph.isPointing(graph.getNode(singleCharacterInferenceLaw),
                                                 inferenceNode))
-                                            graph.point(graph.getNode(singleCharacterInferenceLaws[i]), inferenceNode);
+                                            graph.point(graph.getNode(singleCharacterInferenceLaw), inferenceNode);
                                         if (inference.equals(graph.getQuery())) {
                                             pathExistence = true;
                                             iteration = 0;
@@ -480,7 +482,7 @@ public class Argument<M extends Model> {
                                         }
                                     } else {
                                         DeductionGraphNode newInferenceNode = graph.add(inference);
-                                        graph.point(graph.getNode(singleCharacterInferenceLaws[i]), newInferenceNode);
+                                        graph.point(graph.getNode(singleCharacterInferenceLaw), newInferenceNode);
                                         forwardKnowledgeHistory.add(inference);
                                     }
                                 }
@@ -491,7 +493,8 @@ public class Argument<M extends Model> {
                         break;
                     // equivalency/proposition evaluations
                     currentNodes = graph.getForwardNodes();
-                    outerloop: for (DeductionGraphNode node : currentNodes) {
+                    outerloop: 
+                    for (DeductionGraphNode node : currentNodes) {
                         equivalencyMap = equivalencyLaws.checkEquivalencyLaws(new Proposition(node.getExpression()));
                         for (String law : equivalencyMap.keySet()) {
                             for (String equivalency : equivalencyMap.get(law)) {
@@ -678,8 +681,8 @@ public class Argument<M extends Model> {
                     return foundPath;
                 }
             }
-            whileLoopCount++;
-            if (whileLoopCount > MAX_LOOPS)
+            searchLoopCount++;
+            if (searchLoopCount > MAX_LOOPS)
                 break;
             inferenceMap.clear();
             equivalencyMap.clear();
@@ -1328,7 +1331,7 @@ public class Argument<M extends Model> {
             for (String law : answerTemplate.keySet()) {
                 encodedLawMap.put(law, null);
             }
-
+            // TODO: this definitely needs to be fixed
             final String[] idempotentLaw = new String[] {
                     ".*o.*", ".*a.*"
             };
@@ -1387,9 +1390,9 @@ public class Argument<M extends Model> {
                             break;
                         }
                         case "Associative Law": {
-                            for (int i = 0; i < associativeLaw.length; i++) {
-                                if (cE.matches(associativeLaw[i])) {
-                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, associativeLaw[i]);
+                            for (String s : associativeLaw) {
+                                if (cE.matches(s)) {
+                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, s);
                                     for (int j = 0; j < cESubstrings.length; j = j + 3) {
                                         if (!cESubstrings[j].equals(cESubstrings[j + 1])
                                                 && !cESubstrings[j].equals(cESubstrings[j + 2])
@@ -1409,9 +1412,9 @@ public class Argument<M extends Model> {
                             break;
                         }
                         case "Commutative Law": {
-                            for (int i = 0; i < commutativeLaw.length; i++) {
-                                if (cE.matches(commutativeLaw[i])) {
-                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, commutativeLaw[i]);
+                            for (String s : commutativeLaw) {
+                                if (cE.matches(s)) {
+                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, s);
                                     for (int j = 0; j < cESubstrings.length; j = j + 2) {
                                         if (!cESubstrings[j].equals(cESubstrings[j + 1])) {
                                             final int sentence = j;

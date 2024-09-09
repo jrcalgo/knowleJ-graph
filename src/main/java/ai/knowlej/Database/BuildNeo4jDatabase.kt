@@ -7,7 +7,7 @@ import ai.knowlej.Database.Models.*
 import org.neo4j.driver.*
 
 /*
-* provides methods to connect to neo4j knowledge database(s) and write new nodes/pointers to nodes. Useful in tandem
+* Provides methods to connect to neo4j knowledge database(s) and write new nodes/pointers to nodes. Useful in tandem
 *  with algorithmic graph population.
 */
 open class BuildNeo4jDatabase {

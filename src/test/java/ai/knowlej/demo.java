@@ -88,13 +88,13 @@ public class demo {
         stochasticModels[3] = smTest4;
         stochasticModels[4] = smTest5;
         
-        BuildNeo4jDatabase db = new BuildNeo4jDatabase();
-        db.initDriver("state", "bolt://localhost:7687", "neo4j", "password");
-        DomainGroupNode dgn = new DomainGroupNode("TestGroup", new String[] {"test"}, new HashMap<>() {{
-            put("test1", "test");
-        }});
-        BuildNeo4jDatabase.BuildDomainNodes dgnBuilder = db.new BuildDomainNodes();
-        dgnBuilder.createDomainNode(dgn);
+//        BuildNeo4jDatabase db = new BuildNeo4jDatabase();
+//        db.initDriver("state", "bolt://localhost:7687", "neo4j", "password");
+//        DomainGroupNode dgn = new DomainGroupNode("TestGroup", new String[] {"test"}, new HashMap<>() {{
+//            put("test1", "test");
+//        }});
+//        BuildNeo4jDatabase.BuildDomainNodes dgnBuilder = db.new BuildDomainNodes();
+//        dgnBuilder.createDomainNode(dgn);
     }
 
 }
