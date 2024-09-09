@@ -1,4 +1,4 @@
-package ai.knowlej.Database.Models;
+package ai.knowlej.DataStructures.DatabaseNodeModels;
 
 import java.util.Map;
 

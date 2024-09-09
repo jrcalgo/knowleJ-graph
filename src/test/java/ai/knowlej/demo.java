@@ -6,7 +6,7 @@ import ai.knowlej.PropositionalLogic.Logic.*;
 import ai.knowlej.PropositionalLogic.Models.*;
 
 import ai.knowlej.Database.*;
-import ai.knowlej.Database.Models.*;
+import ai.knowlej.DataStructures.DatabaseNodeModels.*;
 
 
 public class demo {
