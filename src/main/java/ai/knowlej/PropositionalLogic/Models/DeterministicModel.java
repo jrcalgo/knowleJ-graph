@@ -69,7 +69,7 @@ public class DeterministicModel extends Model {
         this.modelName = modelName;
         this.expression = expression;
 
-        setOperands(this.defaultOperandCharValues);
+        setOperands(defaultOperandCharValues);
         this.defaultOperandCharValues = defaultOperandCharValues;
 
         setPredicateBooleanString(this.defaultOperandCharValues);
@@ -128,9 +128,9 @@ public class DeterministicModel extends Model {
         }
         // check if map contains all and only all expression operands
         if (defaultOperandCharValues != null) {
-            for (int i = 0; i < operands.length; i++) {
-                if (!defaultOperandCharValues.containsKey(operands[i]))
-                    throw new InvalidOperandException(operands[i] + " not in expression.");
+            for (char operand : operands) {
+                if (!defaultOperandCharValues.containsKey(operand))
+                    throw new InvalidOperandException(operand + " not in expression.");
             }
         }
     }
@@ -147,7 +147,7 @@ public class DeterministicModel extends Model {
         for (int i = 0; i < this.defaultOperandCharValues.size(); i++) {
             if (i < this.operands.length && i < this.allPredicateCharValues.length) {
                 this.allPredicateCharValues[i] = this.defaultOperandCharValues.get(this.operands[i]);
-                this.allPredicateBooleanValues[i] = this.allPredicateCharValues[i] == 'T' ? true : false;
+                this.allPredicateBooleanValues[i] = this.allPredicateCharValues[i] == 'T';
             }
         }
 
@@ -190,9 +190,9 @@ public class DeterministicModel extends Model {
         for (int i = 0; i < this.symbolRepresentation.length(); i++) {
             if (this.operandSymbolicRepresentation.containsKey(this.symbolRepresentation.charAt(i))) {
                 if ((i+1 < this.symbolRepresentation.length()) && this.symbolRepresentation.charAt(i + 1) == ')') {
-                    sb.append("'" + this.operandSymbolicRepresentation.get(this.symbolRepresentation.charAt(i)) + "'");
+                    sb.append("'").append(this.operandSymbolicRepresentation.get(this.symbolRepresentation.charAt(i))).append("'");
                 } else
-                    sb.append("'" + this.operandSymbolicRepresentation.get(this.symbolRepresentation.charAt(i)) + "' ");
+                    sb.append("'").append(this.operandSymbolicRepresentation.get(this.symbolRepresentation.charAt(i))).append("' ");
             } else {
                 switch (this.symbolRepresentation.charAt(i)) {
                     case '(':

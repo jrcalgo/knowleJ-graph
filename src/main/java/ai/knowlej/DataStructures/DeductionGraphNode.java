@@ -67,27 +67,22 @@ public class DeductionGraphNode {
         if (this.outNodes == null)
             this.outNodes = new LinkedList<DeductionGraphNode>();
         boolean outNodeContains = this.outNodes.contains(outNode);
-        if (this.outNodes == null && outNodeContains == false)
-            this.outNodes = new LinkedList<DeductionGraphNode>();
-        else if (outNodeContains == false)
+        if (!outNodeContains)
             this.outNodes.add(outNode);
-        else
-            return;
     }
 
     public void removeOutNode(DeductionGraphNode outNode) {
-        if (this.outNodes == null)
-            return;
-        else if (this.outNodes.contains(outNode))
-            this.outNodes.remove(outNode);
+        if (this.outNodes == null) {
+        }
+        else this.outNodes.remove(outNode);
     }
 
     public void removeOutNodes(LinkedList<DeductionGraphNode> outNodes) {
-        if (this.outNodes == null)
-            return;
+        if (this.outNodes == null) {
+        }
         else if (this.outNodes.containsAll(outNodes))
             this.outNodes.removeAll(outNodes);
-        else
-            return;
+        else {
+        }
     }
 }

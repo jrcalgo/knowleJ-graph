@@ -4,7 +4,7 @@ public class Validity {
 
     public boolean isTautology(boolean[] rowOrColumn) {
         for (boolean b : rowOrColumn) {
-            if (b == false)
+            if (!b)
                 return false;
         }
         return true;
@@ -12,7 +12,7 @@ public class Validity {
 
     public boolean isContradiction(boolean[] rowOrColumn) {
         for (boolean b : rowOrColumn) {
-            if (b == true)
+            if (b)
                 return false;
         }
         return true;

@@ -6,16 +6,16 @@ import java.util.LinkedList;
 import ai.knowlej.PropositionalLogic.Logic.Proposition;
 
 public class DirectedDeductionGraph {
-    private ArrayList<DeductionGraphNode> nodes; // all graph nodes
-    private ArrayList<DeductionGraphNode> premiseNodes; // initial expression(s) / root(s)
-    private DeductionGraphNode queryNode; // query node
+    private final ArrayList<DeductionGraphNode> nodes; // all graph nodes
+    private final ArrayList<DeductionGraphNode> premiseNodes; // initial expression(s) / root(s)
+    private final DeductionGraphNode queryNode; // query node
     private ArrayList<DeductionGraphNode> forwardNodes; // nodes from premise(s) to query
     private ArrayList<DeductionGraphNode> backwardNodes; // nodes from query to premise(s)
     private int nodeCount = -1;
     private int premiseCount = -1;
 
-    private String[] knowledgeBase;
-    private Proposition query;
+    private final String[] knowledgeBase;
+    private final Proposition query;
 
     public DirectedDeductionGraph(String[] knowledgeBase, Proposition query) {
         this.knowledgeBase = knowledgeBase;
@@ -148,7 +148,7 @@ public class DirectedDeductionGraph {
     public ArrayList<DeductionGraphNode> getLeafNodes() throws Exception {
         ArrayList<DeductionGraphNode> leafs = new ArrayList<>();
         for (DeductionGraphNode node : this.nodes) {
-            if (node.getOutNodes().size() == 0 && !this.isQueryNode(node)) {
+            if (node.getOutNodes().isEmpty() && !this.isQueryNode(node)) {
                 leafs.add(node);
             }
         }
@@ -176,7 +176,7 @@ public class DirectedDeductionGraph {
     }
 
     public boolean isLeafNode(DeductionGraphNode vertex) throws Exception {
-        return vertex.getOutNodes().size() == 0 && !this.isQueryNode(vertex);
+        return vertex.getOutNodes().isEmpty() && !this.isQueryNode(vertex);
     }
 
     public boolean isPremiseNode(DeductionGraphNode vertex) {

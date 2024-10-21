@@ -1,8 +1,6 @@
 package ai.knowlej.PropositionalLogic.Logic;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import ai.knowlej.Exceptions.InvalidExpressionException;
@@ -152,9 +150,7 @@ public class Argument<M extends Model> {
         this.allTruthTable[0][boolColsCount - 1] = "KB";
 
         this.trueKBModels = new ArrayList<>();
-        ArrayList<String> titleRow = new ArrayList<>();
-        for (int i = 0; i < boolColsCount; i++)
-            titleRow.add(this.allTruthTable[0][i]);
+        ArrayList<String> titleRow = new ArrayList<>(Arrays.asList(this.allTruthTable[0]).subList(0, boolColsCount));
 
         this.trueKBModels.add(titleRow);
         titleRow = null;
@@ -195,8 +191,7 @@ public class Argument<M extends Model> {
 
     private boolean evaluateKnowledgeBase(boolean[] modelEvaluations) {
         boolean rowAnswer = true;
-        for (int i = 0; i < modelEvaluations.length; i++)
-            rowAnswer = rowAnswer && modelEvaluations[i];
+        for (boolean modelEvaluation : modelEvaluations) rowAnswer = rowAnswer && modelEvaluation;
 
         return rowAnswer;
     }
@@ -209,9 +204,9 @@ public class Argument<M extends Model> {
             String[] queries = query.split(",");
             StringBuilder answer = new StringBuilder();
             for (String q : queries) {
-                answer.append(checkAllTTModels(new Proposition(q)) + ", ");
+                answer.append(checkAllTTModels(new Proposition(q))).append(", ");
             }
-            return answer.toString().substring(0, answer.length() - 2);
+            return answer.substring(0, answer.length() - 2);
         }
         return checkAllTTModels(new Proposition(query));
     }
@@ -300,7 +295,7 @@ public class Argument<M extends Model> {
      */
     public boolean containsValidArgument(String kbQuery)
             throws Exception, InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
-        if (kbQuery == null || kbQuery.length() == 0)
+        if (kbQuery == null || kbQuery.isEmpty())
             throw new IllegalArgumentException("String query cannot be null or empty.");
 
         boolean foundQuery = false;
@@ -328,7 +323,7 @@ public class Argument<M extends Model> {
 
     public ArrayList<DeductionGraphNode> deduce(String query)
             throws Exception, InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
-        if (query == null || query.length() == 0)
+        if (query == null || query.isEmpty())
             throw new IllegalArgumentException("String query cannot be null or empty.");
         if (query.contains(","))
             throw new IllegalArgumentException("String query cannot contain commas.");
@@ -368,44 +363,18 @@ public class Argument<M extends Model> {
 
     private ArrayList<DeductionGraphNode> bidirectionalIterativeKBChaining(DirectedDeductionGraph graph)
             throws Exception, InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
-        /**
-         * 
-         * 1. Initialize the `DeductionGraph` with root nodes from the knowledge base
-         * and a detached node for the query.
-         * 2. Initialize a variable `iteration` to 1.
-         * 3. Initialize a variable `mostRelevantLeaf` to null.
-         * 4. While a path from a root node to the query node has not been found:
-         * 1. For each node in the graph at the current `iteration`:
-         * 1. Apply all applicable inference laws, considering the given roots and the
-         * current children nodes stored in the graph.
-         * 2. Apply all applicable equivalency laws to the node.
-         * 3. For each resulting sentence from the inference and equivalency laws:
-         * 1. Create a new node for the sentence and add it as a child of the current
-         * node.
-         * 2. If the sentence is an argumentative inference, draw a pointer from the
-         * used nodes to the new node.
-         * 3. If the new node is more relevant than `mostRelevantLeaf` (according to
-         * some relevance metric), update `mostRelevantLeaf`.
-         * 2. If no new nodes were added in the last iteration, wait for 10 seconds and
-         * then continue. If still no new nodes are added, increment
-         * the `iteration` by 1 and return to `mostRelevantLeaf` before moving onto
-         * other nodes.
-         * 5. If a path has been found, return the path. If not, return an indication
-         * that no path could be found.
-         */
+
+        // Initialize inference and equivalency laws
         InferenceLaws<Model> inferenceLaws = new InferenceLaws<>();
         final String[] singleCharacterInferenceLaws = new String[] { "Addition", "Simplification" };
         EquivalencyLaws equivalencyLaws = new EquivalencyLaws();
 
-        Map<String, ArrayList<String>> inferenceMap = new HashMap<>();
-        Map<String, ArrayList<String>> equivalencyMap = new HashMap<>();
-
-        ArrayList<String> forwardKnowledgeHistory = new ArrayList<>(); // serves as forward knowledge history container
+        // Initialize knowledge histories using HashSet for efficient lookup and to prevent duplicates
+        Set<String> forwardKnowledgeHistory = new HashSet<>();
         for (DeductionGraphNode node : graph.getPremiseNodes()) {
             forwardKnowledgeHistory.add(node.getExpression()); // initial node(s)
         }
-        ArrayList<String> backwardKnowledgeHistory = new ArrayList<>(); // serves as backward knowledge history
-                                                                        // container
+        Set<String> backwardKnowledgeHistory = new HashSet<>();
         backwardKnowledgeHistory.add(graph.getQuery()); // initial node
 
         int chainOperations = 1;
@@ -418,106 +387,103 @@ public class Argument<M extends Model> {
         boolean firstIteration = true;
         int iteration = 0;
 
-        ArrayList<String[]> kbCombinations;
+        List<String[]> kbCombinations;
         String argSentence1;
         String argSentence2;
 
-        ArrayList<DeductionGraphNode> currentNodes;
+        List<DeductionGraphNode> currentNodes;
         while (true) {
             switch (chainOperations) {
-                case 1: { // forward chaining
-                    // inference/argument evaluations
-                    kbCombinations = combineKBExpressions(forwardKnowledgeHistory);
-                    outerLoop:
+                case 1: { // Forward chaining
+                    // Inference evaluations
+                    kbCombinations = combineKBExpressions(new ArrayList<>(forwardKnowledgeHistory));
                     for (String[] kbCombination : kbCombinations) {
                         argSentence1 = kbCombination[0];
                         argSentence2 = kbCombination[1];
-                        inferenceMap = inferenceLaws.checkInferenceLaws(
-                                new Proposition[]{new Proposition(argSentence1), new Proposition(argSentence2)});
-                        for (String law : inferenceMap.keySet()) {
-                            for (String inference : inferenceMap.get(law)) {
-                                if (!law.equals("Addition") || !law.equals("Simplification")) {
-                                    if (graph.contains(inference)) {
-                                        DeductionGraphNode inferenceNode = graph.getNode(inference);
-                                        if (!graph.isPointing(graph.getNode(argSentence1), inferenceNode))
-                                            graph.point(graph.getNode(argSentence1), inferenceNode);
-                                        if (!graph.isPointing(graph.getNode(argSentence2), inferenceNode))
-                                            graph.point(graph.getNode(argSentence2), inferenceNode);
-                                        if (inference.equals(graph.getQuery())) {
-                                            pathExistence = true;
-                                            iteration = 0;
-                                            chainOperations = 3;
-                                            break outerLoop;
+                        Map<String, ArrayList<String>> inferenceMap = inferenceLaws.checkInferenceLaws(
+                                new Proposition[] { new Proposition(argSentence1), new Proposition(argSentence2) });
+
+                        if (inferenceMap != null) {
+                            for (String law : inferenceMap.keySet()) {
+                                if (!law.equals("Addition") && !law.equals("Simplification")) {
+                                    List<String> inferences = inferenceMap.get(law);
+                                    if (inferences != null) {
+                                        for (String inference : inferences) {
+                                            if (inference != null && !inference.isEmpty() && !forwardKnowledgeHistory.contains(inference)) {
+                                                forwardKnowledgeHistory.add(inference);
+                                                DeductionGraphNode newInferenceNode = graph.add(inference);
+                                                graph.point(graph.getNode(argSentence1), newInferenceNode);
+                                                graph.point(graph.getNode(argSentence2), newInferenceNode);
+                                                if (inference.equals(graph.getQuery())) {
+                                                    pathExistence = true;
+                                                    chainOperations = 3;
+                                                    break;
+                                                }
+                                            }
                                         }
-                                    } else {
-                                        DeductionGraphNode newInferenceNode = graph.add(inference);
-                                        graph.point(graph.getNode(argSentence1), newInferenceNode);
-                                        graph.point(graph.getNode(argSentence2), newInferenceNode);
-                                        forwardKnowledgeHistory.add(inference);
                                     }
                                 }
                             }
                         }
                     }
-                    if (pathExistence)
-                        break;
+                    if (pathExistence) break;
+
+                    // Single-character inference laws
                     currentNodes = graph.getForwardNodes();
-                    outerLoop: 
                     for (DeductionGraphNode node : currentNodes) {
-                        inferenceMap = inferenceLaws
-                                .checkInferenceLaws(new Proposition[] { new Proposition(node.getExpression()) });
-                        for (String singleCharacterInferenceLaw : singleCharacterInferenceLaws) {
-                            if (!inferenceMap.get(singleCharacterInferenceLaw).isEmpty()) {
-                                for (String inference : inferenceMap.get(singleCharacterInferenceLaw)) {
-                                    if (graph.contains(inference)) {
-                                        DeductionGraphNode inferenceNode = graph.getNode(inference);
-                                        if (!graph.isPointing(graph.getNode(singleCharacterInferenceLaw),
-                                                inferenceNode))
-                                            graph.point(graph.getNode(singleCharacterInferenceLaw), inferenceNode);
-                                        if (inference.equals(graph.getQuery())) {
-                                            pathExistence = true;
-                                            iteration = 0;
-                                            chainOperations = 3;
-                                            break outerLoop;
+                        Map<String, ArrayList<String>> inferenceMap = inferenceLaws.checkInferenceLaws(
+                                new Proposition[] { new Proposition(node.getExpression()) });
+
+                        if (inferenceMap != null) {
+                            for (String law : singleCharacterInferenceLaws) {
+                                List<String> inferences = inferenceMap.get(law);
+                                if (inferences != null && !inferences.isEmpty()) {
+                                    for (String inference : inferences) {
+                                        if (inference != null && !inference.isEmpty() && !forwardKnowledgeHistory.contains(inference)) {
+                                            forwardKnowledgeHistory.add(inference);
+                                            DeductionGraphNode newInferenceNode = graph.add(inference);
+                                            graph.point(node, newInferenceNode);
+                                            if (inference.equals(graph.getQuery())) {
+                                                pathExistence = true;
+                                                chainOperations = 3;
+                                                break;
+                                            }
                                         }
-                                    } else {
-                                        DeductionGraphNode newInferenceNode = graph.add(inference);
-                                        graph.point(graph.getNode(singleCharacterInferenceLaw), newInferenceNode);
-                                        forwardKnowledgeHistory.add(inference);
                                     }
                                 }
                             }
                         }
                     }
-                    if (pathExistence)
-                        break;
-                    // equivalency/proposition evaluations
+                    if (pathExistence) break;
+
+                    // Equivalency evaluations
                     currentNodes = graph.getForwardNodes();
-                    outerloop: 
                     for (DeductionGraphNode node : currentNodes) {
-                        equivalencyMap = equivalencyLaws.checkEquivalencyLaws(new Proposition(node.getExpression()));
-                        for (String law : equivalencyMap.keySet()) {
-                            for (String equivalency : equivalencyMap.get(law)) {
-                                if (graph.contains(equivalency)) {
-                                    DeductionGraphNode equivalencyNode = graph.getNode(equivalency);
-                                    if (!graph.isPointing(graph.getNode(node.getExpression()), equivalencyNode))
-                                        graph.point(graph.getNode(node.getExpression()), equivalencyNode);
-                                    if (equivalency.equals(graph.getQuery())) {
-                                        pathExistence = true;
-                                        iteration = 0;
-                                        chainOperations = 3;
-                                        break outerloop;
+                        Map<String, ArrayList<String>> equivalencyMap = equivalencyLaws.checkEquivalencyLaws(
+                                new Proposition(node.getExpression()));
+
+                        if (equivalencyMap != null) {
+                            for (String law : equivalencyMap.keySet()) {
+                                List<String> equivalencies = equivalencyMap.get(law);
+                                if (equivalencies != null) {
+                                    for (String equivalency : equivalencies) {
+                                        if (equivalency != null && !equivalency.isEmpty() && !forwardKnowledgeHistory.contains(equivalency)) {
+                                            forwardKnowledgeHistory.add(equivalency);
+                                            DeductionGraphNode newEquivalenceNode = graph.add(equivalency);
+                                            graph.point(node, newEquivalenceNode);
+                                            if (equivalency.equals(graph.getQuery())) {
+                                                pathExistence = true;
+                                                chainOperations = 3;
+                                                break;
+                                            }
+                                        }
                                     }
-                                } else {
-                                    DeductionGraphNode newEquivalenceNode = graph.add(equivalency);
-                                    graph.point(graph.getNode(node.getExpression()), newEquivalenceNode);
-                                    forwardKnowledgeHistory.add(equivalency);
                                 }
                             }
                         }
                     }
-                    if (pathExistence)
-                        break;
+                    if (pathExistence) break;
+
                     iteration++;
                     if (iteration > MAX_ITERATIONS) {
                         iteration = 0;
@@ -525,170 +491,174 @@ public class Argument<M extends Model> {
                     }
                     break;
                 }
-                case 2: { // backward chaining
+                case 2: { // Backward chaining
                     if (!firstIteration) {
-                        // inference/argument evaluations
-                        kbCombinations = combineKBExpressions(backwardKnowledgeHistory);
-                        outerLoop: for (int i = 0; i < kbCombinations.size(); i++) {
-                            argSentence1 = kbCombinations.get(i)[0];
-                            argSentence2 = kbCombinations.get(i)[1];
-                            inferenceMap = inferenceLaws.checkInferenceLaws(
+                        // Inference evaluations
+                        kbCombinations = combineKBExpressions(new ArrayList<>(backwardKnowledgeHistory));
+                        for (String[] kbCombination : kbCombinations) {
+                            argSentence1 = kbCombination[0];
+                            argSentence2 = kbCombination[1];
+                            Map<String, ArrayList<String>> inferenceMap = inferenceLaws.checkInferenceLaws(
                                     new Proposition[] { new Proposition(argSentence1), new Proposition(argSentence2) });
-                            for (String law : inferenceMap.keySet()) {
-                                for (String inference : inferenceMap.get(law)) {
+
+                            if (inferenceMap != null) {
+                                for (String law : inferenceMap.keySet()) {
                                     if (!law.equals("Addition") && !law.equals("Simplification")) {
-                                        if (graph.contains(inference)) {
-                                            DeductionGraphNode inferenceNode = graph.getNode(inference);
-                                            if (!graph.isPointing(graph.getNode(argSentence1), inferenceNode))
-                                                graph.point(graph.getNode(argSentence1), inferenceNode);
-                                            if (!graph.isPointing(graph.getNode(argSentence2), inferenceNode))
-                                                graph.point(graph.getNode(argSentence2), inferenceNode);
-                                            if (inference.equals(graph.getQuery())) {
-                                                pathExistence = true;
-                                                iteration = 0;
-                                                chainOperations = 3;
-                                                break outerLoop;
+                                        List<String> inferences = inferenceMap.get(law);
+                                        if (inferences != null) {
+                                            for (String inference : inferences) {
+                                                if (inference != null && !inference.isEmpty() && !backwardKnowledgeHistory.contains(inference)) {
+                                                    backwardKnowledgeHistory.add(inference);
+                                                    DeductionGraphNode newInferenceNode = graph.add(inference);
+                                                    graph.point(graph.getNode(argSentence1), newInferenceNode);
+                                                    graph.point(graph.getNode(argSentence2), newInferenceNode);
+                                                    if (inference.equals(graph.getQuery())) {
+                                                        pathExistence = true;
+                                                        chainOperations = 3;
+                                                        break;
+                                                    }
+                                                }
                                             }
-                                        } else {
-                                            DeductionGraphNode newInferenceNode = graph.add(inference);
-                                            graph.point(graph.getNode(argSentence1), newInferenceNode);
-                                            graph.point(graph.getNode(argSentence2), newInferenceNode);
-                                            backwardKnowledgeHistory.add(inference);
                                         }
                                     }
                                 }
                             }
                         }
-                        if (pathExistence)
-                            break;
+                        if (pathExistence) break;
+
+                        // Single-character inference laws
                         currentNodes = graph.getBackwardNodes();
-                        outerLoop: for (DeductionGraphNode node : currentNodes) {
-                            for (int i = 0; i < singleCharacterInferenceLaws.length; i++) {
-                                if (!inferenceMap.get(singleCharacterInferenceLaws[i]).isEmpty()) {
-                                    for (String inference : inferenceMap.get(singleCharacterInferenceLaws[i])) {
-                                        if (graph.contains(inference)) {
-                                            DeductionGraphNode inferenceNode = graph.getNode(inference);
-                                            if (!graph.isPointing(graph.getNode(node.getExpression()), inferenceNode))
-                                                graph.point(graph.getNode(node.getExpression()), inferenceNode);
-                                            if (inference.equals(graph.getQuery())) {
-                                                pathExistence = true;
-                                                iteration = 0;
-                                                chainOperations = 3;
-                                                break outerLoop;
+                        for (DeductionGraphNode node : currentNodes) {
+                            Map<String, ArrayList<String>> inferenceMap = inferenceLaws.checkInferenceLaws(
+                                    new Proposition[] { new Proposition(node.getExpression()) });
+
+                            if (inferenceMap != null) {
+                                for (String law : singleCharacterInferenceLaws) {
+                                    List<String> inferences = inferenceMap.get(law);
+                                    if (inferences != null && !inferences.isEmpty()) {
+                                        for (String inference : inferences) {
+                                            if (inference != null && !inference.isEmpty() && !backwardKnowledgeHistory.contains(inference)) {
+                                                backwardKnowledgeHistory.add(inference);
+                                                DeductionGraphNode newInferenceNode = graph.add(inference);
+                                                graph.point(node, newInferenceNode);
+                                                if (inference.equals(graph.getQuery())) {
+                                                    pathExistence = true;
+                                                    chainOperations = 3;
+                                                    break;
+                                                }
                                             }
-                                        } else {
-                                            DeductionGraphNode newInferenceNode = graph.add(inference);
-                                            graph.point(graph.getNode(singleCharacterInferenceLaws[i]),
-                                                    newInferenceNode);
-                                            backwardKnowledgeHistory.add(inference);
                                         }
                                     }
                                 }
                             }
                         }
-                        if (pathExistence)
-                            break;
-                        // equivalency/proposition evaluations
+                        if (pathExistence) break;
+
+                        // Equivalency evaluations
                         currentNodes = graph.getBackwardNodes();
-                        outerLoop: for (DeductionGraphNode node : currentNodes) {
-                            equivalencyMap = equivalencyLaws
-                                    .checkEquivalencyLaws(new Proposition(node.getExpression()));
-                            for (String law : equivalencyMap.keySet()) {
-                                for (String equivalency : equivalencyMap.get(law)) {
-                                    if (graph.contains(equivalency)) {
-                                        DeductionGraphNode equivalencyNode = graph.getNode(equivalency);
-                                        if (!graph.isPointing(graph.getNode(node.getExpression()), equivalencyNode))
-                                            graph.point(graph.getNode(node.getExpression()), equivalencyNode);
-                                        if (equivalency.equals(graph.getQuery())) {
-                                            pathExistence = true;
-                                            iteration = 0;
-                                            chainOperations = 3;
-                                            break outerLoop;
+                        for (DeductionGraphNode node : currentNodes) {
+                            Map<String, ArrayList<String>> equivalencyMap = equivalencyLaws.checkEquivalencyLaws(
+                                    new Proposition(node.getExpression()));
+
+                            if (equivalencyMap != null) {
+                                for (String law : equivalencyMap.keySet()) {
+                                    List<String> equivalencies = equivalencyMap.get(law);
+                                    if (equivalencies != null) {
+                                        for (String equivalency : equivalencies) {
+                                            if (equivalency != null && !equivalency.isEmpty() && !backwardKnowledgeHistory.contains(equivalency)) {
+                                                backwardKnowledgeHistory.add(equivalency);
+                                                DeductionGraphNode newEquivalencyNode = graph.add(equivalency);
+                                                graph.point(node, newEquivalencyNode);
+                                                if (equivalency.equals(graph.getQuery())) {
+                                                    pathExistence = true;
+                                                    chainOperations = 3;
+                                                    break;
+                                                }
+                                            }
                                         }
-                                    } else {
-                                        DeductionGraphNode newEquivalencyNode = graph.add(equivalency);
-                                        graph.point(graph.getNode(node.getExpression()), newEquivalencyNode);
-                                        backwardKnowledgeHistory.add(equivalency);
                                     }
                                 }
                             }
                         }
-                        if (pathExistence)
-                            break;
+                        if (pathExistence) break;
                     } else {
-                        inferenceMap = inferenceLaws.checkInferenceLaws(
-                                new Proposition[] { new Proposition(backwardKnowledgeHistory.get(0)) });
-                        outerLoop: for (String law : inferenceMap.keySet()) {
-                            for (String inference : inferenceMap.get(law)) {
-                                if (graph.contains(inference)) {
-                                    DeductionGraphNode inferenceNode = graph.getNode(inference);
-                                    if (!graph.isPointing(graph.getQueryNode(), inferenceNode))
-                                        graph.point(graph.getQueryNode(), inferenceNode);
-                                    if (inference.equals(graph.getQuery())) {
-                                        pathExistence = true;
-                                        iteration = 0;
-                                        chainOperations = 3;
-                                        break outerLoop;
+                        // First iteration of backward chaining
+                        Map<String, ArrayList<String>> inferenceMap = inferenceLaws.checkInferenceLaws(
+                                new Proposition[] { new Proposition(graph.getQuery()) });
+
+                        if (inferenceMap != null) {
+                            for (String law : inferenceMap.keySet()) {
+                                List<String> inferences = inferenceMap.get(law);
+                                if (inferences != null) {
+                                    for (String inference : inferences) {
+                                        if (inference != null && !inference.isEmpty() && !backwardKnowledgeHistory.contains(inference)) {
+                                            backwardKnowledgeHistory.add(inference);
+                                            DeductionGraphNode newInferenceNode = graph.add(inference);
+                                            graph.point(graph.getQueryNode(), newInferenceNode);
+                                            if (inference.equals(graph.getQuery())) {
+                                                pathExistence = true;
+                                                chainOperations = 3;
+                                                break;
+                                            }
+                                        }
                                     }
-                                } else {
-                                    DeductionGraphNode newInferenceNode = graph.add(inference);
-                                    graph.point(graph.getQueryNode(), newInferenceNode);
-                                    backwardKnowledgeHistory.add(inference);
                                 }
                             }
                         }
-                        if (pathExistence)
-                            break;
+                        if (pathExistence) break;
+
                         currentNodes = graph.getBackwardNodes();
-                        outerLoop: for (DeductionGraphNode node : currentNodes) {
-                            equivalencyMap = equivalencyLaws
-                                    .checkEquivalencyLaws(new Proposition(node.getExpression())); // query
-                            for (String law : equivalencyMap.keySet()) {
-                                for (String equivalency : equivalencyMap.get(law)) {
-                                    if (graph.contains(equivalency)) {
-                                        DeductionGraphNode equivalencyNode = graph.getNode(equivalency);
-                                        if (!graph.isPointing(graph.getNode(node.getExpression()), equivalencyNode))
-                                            graph.point(graph.getNode(node.getExpression()), equivalencyNode);
-                                        if (equivalency.equals(graph.getQuery())) {
-                                            pathExistence = true;
-                                            iteration = 0;
-                                            chainOperations = 3;
-                                            break outerLoop;
+                        for (DeductionGraphNode node : currentNodes) {
+                            Map<String, ArrayList<String>> equivalencyMap = equivalencyLaws.checkEquivalencyLaws(
+                                    new Proposition(node.getExpression()));
+
+                            if (equivalencyMap != null) {
+                                for (String law : equivalencyMap.keySet()) {
+                                    List<String> equivalencies = equivalencyMap.get(law);
+                                    if (equivalencies != null) {
+                                        for (String equivalency : equivalencies) {
+                                            if (equivalency != null && !equivalency.isEmpty() && !backwardKnowledgeHistory.contains(equivalency)) {
+                                                backwardKnowledgeHistory.add(equivalency);
+                                                DeductionGraphNode newEquivalencyNode = graph.add(equivalency);
+                                                graph.point(node, newEquivalencyNode);
+                                                if (equivalency.equals(graph.getQuery())) {
+                                                    pathExistence = true;
+                                                    chainOperations = 3;
+                                                    break;
+                                                }
+                                            }
                                         }
-                                    } else {
-                                        DeductionGraphNode newEquivalencyNode = graph.add(equivalency);
-                                        graph.point(graph.getNode(node.getExpression()), newEquivalencyNode);
-                                        backwardKnowledgeHistory.add(equivalency);
                                     }
                                 }
                             }
                         }
                         firstIteration = false;
-                        if (pathExistence)
-                            break;
+                        if (pathExistence) break;
                     }
                     iteration++;
-                    if (iteration == MAX_ITERATIONS && chainOperations < 2) {
+                    if (iteration >= MAX_ITERATIONS) {
                         iteration = 0;
                         chainOperations++;
                     }
                     break;
                 }
                 case 3: {
-                    ArrayList<DeductionGraphNode> foundPath = graph.astarToQuery();
-                    chainOperations++;
-                    System.gc();
-                    return foundPath;
+                    // Extract the path using A* search
+                    return graph.astarToQuery();
                 }
+                default:
+                    // Should not reach here
+                    return null;
             }
             searchLoopCount++;
-            if (searchLoopCount > MAX_LOOPS)
+            if (searchLoopCount > MAX_LOOPS) {
+                // Exceeded maximum number of loops
                 break;
-            inferenceMap.clear();
-            equivalencyMap.clear();
+            }
         }
-        return null;
+        return null; // Return null if no path is found within the maximum number of loops
     }
+
 
     private ArrayList<String[]> combineKBExpressions(ArrayList<String> kb)
             throws InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
@@ -705,9 +675,9 @@ public class Argument<M extends Model> {
     }
 
     public void printAllTrueKBModels() {
-        for (int i = 0; i < this.trueKBModels.size(); i++) {
-            for (int j = 0; j < this.trueKBModels.get(i).size(); j++) {
-                System.out.print(this.trueKBModels.get(i).get(j) + "\s");
+        for (ArrayList<String> trueKBModel : this.trueKBModels) {
+            for (String s : trueKBModel) {
+                System.out.print(s + " ");
             }
             System.out.println();
         }
@@ -732,7 +702,7 @@ public class Argument<M extends Model> {
             throw new IndexOutOfBoundsException(fromCol + " is out of bounds.");
 
         for (int i = 0; i < allTruthTable[i].length; i++) {
-            System.out.print(i + ".\s");
+            System.out.print(i + " ");
             System.out.print(allTruthTable[0][i] + "\s\s\s");
         }
 
@@ -865,7 +835,7 @@ public class Argument<M extends Model> {
 
             for (String law : encodedLawMap.keySet()) {
                 ArrayList<Map<Character, String>> encodings = new ArrayList<>();
-                if (kb.length == 2 && law != "Addition" && law != "Simplification") {
+                if (kb.length == 2 && !Objects.equals(law, "Addition") && !Objects.equals(law, "Simplification")) {
                     switch (law) {
                         case "Modus Ponens": {
                             final String[] premise2Substrings = subdivideExpressionCharacters(kb[1], modusPonens[1]);
@@ -896,8 +866,8 @@ public class Argument<M extends Model> {
                             break;
                         }
                         case "Simplification": {
-                            for (int premise = 0; premise < kb.length; premise++) {
-                                final String[] premise1Substrings = subdivideExpressionCharacters(kb[premise],
+                            for (String s : kb) {
+                                final String[] premise1Substrings = subdivideExpressionCharacters(s,
                                         simplification);
                                 if (premise1Substrings == null)
                                     break;
@@ -982,7 +952,7 @@ public class Argument<M extends Model> {
                             break;
                         }
                     }
-                } else if (kb.length == 1 && (law == "Addition" || law == "Simplification")) { // addition law
+                } else if (kb.length == 1 && (Objects.equals(law, "Addition") || Objects.equals(law, "Simplification"))) { // addition law
                     switch(law) {
                         case "Addition": {
 
@@ -1048,7 +1018,7 @@ public class Argument<M extends Model> {
             if (kbExpressionSubstrings.isEmpty())
                 return null;
 
-            return kbExpressionSubstrings.toArray(new String[kbExpressionSubstrings.size()]);
+            return kbExpressionSubstrings.toArray(new String[0]);
         }
 
         /* Rules of Argument Inference */
@@ -1372,9 +1342,9 @@ public class Argument<M extends Model> {
                     ArrayList<Map<Character, String>> encodings = new ArrayList<>();
                     switch (law) {
                         case "Idempotent Law": {
-                            for (int i = 0; i < idempotentLaw.length; i++) {
-                                if (cE.matches(idempotentLaw[i])) {
-                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, idempotentLaw[i]);
+                            for (String s : idempotentLaw) {
+                                if (cE.matches(s)) {
+                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, s);
                                     for (int j = 0; j < cESubstrings.length; j = j + 2) {
                                         if (cESubstrings[j].equals(cESubstrings[j + 1])) {
                                             final int sentence = j;
@@ -1496,9 +1466,9 @@ public class Argument<M extends Model> {
                             break;
                         }
                         case "Identity Law": {
-                            for (int i = 0; i < identityLaw.length; i++) {
-                                if (cE.matches(identityLaw[i])) {
-                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, identityLaw[i]);
+                            for (String s : identityLaw) {
+                                if (cE.matches(s)) {
+                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, s);
                                     encodings.add(new HashMap<Character, String>() {
                                         {
                                             put(lawOperands[0], cESubstrings[0]);
@@ -1509,9 +1479,9 @@ public class Argument<M extends Model> {
                             break;
                         }
                         case "Domination Law": {
-                            for (int i = 0; i < dominationLaw.length; i++) {
-                                if (cE.matches(dominationLaw[i])) {
-                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, dominationLaw[i]);
+                            for (String s : dominationLaw) {
+                                if (cE.matches(s)) {
+                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, s);
                                     encodings.add(new HashMap<Character, String>() {
                                         {
                                             put(lawOperands[0], cESubstrings[0]);
@@ -1522,9 +1492,9 @@ public class Argument<M extends Model> {
                             break;
                         }
                         case "Complement Law": {
-                            for (int i = 0; i < complementLaw.length; i++) {
-                                if (cE.matches(complementLaw[i])) {
-                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, complementLaw[i]);
+                            for (String s : complementLaw) {
+                                if (cE.matches(s)) {
+                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, s);
                                     for (int j = 0; j < cESubstrings.length; j = j + 2) {
                                         if (cESubstrings[j].equals(cESubstrings[j + 1])) {
                                             final int sentence = j;
@@ -1540,9 +1510,9 @@ public class Argument<M extends Model> {
                             break;
                         }
                         case "DeMorgan's Law": {
-                            for (int i = 0; i < deMorgansLaw.length; i++) {
-                                if (cE.matches(deMorgansLaw[i])) {
-                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, deMorgansLaw[i]);
+                            for (String s : deMorgansLaw) {
+                                if (cE.matches(s)) {
+                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, s);
                                     for (int j = 0; j < cESubstrings.length; j = j + 2) {
                                         if (!cESubstrings[j].equals(cESubstrings[j + 1])) {
                                             final int sentence = j;
@@ -1559,9 +1529,9 @@ public class Argument<M extends Model> {
                             break;
                         }
                         case "Absorption Law": {
-                            for (int i = 0; i < absorptionLaw.length; i++) {
-                                if (cE.matches(absorptionLaw[i])) {
-                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, absorptionLaw[i]);
+                            for (String s : absorptionLaw) {
+                                if (cE.matches(s)) {
+                                    final String[] cESubstrings = subdivideExpressionCharacters(cE, s);
                                     for (int j = 0; j < cESubstrings.length; j = j + 3) {
                                         if (cESubstrings[j].equals(cESubstrings[j + 1])
                                                 && !cESubstrings[j + 2].equals(cESubstrings[j])) {

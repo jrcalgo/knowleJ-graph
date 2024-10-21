@@ -57,7 +57,7 @@ public class TruthTableBuilder {
                 }
             }
             for (int j = 0; j < operandCount; j++) {
-                valueTable[i][j] = operandValues[j].equals("T") ? true : false;
+                valueTable[i][j] = operandValues[j].equals("T");
                 truthTable[i + 1][j] = operandValues[j];
             }
         }

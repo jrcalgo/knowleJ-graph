@@ -6,13 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.OptionalInt;
-import java.util.Stack;
+import java.util.*;
 import java.util.function.Function;
 
 import ai.knowlej.Exceptions.*;
@@ -74,9 +68,7 @@ public class Proposition {
         sentences = new ArrayList<String>();
 
         parseOperands();
-        for (int i = 0; i < this.operands.size(); i++) {
-            sentences.add(this.operands.get(i));
-        }
+        sentences.addAll(this.operands);
 
         sentences.add(this.expression.getExpression());
 
@@ -253,13 +245,13 @@ public class Proposition {
             throw new IndexOutOfBoundsException(fromCol + " is out of bounds.");
 
         for (int i = 0; i < truthTable[i].length; i++) {
-            System.out.print(i + ".\s");
+            System.out.print(i + " ");
             System.out.print(truthTable[0][i] + "\s\s\s");
         }
 
         for (int i = 1; i < truthTable.length; i++) {
             for (int j = fromCol; j < toCol; j++) {
-                System.out.print(i + "." + j + ".\s");
+                System.out.print(i + "." + j + " ");
                 System.out.print(truthTable[i][j] + "\s\s\s");
             }
             System.out.println();
@@ -466,9 +458,9 @@ public class Proposition {
         try {
             csvWriter = new FileWriter(path.resolve(file).toString());
 
-            for (int i = 0; i < truthTable.length; i++) {
-                for (int j = 0; j < truthTable[i].length; j++) {
-                    csvWriter.append(truthTable[i][j]);
+            for (String[] strings : truthTable) {
+                for (int j = 0; j < strings.length; j++) {
+                    csvWriter.append(strings[j]);
                     csvWriter.append(", ");
                 }
                 csvWriter.append("\n");
@@ -478,6 +470,7 @@ public class Proposition {
             e.printStackTrace();
         } finally {
             try {
+                assert csvWriter != null;
                 csvWriter.flush();
                 csvWriter.close();
             } catch (IOException e) {
@@ -496,7 +489,7 @@ public class Proposition {
 
     }
 
-    private class PropositionOperators {
+    private static class PropositionOperators {
         // boolean methods
         public boolean not(boolean operand) {
             return !operand;
@@ -511,10 +504,7 @@ public class Proposition {
         }
 
         public boolean implies(boolean left, boolean right) {
-            if (!right && left)
-                return false;
-            else
-                return true;
+            return right || !left;
         }
 
         public boolean iff(boolean left, boolean right) {
@@ -524,10 +514,7 @@ public class Proposition {
         public boolean xor(boolean left, boolean right) {
             if (left && !right)
                 return true;
-            else if (!left && right)
-                return true;
-            else
-                return false;
+            else return !left && right;
         }   
 
         // String methods
@@ -588,7 +575,7 @@ public class Proposition {
     /**
      * 
      */
-    protected class Expression {
+    protected static class Expression {
 
         /** logical expression String representing math equation */
         private String expression;
@@ -710,7 +697,7 @@ public class Proposition {
                 }
                 if (lpCount > 10 || rpCount > 10)
                     throw new InvalidExpressionException("Must be less than 11 left and right parentheses.");
-                else if (lpCount != rpCount)
+                else if (!lpCount.equals(rpCount))
                     throw new InvalidExpressionException("left and right parentheses count is not equal.");
 
                 // replace first 10 left parentheses with 0-9
@@ -1037,7 +1024,7 @@ public class Proposition {
          * @return
          */
         public boolean isOperand(String s) {
-            if (s == "T" || s == "F") {
+            if (Objects.equals(s, "T") || Objects.equals(s, "F")) {
                 return false;
             }
             return OPERAND_LIST.contains(s);

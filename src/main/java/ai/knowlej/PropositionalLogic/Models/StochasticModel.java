@@ -11,8 +11,8 @@ import ai.knowlej.PropositionalLogic.Logic.Proposition;
 import ai.knowlej.PropositionalLogic.Logic.Validity;
 
 public class StochasticModel extends Model {
-    private String modelName;
-    private Proposition expression;
+    private final String modelName;
+    private final Proposition expression;
 
     private char[] operands;
     private Map<Character, Double> defaultOperandProbabilityValues;
@@ -168,9 +168,9 @@ public class StochasticModel extends Model {
     private void setOperands(Double defaultTruthThreshold, Map<Character, Double> defaultOperandProbabilityValues, Map<Character, Double> individualOperandTruthThresholds) {
         setOperands();
         if (defaultOperandProbabilityValues != null) {
-            for (int i = 0; i < operands.length; i++) {
-                if (!defaultOperandProbabilityValues.containsKey(operands[i]))
-                    throw new IllegalArgumentException(operands[i] + " not in expression.");
+            for (char operand : operands) {
+                if (!defaultOperandProbabilityValues.containsKey(operand))
+                    throw new IllegalArgumentException(operand + " not in expression.");
             }
         }
 
@@ -182,6 +182,7 @@ public class StochasticModel extends Model {
 
         if (individualOperandTruthThresholds == null) {
             this.defaultOperandCharValues = new HashMap<>();
+            assert defaultOperandProbabilityValues != null;
             for (Character operand : defaultOperandProbabilityValues.keySet()) {
                 if (defaultOperandProbabilityValues.get(operand) < 0.0 || defaultOperandProbabilityValues.get(operand) > 1.0)
                     throw new IllegalArgumentException(operand + " probability must be >= 0 or <= 1.");
@@ -190,6 +191,7 @@ public class StochasticModel extends Model {
             }
         } else {
             this.defaultOperandCharValues = new HashMap<>();
+            assert defaultOperandProbabilityValues != null;
             for (Character operand : defaultOperandProbabilityValues.keySet()) {
                 if (defaultOperandProbabilityValues.get(operand) < 0.0 || defaultOperandProbabilityValues.get(operand) > 1.0)
                     throw new IllegalArgumentException(operand + " probability must be >= 0 or <= 1.");
@@ -222,7 +224,7 @@ public class StochasticModel extends Model {
         for (int i = 0; i < this.operands.length; i++) {
             this.allPredicateProbabilityValues[i] = this.defaultOperandProbabilityValues.get(this.operands[i]);
             this.allPredicateCharValues[i] = this.operands[i];
-            this.allPredicateBooleanValues[i] = (this.defaultOperandCharValues.get(this.operands[i]) == 'T') ? true : false;
+            this.allPredicateBooleanValues[i] = this.defaultOperandCharValues.get(this.operands[i]) == 'T';
         }
 
         this.allPredicateProbabilityValues[this.defaultOperandCharValues.size()] = this.predicateEvaluation ? 1.0 : 0.0;
@@ -279,9 +281,9 @@ public class StochasticModel extends Model {
         for (int i = 0; i < this.symbolRepresentation.length(); i++) {
             if (this.operandSymbolicRepresentation.containsKey(this.symbolRepresentation.charAt(i))) {
                 if ((i+1 < this.symbolRepresentation.length()) && this.symbolRepresentation.charAt(i + 1) == ')') {
-                    sb.append("'" + this.operandSymbolicRepresentation.get(this.symbolRepresentation.charAt(i)) + "'");
+                    sb.append("'").append(this.operandSymbolicRepresentation.get(this.symbolRepresentation.charAt(i))).append("'");
                 } else
-                    sb.append("'" + this.operandSymbolicRepresentation.get(this.symbolRepresentation.charAt(i)) + "' ");
+                    sb.append("'").append(this.operandSymbolicRepresentation.get(this.symbolRepresentation.charAt(i))).append("' ");
             } else {
                 switch (this.symbolRepresentation.charAt(i)) {
                     case '(':

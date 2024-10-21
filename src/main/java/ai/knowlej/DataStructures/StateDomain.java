@@ -11,7 +11,6 @@ public record StateDomain(String[] logicSentence) {
                 throw new RuntimeException("Invalid statement included in logicalStatements");
             }
         }
-        System.gc();
     }
 }
 
