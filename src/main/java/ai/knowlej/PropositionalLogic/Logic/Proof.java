@@ -1,14 +1,20 @@
 package ai.knowlej.PropositionalLogic.Logic;
 
+import ai.knowlej.DataStructures.DeductionGraphNode;
+
 import java.util.ArrayList;
 
-public record Proof(ArrayList<String> proof) {
+public record Proof(ArrayList<DeductionGraphNode> proof) {
 
-    void storeStatement(String statement) {
-        proof.add(statement);
+    void placeStatement(DeductionGraphNode statementNode, int index) {
+        proof.set(index, statementNode);
     }
 
-    void replaceProof(ArrayList<String> newProof) {
+    void appendStatement(DeductionGraphNode statementNode) {
+        proof.add(statementNode);
+    }
+
+    void replaceProof(ArrayList<DeductionGraphNode> newProof) {
         proof.clear();
         proof.addAll(newProof);
     }

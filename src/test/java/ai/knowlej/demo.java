@@ -12,7 +12,7 @@ import ai.knowlej.DataStructures.DatabaseNodeModels.*;
 public class demo {
     public static void main(String[] args) throws Exception {
         StochasticModel smTest = new StochasticModel("Test1", "A&B|C");
-        System.out.println(smTest.getModelName() + ": " + smTest.getExpression().toString());
+        System.out.println(smTest.getModelName() + ": " + smTest.getExpression());
 
         StochasticModel smTest2 = new StochasticModel("Test2", "A&B|C", new HashMap<Character, String>() {{
             put('A', "Cat");
@@ -87,6 +87,9 @@ public class demo {
         stochasticModels[2] = smTest3;
         stochasticModels[3] = smTest4;
         stochasticModels[4] = smTest5;
+
+        Argument<Model> argument = new Argument<>(stochasticModels);
+        argument.deduce("A&C|B->D&A");
         
 //        BuildNeo4jDatabase db = new BuildNeo4jDatabase();
 //        db.initDriver("state", "bolt://localhost:7687", "neo4j", "password");

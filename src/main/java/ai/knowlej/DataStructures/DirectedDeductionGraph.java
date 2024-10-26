@@ -1,12 +1,13 @@
 package ai.knowlej.DataStructures;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 import ai.knowlej.PropositionalLogic.Logic.Proposition;
 
 public class DirectedDeductionGraph {
-    private final ArrayList<DeductionGraphNode> nodes; // all graph nodes
+    private ArrayList<DeductionGraphNode> nodes; // all graph nodes
     private final ArrayList<DeductionGraphNode> premiseNodes; // initial expression(s) / root(s)
     private final DeductionGraphNode queryNode; // query node
     private ArrayList<DeductionGraphNode> forwardNodes; // nodes from premise(s) to query
@@ -14,26 +15,26 @@ public class DirectedDeductionGraph {
     private int nodeCount = -1;
     private int premiseCount = -1;
 
-    private final String[] knowledgeBase;
+    private final HashSet<String> knowledgeBase;
     private final Proposition query;
 
-    public DirectedDeductionGraph(String[] knowledgeBase, Proposition query) {
+    public DirectedDeductionGraph(HashSet<String> knowledgeBase, Proposition query) {
         this.knowledgeBase = knowledgeBase;
         this.query = query;
 
         // store knowledge base expressions as given nodes and as root nodes for subgraphs in this.nodes
         nodes = new ArrayList<DeductionGraphNode>();
         premiseNodes = new ArrayList<DeductionGraphNode>();
-        for (int i = 0; i < knowledgeBase.length; i++) {
-            this.premiseNodes.add(new DeductionGraphNode(knowledgeBase[i]));
+        for (int i = 0; i < knowledgeBase.size(); i++) {
+            this.premiseNodes.add(new DeductionGraphNode(knowledgeBase.toArray(new String[0])[i]));
             this.nodes.add(this.premiseNodes.get(i));
             this.nodeCount++;
             this.premiseCount++;
         }
         // points knowledge base expressions to each other (signifies mutual relationship/traversal)
-        if (knowledgeBase.length > 1) {
-            for (int i = 0; i < knowledgeBase.length; i++) {
-                for (int j = knowledgeBase.length-1; j > 0; j--) {
+        if (knowledgeBase.size() > 1) {
+            for (int i = 0; i < knowledgeBase.size(); i++) {
+                for (int j = knowledgeBase.size()-1; j > 0; j--) {
                     if (i != j) {
                         this.mutuallyPoint(this.premiseNodes.get(i), this.premiseNodes.get(j));
                     } else
@@ -133,7 +134,7 @@ public class DirectedDeductionGraph {
         return -1;
     }
 
-    public String[] getKnowledgeBase() {
+    public HashSet<String> getKnowledgeBase() {
         return this.knowledgeBase;
     }
 
@@ -169,6 +170,22 @@ public class DirectedDeductionGraph {
 
     public DeductionGraphNode getQueryNode() {
         return this.queryNode;
+    }
+
+    public void addForwardNode(DeductionGraphNode node) {
+        if (this.forwardNodes == null) {
+            this.forwardNodes = new ArrayList<>();
+            this.forwardNodes.addAll(this.premiseNodes);
+        }
+        this.forwardNodes.add(node);
+    }
+
+    public void addBackwardNode(DeductionGraphNode node) {
+        if (this.backwardNodes == null) {
+            this.backwardNodes = new ArrayList<>();
+            this.backwardNodes.add(this.queryNode);
+        }
+        this.backwardNodes.add(node);
     }
 
     public boolean isNode(DeductionGraphNode vertex) {

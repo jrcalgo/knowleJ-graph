@@ -286,7 +286,7 @@ public class Argument<M extends Model> {
     /**
      * in other words, is there a valid argument to be had in the current knowledge
      * base for a query that is also in the current knowledge base
-     * 
+     *
      * @param kbQuery
      * @return
      * @throws InvalidExpressionException
@@ -321,16 +321,16 @@ public class Argument<M extends Model> {
         return false;
     }
 
-    public ArrayList<DeductionGraphNode> deduce(String query)
+    public void deduce(String query)
             throws Exception, InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (query == null || query.isEmpty())
             throw new IllegalArgumentException("String query cannot be null or empty.");
         if (query.contains(","))
             throw new IllegalArgumentException("String query cannot contain commas.");
-        return this.deduce(new Proposition(query));
+        this.deduce(new Proposition(query));
     }
 
-    public ArrayList<DeductionGraphNode> deduce(Proposition query)
+    public Proof deduce(Proposition query)
             throws Exception, InvalidExpressionException, InvalidOperandException, InvalidLogicOperatorException {
         if (query == null)
             throw new IllegalArgumentException("Proposition query cannot be null or empty.");
@@ -356,9 +356,11 @@ public class Argument<M extends Model> {
             kbConversions[i] = kbPropositions[i].getConvertedExpression();
         }
 
-        DirectedDeductionGraph dg = new DirectedDeductionGraph(this.getKnowledgeBaseExpressions(), query);
+        HashSet<String> kbExpressionSet = new HashSet<>(Arrays.asList(this.getKnowledgeBaseExpressions()));
 
-        return bidirectionalIterativeKBChaining(dg);
+        DirectedDeductionGraph dg = new DirectedDeductionGraph(kbExpressionSet, query);
+
+        return new Proof(bidirectionalIterativeKBChaining(dg));
     }
 
     private ArrayList<DeductionGraphNode> bidirectionalIterativeKBChaining(DirectedDeductionGraph graph)
@@ -380,7 +382,7 @@ public class Argument<M extends Model> {
         int chainOperations = 1;
         boolean pathExistence = false;
 
-        final int MAX_LOOPS = 50;
+        final int MAX_LOOPS = 100;
         int searchLoopCount = 0;
 
         final int MAX_ITERATIONS = 2;
@@ -414,6 +416,7 @@ public class Argument<M extends Model> {
                                                 DeductionGraphNode newInferenceNode = graph.add(inference);
                                                 graph.point(graph.getNode(argSentence1), newInferenceNode);
                                                 graph.point(graph.getNode(argSentence2), newInferenceNode);
+                                                graph.addForwardNode(newInferenceNode);
                                                 if (inference.equals(graph.getQuery())) {
                                                     pathExistence = true;
                                                     chainOperations = 3;
@@ -443,6 +446,7 @@ public class Argument<M extends Model> {
                                             forwardKnowledgeHistory.add(inference);
                                             DeductionGraphNode newInferenceNode = graph.add(inference);
                                             graph.point(node, newInferenceNode);
+                                            graph.addForwardNode(newInferenceNode);
                                             if (inference.equals(graph.getQuery())) {
                                                 pathExistence = true;
                                                 chainOperations = 3;
@@ -471,6 +475,7 @@ public class Argument<M extends Model> {
                                             forwardKnowledgeHistory.add(equivalency);
                                             DeductionGraphNode newEquivalenceNode = graph.add(equivalency);
                                             graph.point(node, newEquivalenceNode);
+                                            graph.addForwardNode(newEquivalenceNode);
                                             if (equivalency.equals(graph.getQuery())) {
                                                 pathExistence = true;
                                                 chainOperations = 3;
@@ -512,6 +517,7 @@ public class Argument<M extends Model> {
                                                     DeductionGraphNode newInferenceNode = graph.add(inference);
                                                     graph.point(graph.getNode(argSentence1), newInferenceNode);
                                                     graph.point(graph.getNode(argSentence2), newInferenceNode);
+                                                    graph.addBackwardNode(newInferenceNode);
                                                     if (inference.equals(graph.getQuery())) {
                                                         pathExistence = true;
                                                         chainOperations = 3;
@@ -541,6 +547,7 @@ public class Argument<M extends Model> {
                                                 backwardKnowledgeHistory.add(inference);
                                                 DeductionGraphNode newInferenceNode = graph.add(inference);
                                                 graph.point(node, newInferenceNode);
+                                                graph.addBackwardNode(newInferenceNode);
                                                 if (inference.equals(graph.getQuery())) {
                                                     pathExistence = true;
                                                     chainOperations = 3;
@@ -569,6 +576,7 @@ public class Argument<M extends Model> {
                                                 backwardKnowledgeHistory.add(equivalency);
                                                 DeductionGraphNode newEquivalencyNode = graph.add(equivalency);
                                                 graph.point(node, newEquivalencyNode);
+                                                graph.addBackwardNode(newEquivalencyNode);
                                                 if (equivalency.equals(graph.getQuery())) {
                                                     pathExistence = true;
                                                     chainOperations = 3;
@@ -595,6 +603,7 @@ public class Argument<M extends Model> {
                                             backwardKnowledgeHistory.add(inference);
                                             DeductionGraphNode newInferenceNode = graph.add(inference);
                                             graph.point(graph.getQueryNode(), newInferenceNode);
+                                            graph.addBackwardNode(newInferenceNode);
                                             if (inference.equals(graph.getQuery())) {
                                                 pathExistence = true;
                                                 chainOperations = 3;
@@ -621,6 +630,7 @@ public class Argument<M extends Model> {
                                                 backwardKnowledgeHistory.add(equivalency);
                                                 DeductionGraphNode newEquivalencyNode = graph.add(equivalency);
                                                 graph.point(node, newEquivalencyNode);
+                                                graph.addBackwardNode(newEquivalencyNode);
                                                 if (equivalency.equals(graph.getQuery())) {
                                                     pathExistence = true;
                                                     chainOperations = 3;
@@ -731,7 +741,7 @@ public class Argument<M extends Model> {
         };
 
         /**
-         * 
+         *
          * @param kbPropositions an Argument object containing given knowledge base and each
          *            successive deduction; knowledge history
          * @return Maps inference law to list of strings, with each string containing
@@ -750,9 +760,10 @@ public class Argument<M extends Model> {
             String[] encoded_kb = kbConversions;
             for (String law : answerEncodings.keySet()) {
                 for (Map<Character, String> encoding : answerEncodings.get(law)) {
+                    int i = 0;
                     for (Map.Entry<Character, String> entry : encoding.entrySet()) {
-                        for (int i = 0; i < encoded_kb.length; i++)
                             encoded_kb[i] = encoded_kb[i].replace(entry.getValue(), entry.getKey().toString());
+                            i++;
                     }
                     ArrayList<String> answerDecodings = new ArrayList<>();
                     switch (law) {
@@ -771,7 +782,7 @@ public class Argument<M extends Model> {
                         }
                         case "Simplification": {
                             if (encoded_kb.length == 1)
-                                answerDecodings.add(argumentDecoder(simplification(encoded_kb), encoding));
+                                answerDecodings.add(argumentDecoder(simplification(encoded_kb[0]), encoding));
                             break;
                         }
                         case "Conjunction": {
@@ -795,12 +806,7 @@ public class Argument<M extends Model> {
                         }
                     }
 
-                    answerEncodings.get(law).remove(encoding);
-                    if (answerEncodings.get(law).isEmpty()) {
-                        answerSet.put(law, answerDecodings);
-                        answerDecodings.clear();
-                        encoded_kb = kbConversions;
-                    }
+                    answerSet.put(law, answerDecodings);
                 }
             }
             return answerSet;
@@ -813,20 +819,20 @@ public class Argument<M extends Model> {
             }
 
             final String[] modusPonens = new String[] {
-                    ".*", ".*m.*"
+                    "^(.*)$", "^(.*)m(.*)$"
             };
             final String[] modusTollens = new String[] {
-                    "n.*", ".*m.*"
+                    "^n(.*)", "^(.*)m(.*)$"
             };
-            final String simplification = ".*a.*";
+            final String simplification = "^(.*)a(.*)$";
             final String[] hypotheticalSyllogism = new String[] {
-                    ".*m.*", ".*m.*"
+                    "^(.*)m(.*)$", "^(.*)m(.*)$"
             };
             final String[] disjunctiveSyllogism = new String[] {
-                    ".*o.*", "n.*"
+                    "^(.*)o(.*)$", "^n(.*)$"
             };
             final String[] resolution = new String[] {
-                    ".*o.*", "n.*o.*"
+                    "^(.*)o(.*)$", "^n(.*)o(.*)$"
             };
 
             final Character[] lawOperands = new Character[] {
@@ -841,6 +847,8 @@ public class Argument<M extends Model> {
                             final String[] premise2Substrings = subdivideExpressionCharacters(kb[1], modusPonens[1]);
                             if (premise2Substrings == null)
                                 break;
+                            else if (premise2Substrings.length != 2)
+                                break;
                             if (kb[0].equals(premise2Substrings[0]) && !kb[0].equals(premise2Substrings[1])) {
                                 encodings.add(new HashMap<Character, String>() {
                                     {
@@ -854,6 +862,8 @@ public class Argument<M extends Model> {
                         case "Modus Tollens": {
                             final String[] premise2Substrings = subdivideExpressionCharacters(kb[1], modusTollens[1]);
                             if (premise2Substrings == null)
+                                break;
+                            else if (premise2Substrings.length != 2)
                                 break;
                             if (kb[0].equals(premise2Substrings[1]) && !kb[0].equals(premise2Substrings[0])) {
                                 encodings.add(new HashMap<Character, String>() {
@@ -870,6 +880,8 @@ public class Argument<M extends Model> {
                                 final String[] premise1Substrings = subdivideExpressionCharacters(s,
                                         simplification);
                                 if (premise1Substrings == null)
+                                    break;
+                                else if (premise1Substrings.length != 2)
                                     break;
                                 if (!premise1Substrings[0].equals(premise1Substrings[1])) {
                                     encodings.add(new HashMap<Character, String>() {
@@ -898,7 +910,7 @@ public class Argument<M extends Model> {
                                     hypotheticalSyllogism[0]);
                             final String[] premise2Substrings = subdivideExpressionCharacters(kb[1],
                                     hypotheticalSyllogism[1]);
-                            if (premise1Substrings == null || premise2Substrings == null) 
+                            if (premise1Substrings == null || premise2Substrings == null)
                                 break;
                             if (!premise1Substrings[0].equals(premise1Substrings[1])
                                     && !premise1Substrings[0].equals(premise2Substrings[1])
@@ -965,13 +977,9 @@ public class Argument<M extends Model> {
                     continue;
 
                 encodedLawMap.put(law, encodings);
-                System.gc();
             }
             // cleans up unfound encoded laws
-            for (String law : encodedLawMap.keySet()) {
-                if (encodedLawMap.get(law) == null)
-                    encodedLawMap.remove(law);
-            }
+            encodedLawMap.values().removeIf(Objects::isNull);
             if (encodedLawMap.isEmpty())
                 return null;
 
@@ -979,8 +987,22 @@ public class Argument<M extends Model> {
         }
 
         private String argumentDecoder(String kbExpression, Map<Character, String> encoding) {
+            if (kbExpression == null || encoding == null)
+                return null;
+            String decodedExpression = kbExpression;
 
-            return null;
+            for (Map.Entry<Character, String> entry : encoding.entrySet()) {
+                String placeholder = Pattern.quote(entry.getKey().toString());
+                String actualExpression = entry.getValue();
+
+                if (actualExpression == null) {
+                    return null;
+                }
+
+                decodedExpression = decodedExpression.replaceAll(placeholder, actualExpression);
+            }
+
+            return decodedExpression;
         }
 
         private String findMatchingSubstringPairs(String cE, String operator) {
@@ -1012,7 +1034,9 @@ public class Argument<M extends Model> {
 
             while (matcher.find()) {
                 for (int i = 0; i <= matcher.groupCount(); i++) {
-                    kbExpressionSubstrings.add(matcher.group(i));
+                    String group = matcher.group(i);
+                    if (group != null && !group.equals(kbExpression))
+                        kbExpressionSubstrings.add(group);
                 }
             }
             if (kbExpressionSubstrings.isEmpty())
@@ -1025,7 +1049,7 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P], [P->Q] entails {Q}
-         * 
+         *
          * @param premises
          * @return Rule string
          */
@@ -1043,7 +1067,7 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [~Q], [P->Q] entails {~P}
-         * 
+         *
          * @param premises
          * @return Rule string
          */
@@ -1062,7 +1086,7 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P] entails {P|Q}
-         * 
+         *
          * @param premise
          * @return Rule string
          */
@@ -1078,15 +1102,15 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P&Q] entails {P}
-         * 
-         * @param premises
+         *
+         * @param premise
          * @return Rule string
          */
-        private String simplification(String[] premises) {
+        private String simplification(String premise) {
             String conclusion = null;
-            if (premises[0].equals("PaQ"))
+            if (premise.equals("PaQ"))
                 conclusion = "P";
-            else if (premises[0].equals("QaP"))
+            else if (premise.equals("QaP"))
                 conclusion = "Q";
 
             return conclusion;
@@ -1094,7 +1118,7 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P], [Q] entails {P&Q}
-         * 
+         *
          * @param premises
          * @return Rule string
          */
@@ -1110,7 +1134,7 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P->Q], [Q->R] entails {P->R}
-         * 
+         *
          * @param premises
          * @return Rule string
          */
@@ -1131,7 +1155,7 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P|Q], [~P] entails {Q}
-         * 
+         *
          * @param premises
          * @return Rule string
          */
@@ -1151,7 +1175,7 @@ public class Argument<M extends Model> {
         /**
          * Rule: [P|Q], [~P|R] entails {Q|R}
          * this one is powerful
-         * 
+         *
          * @param premises
          * @return Rule string
          */
@@ -1194,7 +1218,7 @@ public class Argument<M extends Model> {
         };
 
         /**
-         * 
+         *
          * @param p A single propositional expression
          * @return Maps equivalency to list strings, with each string containing
          *         [applied expression] and resulting {conversion}.
@@ -1217,7 +1241,7 @@ public class Argument<M extends Model> {
              * Fourth, evaluate and store result in answerSet.
              * Repeat steps until possible evaluations is exhausted.
              * Fifth, return answerSet.
-             * 
+             *
              * ## REMEMBER: Do not store repeated evaluations in answerSet, i.e.
              */
             String cE = p.getConvertedExpression(); // easier to work with
@@ -1301,36 +1325,36 @@ public class Argument<M extends Model> {
             for (String law : answerTemplate.keySet()) {
                 encodedLawMap.put(law, null);
             }
-            // TODO: this definitely needs to be fixed
+
             final String[] idempotentLaw = new String[] {
-                    ".*o.*", ".*a.*"
+                    "^(.*)o(.*)$", "^(.*)a(.*)$"
             };
             final String[] associativeLaw = new String[] {
-                    "(.*o.*)o.*", ".*o(.*o.*)", "(.*a.*)a.*", ".*a(.*a.*)"
+                    "^((.*)o(.*))o(.*)$", "^(.*)o((.*)o(.*))$", "^((.*)a(.*))a(.*)$", "^(.*)a((.*)a(.*))$"
             };
             final String[] commutativeLaw = new String[] {
-                    ".*o.*", ".*a.*"
+                    "^(.*)o(.*)$", "^(.*)a(.*)$"
             };
             final String[] distributiveLaw = new String[] {
-                    ".*o(.*a.*)", "(.*o.*)a(.*o.*)", ".*a(.*o.*)", "(.*a.*)o(.*a.*)"
+                    "^(.*)o((.*)a(.*))$", "^((.*)o(.*))a((.*)o(.*))$", "^(.*)a((.*)o(.*))$", "^((.*)a(.*))o((.*)a(.*))$"
             };
             final String[] identityLaw = new String[] {
-                    ".*oF", ".*aT", "Fo.*", "Ta.*"
+                    "^(.*)oF$", "^(.*)aT$", "^Fo(.*)$", "^Ta(.*)$"
             };
             final String[] dominationLaw = new String[] {
-                    ".*aF", ".*oT", "Fa.*", "To.*"
+                    "^(.*)aF$", "^(.*)oT$", "^Fa(.*)$", "^To(.*)$"
             };
             final String[] complementLaw = new String[] {
-                    ".*an.*", ".*on.*"
+                    "^(.*)an(.*)$", "^(.*)on(.*)$"
             };
             final String[] deMorgansLaw = new String[] {
-                    "n(.*o.*)", "n.*an.*", "n(.*a.*)", "n.*on.*"
+                    "^n((.*)o(.*))$", "^n(.*)an(.*)$", "^n((.*)a(.*))$", "^n(.*)on(.*)$"
             };
             final String[] absorptionLaw = new String[] {
-                    ".*o(.*a.*)", ".*a(.*o.*)"
+                    "^(.*)o((.*)a(.*))", "^(.*)a((.*)o(.*))$"
             };
             final String[] conditionalIdentity = new String[] {
-                    ".*m.*", "n.*o.*", ".*i.*", "(.*m.*)a(.*m.*)"
+                    "^(.*)m(.*)$", "^n(.*)o(.*)$", "^(.*)i(.*)$", "^((.*)m(.*))a((.*)m(.*))$"
             };
 
             final Character[] lawOperands = new Character[] {
@@ -1596,7 +1620,6 @@ public class Argument<M extends Model> {
                     }
                     encodedLawMap.put(law, encodings);
                 }
-                System.gc();
             }
 
             for (String law : encodedLawMap.keySet()) {
@@ -1609,11 +1632,22 @@ public class Argument<M extends Model> {
         }
 
         private String expressionDecoder(String cE, Map<Character, String> encodings) {
-            String decoding = "";
+            if (cE == null || encodings == null)
+                return null;
+            String decodedExpression = cE;
+
             for (Map.Entry<Character, String> entry : encodings.entrySet()) {
-                decoding = cE.replaceAll(entry.getKey().toString(), entry.getValue());
+                String placeholder = Pattern.quote(entry.getKey().toString());
+                String actualExpression = entry.getValue();
+
+                if (actualExpression == null) {
+                    return null;
+                }
+
+                decodedExpression = decodedExpression.replaceAll(placeholder, actualExpression);
             }
-            return decoding;
+
+            return decodedExpression;
         }
 
         private boolean findMatchingSubstringPairs(String[] substrings) {
@@ -1650,7 +1684,7 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P|P] == {P} OR [P&P] == {P}
-         * 
+         *
          */
         private String idempotentLaw(String cE) {
             String law = null;
@@ -1662,7 +1696,7 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [(P|Q)|R] == {P|(Q|R)} OR [(P&Q)&R] == {P&(Q&R)}
-         * 
+         *
          * @param cE
          * @return
          */
@@ -1683,7 +1717,7 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P|Q] == {Q|P} OR [P&Q] == {Q&P}
-         * 
+         *
          * @param cE
          * @return
          */
@@ -1699,7 +1733,7 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P|(Q&R)] == {(P|Q)&(P|R)} OR [P&(Q|R)] == {(P&Q)|(P&R)}
-         * 
+         *
          * @param cE
          * @return
          */
@@ -1720,7 +1754,7 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P|F] == {P} OR [P&T] == {P}
-         * 
+         *
          * @param cE
          * @return
          */
@@ -1734,7 +1768,7 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P&F] == {F} OR [P|T] == {T}
-         * 
+         *
          * @param cE
          * @return
          */
@@ -1750,7 +1784,7 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [~~P] == {P}
-         * 
+         *
          * @param cE
          * @return
          */
@@ -1764,7 +1798,7 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P&~P] == {F}, [~T] == {F} OR [P|~P] == {T}, [~F] == {T}
-         * 
+         *
          * @param cE
          * @return
          */
@@ -1784,7 +1818,7 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [~(P|Q)] == {~P&~Q} OR [~(P&Q)] == {~P|~Q}
-         * 
+         *
          * @param cE
          * @return
          */
@@ -1805,7 +1839,7 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P|(P&Q)] == {P} OR [P&(P|Q)] == {P}
-         * 
+         *
          * @param cE
          * @return
          */
@@ -1819,7 +1853,7 @@ public class Argument<M extends Model> {
 
         /**
          * Rule: [P->Q] == {~P|Q} OR [P<>Q] == {(P->Q)&(Q->P)}
-         * 
+         *
          * @param cE
          * @return
          */
