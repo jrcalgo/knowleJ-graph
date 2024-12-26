@@ -10,9 +10,9 @@ import ai.knowlej.Exceptions.InvalidExpressionException;
 import ai.knowlej.Exceptions.InvalidLogicOperatorException;
 import ai.knowlej.Exceptions.InvalidOperandException;
 
-public class DeterministicModel extends Model {
+public class DeterministicModel extends ModelAbstract {
     private String modelName;
-    private Proposition expression;
+    private final Proposition expression;
 
     private char[] operands;
     private Map<Character, Character> defaultOperandCharValues;

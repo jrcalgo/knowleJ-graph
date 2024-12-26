@@ -489,7 +489,7 @@ public class Proposition {
 
     }
 
-    private static class PropositionOperators {
+    protected static class PropositionOperators {
         // boolean methods
         public boolean not(boolean operand) {
             return !operand;
@@ -584,7 +584,7 @@ public class Proposition {
         /** converted logical expression string for easier back-end operations */
         private String convertedExpression;
         /** Maximum number of characters accepted in converted expression String */
-        private final short MAX_CHARACTERS = 255;
+        private final short MAX_CHARACTERS = 1000;
 
         /**
          * @throws InvalidExpressionException

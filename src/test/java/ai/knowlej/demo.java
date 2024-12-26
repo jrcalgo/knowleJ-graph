@@ -88,7 +88,7 @@ public class demo {
         stochasticModels[3] = smTest4;
         stochasticModels[4] = smTest5;
 
-        Argument<Model> argument = new Argument<>(stochasticModels);
+        Argument<ModelAbstract> argument = new Argument<>(stochasticModels);
         argument.deduce("A&C|B->D&A");
         
 //        BuildNeo4jDatabase db = new BuildNeo4jDatabase();

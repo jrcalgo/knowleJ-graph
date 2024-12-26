@@ -10,7 +10,7 @@ import ai.knowlej.Exceptions.InvalidOperandException;
 import ai.knowlej.PropositionalLogic.Logic.Proposition;
 import ai.knowlej.PropositionalLogic.Logic.Validity;
 
-public class StochasticModel extends Model {
+public class StochasticModel extends ModelAbstract {
     private final String modelName;
     private final Proposition expression;
 

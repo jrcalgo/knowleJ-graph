@@ -5,7 +5,7 @@ import java.util.Map;
 import ai.knowlej.Exceptions.InvalidExpressionException;
 import ai.knowlej.PropositionalLogic.Logic.Proposition;
 
-public abstract class Model {
+public abstract class ModelAbstract {
     public abstract String getModelName();
 
     public abstract Proposition getProposition();
