@@ -1,4 +1,4 @@
-package ai.knowlej.DataStructures;
+package ai.knowlej.DataStructures.Graph;
 
 import java.util.LinkedList;
 
@@ -73,16 +73,19 @@ public class DeductionGraphNode {
 
     public void removeOutNode(DeductionGraphNode outNode) {
         if (this.outNodes == null) {
+            System.out.println("No out edges for this node");
         }
         else this.outNodes.remove(outNode);
     }
 
     public void removeOutNodes(LinkedList<DeductionGraphNode> outNodes) {
         if (this.outNodes == null) {
+
         }
         else if (this.outNodes.containsAll(outNodes))
             this.outNodes.removeAll(outNodes);
         else {
+
         }
     }
 }

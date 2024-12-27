@@ -1,4 +1,7 @@
 torch
-numpy
+torch_geometric
+numpy~=1.26.4
 pandas
 neo4j-python-driver
+setuptools~=75.2.0
+py4j~=0.10.9.7

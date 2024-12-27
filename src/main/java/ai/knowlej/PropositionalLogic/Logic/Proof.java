@@ -1,6 +1,6 @@
 package ai.knowlej.PropositionalLogic.Logic;
 
-import ai.knowlej.DataStructures.DeductionGraphNode;
+import ai.knowlej.DataStructures.Graph.DeductionGraphNode;
 
 import java.util.ArrayList;
 
