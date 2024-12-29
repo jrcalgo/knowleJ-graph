@@ -1,7 +1,7 @@
 package ai.knowlej.Database
 
-import ai.knowlej.DataStructures.DeductionGraphNode
-import ai.knowlej.DataStructures.DirectedDeductionGraph
+import ai.knowlej.DataStructures.Graph.DeductionGraphNode
+import ai.knowlej.DataStructures.Graph.DirectedDeductionGraph
 import ai.knowlej.DataStructures.DatabaseNodeModels.*
 
 import org.neo4j.driver.*

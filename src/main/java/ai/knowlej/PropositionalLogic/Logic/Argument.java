@@ -437,7 +437,7 @@ public class Argument<M extends ModelAbstract> {
                                                 computationGraph.addForwardNode(newInferenceNode);
                                                 if (inference.equals(computationGraph.getQuery())) {
                                                     pathExistence = true;
-                                                    chainOperations = 3;
+                                                    searchLoopCount = MAX_LOOPS + 1;
                                                     break outerloop;
                                                 }
                                             }
@@ -467,7 +467,7 @@ public class Argument<M extends ModelAbstract> {
                                             computationGraph.addForwardNode(newInferenceNode);
                                             if (inference.equals(computationGraph.getQuery())) {
                                                 pathExistence = true;
-                                                chainOperations = 3;
+                                                searchLoopCount = MAX_LOOPS + 1;
                                                 break outerloop;
                                             }
                                         }
@@ -499,7 +499,7 @@ public class Argument<M extends ModelAbstract> {
                                             newEquivalencies.add(newEquivalenceNode);
                                             if (equivalency.equals(computationGraph.getQuery())) {
                                                 pathExistence = true;
-                                                chainOperations = 3;
+                                                searchLoopCount = MAX_LOOPS + 1;
                                                 break outerloop;
                                             }
                                         }
@@ -513,7 +513,7 @@ public class Argument<M extends ModelAbstract> {
                     }
 
                     iteration++;
-                    if (iteration == MAX_FORWARD_ITERATIONS && chainOperations != 3) {
+                    if (iteration >= MAX_FORWARD_ITERATIONS) {
                         iteration = 0;
                         chainOperations++;
                     }
@@ -543,7 +543,7 @@ public class Argument<M extends ModelAbstract> {
                                                     computationGraph.addBackwardNode(newInferenceNode);
                                                     if (inference.equals(computationGraph.getQuery())) {
                                                         pathExistence = true;
-                                                        chainOperations = 3;
+                                                        searchLoopCount = MAX_LOOPS + 1;
                                                         break outerloop;
                                                     }
                                                 }
@@ -573,7 +573,7 @@ public class Argument<M extends ModelAbstract> {
                                                 computationGraph.addBackwardNode(newInferenceNode);
                                                 if (inference.equals(computationGraph.getQuery())) {
                                                     pathExistence = true;
-                                                    chainOperations = 3;
+                                                    searchLoopCount = MAX_LOOPS + 1;
                                                     break outerloop;
                                                 }
                                             }
@@ -603,7 +603,7 @@ public class Argument<M extends ModelAbstract> {
                                                 newEquivalencies.add(newEquivalencyNode);
                                                 if (equivalency.equals(computationGraph.getQuery())) {
                                                     pathExistence = true;
-                                                    chainOperations = 3;
+                                                    searchLoopCount = MAX_LOOPS + 1;
                                                     break outerloop;
                                                 }
                                             }
@@ -616,6 +616,10 @@ public class Argument<M extends ModelAbstract> {
                             computationGraph.addBackwardNode(equNode);
                         }
                         iteration++;
+                        if (iteration >= MAX_BACKWARD_ITERATIONS) {
+                            iteration = 0;
+                            chainOperations--;
+                        }
 
                         break;
                     } else {
@@ -635,7 +639,7 @@ public class Argument<M extends ModelAbstract> {
                                             computationGraph.addBackwardNode(newInferenceNode);
                                             if (inference.equals(computationGraph.getQuery())) {
                                                 pathExistence = true;
-                                                chainOperations = 3;
+                                                searchLoopCount = MAX_LOOPS + 1;
                                                 break outerloop;
                                             }
                                         }
@@ -663,7 +667,7 @@ public class Argument<M extends ModelAbstract> {
                                                 newEquivalencies.add(newEquivalencyNode);
                                                 if (equivalency.equals(computationGraph.getQuery())) {
                                                     pathExistence = true;
-                                                    chainOperations = 3;
+                                                    searchLoopCount = MAX_LOOPS + 1;
                                                     break outerloop;
                                                 }
                                             }
@@ -672,24 +676,14 @@ public class Argument<M extends ModelAbstract> {
                                 }
                             }
                         }
-                        firstIteration = false;
                         for (DeductionGraphNode equNode : newEquivalencies) {
                             computationGraph.addBackwardNode(equNode);
                         }
 
+                        firstIteration = false;
                         iteration++;
-                        if (iteration > MAX_BACKWARD_ITERATIONS && chainOperations != 3) {
-                            iteration = 0;
-                            chainOperations--;
-                        }
                     }
                     break;
-                }
-                // 3: Search and return the best path found through chaining
-                case 3: {
-                    // Extract the only/best path(s) using A* search
-                    computationGraph.printAdjacencyMatrix();
-                    return computationGraph.bidirectionalAstar(forwardKnowledgeHistory, backwardKnowledgeHistory);
                 }
                 default:
                     // Should not reach here
@@ -697,6 +691,12 @@ public class Argument<M extends ModelAbstract> {
             }
             searchLoopCount++;
         } while (searchLoopCount <= MAX_LOOPS);
+
+        if (pathExistence) {
+            computationGraph.printAdjacencyMatrix();
+            return computationGraph.multithreadedBidirectionalAStar(forwardKnowledgeHistory, backwardKnowledgeHistory);
+        }
+
         return null; // Return null if no path is found within the maximum number of loops
     }
 

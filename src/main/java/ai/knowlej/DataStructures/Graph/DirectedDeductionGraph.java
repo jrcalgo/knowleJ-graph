@@ -1,8 +1,13 @@
 package ai.knowlej.DataStructures.Graph;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import ai.knowlej.PropositionalLogic.Logic.Proposition;
 
@@ -195,21 +200,6 @@ public class DirectedDeductionGraph {
         return false;
     }
 
-    public ArrayList<DeductionGraphNode> bidirectionalAstar(Set<String> forwardKnowledgeHistory, Set<String> backwardKnowledgeHistory) {
-
-    }
-
-    private ArrayList<DeductionGraphNode> astarToQuery(HashSet<String> forwardKnowledgeHistory, String query) {
-        ArrayList<DeductionGraphNode> paths = null;
-        // TODO: Implement your A* or search algorithm
-        return paths;
-    }
-
-    public ArrayList<DeductionGraphNode> astarToPremises(HashSet<String> backwardKnowledgeHistory, ArrayList<String> premises) {
-        ArrayList<DeductionGraphNode> paths = null;
-
-        return paths;
-    }
 
     public DeductionGraphNode getNode(String expression) throws Exception {
         for (DeductionGraphNode node : this.nodes) {
@@ -320,5 +310,148 @@ public class DirectedDeductionGraph {
                 System.out.print(cell + " ");
             }
         }
+    }
+
+    private record astarNodeRecord(DeductionGraphNode node, Integer f, int g, int h) {
+        astarNodeRecord {
+            if (node == null) {
+                throw new IllegalArgumentException("Node cannot be null");
+            }
+            if (f < 0 || g < 0 || h < 0) {
+                throw new IllegalArgumentException("f, g, and h must be non-negative");
+            }
+        }
+    }
+
+    public ArrayList<DeductionGraphNode> multithreadedBidirectionalAStar(Set<String> forwardKnowledgeHistory, Set<String> backwardKnowledgeHistory) throws Exception {
+        final ConcurrentHashMap<String, astarNodeRecord> forwardClosedSet = new ConcurrentHashMap<>();
+        final ConcurrentHashMap<String, astarNodeRecord> backwardClosedSet = new ConcurrentHashMap<>();
+
+        final PriorityBlockingQueue<astarNodeRecord> forwardOpenSet = new PriorityBlockingQueue<>();
+        final PriorityBlockingQueue<astarNodeRecord> backwardOpenSet = new PriorityBlockingQueue<>();
+
+        final AtomicBoolean pathFound = new AtomicBoolean(false);
+        final AtomicReference<DeductionGraphNode> meetingNode = new AtomicReference<>();
+
+        final Object lock = new Object();
+
+        for (DeductionGraphNode premise : this.premiseNodes) {
+            int h = heuristic(premise, this.queryNode);
+            astarNodeRecord nodeRecord = new astarNodeRecord(premise, null, 0, h);
+            forwardOpenSet.add(nodeRecord);
+            forwardClosedSet.put(premise.getExpression(), nodeRecord);
+        }
+
+        int hBackward = heuristic(this.queryNode, this.premiseNodes.get(0));
+        astarNodeRecord nodeRecord = new astarNodeRecord(this.queryNode, null, 0, hBackward);
+        backwardOpenSet.add(nodeRecord);
+        backwardClosedSet.put(this.queryNode.getExpression(), nodeRecord);
+
+        Runnable forwardTask = () -> {
+            try {
+                while (!forwardOpenSet.isEmpty() && !pathFound.get()) {
+                    astarNodeRecord currentForward = forwardOpenSet.take();
+
+                    for (DeductionGraphNode neighbor : currentForward.node.getOutNodes()) {
+                        if (pathFound.get()) break;
+
+                        String expression = neighbor.getExpression();
+                        if (forwardClosedSet.containsKey(expression)) continue;
+
+                        int tentativeG = currentForward.g + 1;
+                        int h = heuristic(neighbor, this.queryNode);
+                        int f = tentativeG + h;
+
+                        astarNodeRecord neighborRecord = new astarNodeRecord(neighbor, f, tentativeG, h);
+                        forwardOpenSet.add(neighborRecord);
+                        forwardClosedSet.put(expression, neighborRecord);
+
+                        if (backwardClosedSet.containsKey(expression)) {
+                            synchronized (lock) {
+                                pathFound.set(true);
+                                meetingNode.set(neighbor);
+                            }
+                        }
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        };
+
+        Runnable backwardTask = () -> {
+            try {
+                while (!backwardOpenSet.isEmpty() && !pathFound.get()) {
+                    astarNodeRecord currentBackward = backwardOpenSet.take();
+
+                    for (DeductionGraphNode neighbor : currentBackward.node.getOutNodes()) {
+                        if (pathFound.get()) break;
+
+                        String expression = neighbor.getExpression();
+                        if (backwardClosedSet.containsKey(expression)) continue;
+
+                        int tentativeG = currentBackward.g + 1;
+                        int h = heuristic(neighbor, this.queryNode);
+                        int f = tentativeG + h;
+
+                        astarNodeRecord neighborRecord = new astarNodeRecord(neighbor, f, tentativeG, h);
+                        backwardOpenSet.add(neighborRecord);
+                        backwardClosedSet.put(expression, neighborRecord);
+
+                        if (forwardClosedSet.containsKey(expression)) {
+                            synchronized (lock) {
+                                pathFound.set(true);
+                                meetingNode.set(neighbor);
+                            }
+                        }
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        };
+
+        Thread forwardThread = new Thread(forwardTask, "Forward A*");
+        Thread backwardThread = new Thread(backwardTask, "Backward A*");
+
+        forwardThread.start();
+        backwardThread.start();
+
+        try {
+            forwardThread.join();
+            backwardThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            Thread.currentThread().interrupt();
+        }
+
+        if (meetingNode != null) {
+            ArrayList<DeductionGraphNode> forwardPath = reconstructPath(meetingNode.get(), forwardClosedSet);
+            ArrayList<DeductionGraphNode> backwardPath = reconstructPath(meetingNode.get(), backwardClosedSet);
+            Collections.reverse(backwardPath);
+            forwardPath.addAll(backwardPath.subList(1, backwardPath.size()));
+            return forwardPath;
+        }
+
+        return null;
+    }
+
+    private int heuristic(DeductionGraphNode start, DeductionGraphNode goal) {
+        return 0;
+    }
+
+    private ArrayList<DeductionGraphNode> reconstructPath(DeductionGraphNode node, ConcurrentHashMap<String, astarNodeRecord> closedSet) {
+        ArrayList<DeductionGraphNode> path = new ArrayList<>();
+        path.add(node);
+
+        while (closedSet.containsKey(node.getExpression())) {
+            astarNodeRecord nodeRecord = closedSet.get(node.getExpression());
+            node = nodeRecord.node;
+            path.add(node);
+        }
+
+        return path;
     }
 }
