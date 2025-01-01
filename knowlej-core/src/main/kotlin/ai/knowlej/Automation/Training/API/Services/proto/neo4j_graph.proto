@@ -1,0 +1,17 @@
+// neo4j_service.proto
+syntax = "proto3";
+
+package ai.knowlej.Automation.API;
+
+service Neo4jService {
+  rpc GetDesiredGraph (GetDesiredGraphRequest)
+      returns (GetDesiredGraphResponse);
+}
+
+message GetDesiredGraphRequest {
+  string graph_id = 1;
+}
+
+message GetDesiredGraphResponse {
+  string graph_data = 1;
+}

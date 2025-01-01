@@ -1,0 +1,17 @@
+// computation_graph_service.proto
+syntax = "proto3";
+
+package ai.knowlej.Automation.API;
+
+service ComputationGraphService {
+    rpc GetCurrentComputationGraph (GetComputationGraphRequest)
+        returns (GetComputationGraphResponse);
+}
+
+message GetComputationGraphRequest {
+
+}
+
+message GetComputationGraphResponse {
+    string graph_data = 1;
+}

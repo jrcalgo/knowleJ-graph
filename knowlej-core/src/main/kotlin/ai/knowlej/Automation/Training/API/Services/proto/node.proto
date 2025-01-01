@@ -1,0 +1,22 @@
+// node_data_service.proto
+syntax = "proto3";
+
+package ai.knowlej.Automation.API;
+
+service NodeDataService {
+  rpc GetNodeData (GetNodeDataRequest) returns (GetNodeDataResponse);
+}
+
+message GetNodeDataRequest {
+  repeated string node_ids = 1;
+  repeated string applied_laws = 2;
+}
+
+message GetNodeDataResponse {
+  repeated NodeData nodes = 1;
+}
+
+message NodeData {
+  string node_id = 1;
+  string content = 2;
+}
