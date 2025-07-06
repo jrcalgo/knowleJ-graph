@@ -11,7 +11,7 @@
 
 - **Research-Grade Logic Engine**: Implements complete propositional logic with inference and equivalency laws
 - **Graph-Based Reasoning**: Advanced deduction graphs for proof search and chaining
-- **ML-Ready Architecture**: Designed for hybrid symbolic-ML approaches (ML components in development)
+- **ML-Ready Architecture**: Designed for hybrid symbolic-ML approaches (in development)
 - **Neo4j Integration**: Scalable graph database support for knowledge persistence (in development)
 - **gRPC API**: Modern service-oriented architecture for distributed systems (in development)
 
